@@ -98,71 +98,74 @@ Establishes the monorepo baseline, dependency set, environment contract, and tes
 
 ## Phase 1 — Database Schema & ORM
 
-Defines every table, runs the first migration, and seeds a development clinic.
+Configures Better Auth, generates its schema, defines domain tables, runs a single unified migration, and seeds development data.
 
 ### 1.1 Drizzle Client
 
-- [ ] Create `lib/db/client.ts` — exports a singleton Drizzle instance connected via `DATABASE_URL` (pooled) and `DIRECT_URL` (direct, for migrations).
-- [ ] Configure `drizzle.config.ts` at project root pointing to `lib/db/schema.ts` and the `DIRECT_URL`.
+- [x] Create `lib/db/client.ts` — exports a singleton Drizzle instance connected via `DATABASE_URL` (pooled) and `DIRECT_URL` (direct, for migrations).
+- [x] Configure `drizzle.config.ts` at project root pointing to `lib/db/schema.ts` and the `DIRECT_URL`.
 
-### 1.2 Schema
+### 1.2 Better Auth Config (First Pass — No Migration Yet)
 
-- [ ] Create `lib/db/schema.ts` with all tables matching `docs/PRD.md §9`:
+- [x] Create `lib/auth/auth.ts` — initialises Better Auth:
+  - Configure `drizzleAdapter` pointing to `lib/db/client.ts`.
+  - Configure GitHub and Google OAuth providers (credentials from env).
+  - Use `user.additionalFields` to declare `clinicId` (string, references `clinics.id`) and `role` (string enum: `doctor | receptionist`) as extra columns on Better Auth's own user table.
+  - Do **not** create a separate hand-written `users` table.
+
+### 1.3 Generate Better Auth Schema via CLI
+
+- [x] Run Better Auth CLI schema generation:
+  ```bash
+  npx @better-auth/cli@latest generate --adapter drizzle --dialect pg --output lib/db/auth-schema.ts
+  ```
+  - Outputs authoritative `user`, `session`, `account`, and `verification` table definitions into `lib/db/auth-schema.ts` including the `clinicId` and `role` columns.
+
+### 1.4 Unified Schema & Migration
+
+- [x] Create `lib/db/schema.ts` defining domain tables matching `docs/PRD.md §9`:
   - `clinics` — `id`, `name`, `logoUrl`, `createdAt`
-  - `users` — `id`, `clinicId` (FK → clinics), `role` (enum: `doctor | receptionist`), `name`, `email`, `createdAt`
-  - `patients` — `id`, `clinicId`, `name`, `dob`, `sex`, `phone`, `email`, `address`, `deletedAt`, `createdAt`, `updatedAt`
+  - `patients` — `id`, `clinicId` (FK → clinics), `name`, `dob`, `sex`, `phone`, `email`, `address`, `deletedAt`, `createdAt`, `updatedAt`
   - `allergies` — `id`, `patientId` (FK → patients), `substance`, `severity` (enum: `mild | moderate | severe`), `reaction`, `createdAt`
-  - `problems` — `id`, `patientId`, `condition`, `status` (enum: `active | resolved`), `onsetDate`, `createdAt`
-  - `appointments` — `id`, `clinicId`, `patientId`, `doctorId`, `scheduledAt`, `status` (enum: `scheduled | checked-in | completed | no-show | cancelled`), `isWalkIn`, `reason`, `createdAt`
-  - `consultations` — `id`, `patientId`, `doctorId`, `appointmentId` (unique FK), `chiefComplaint`, `symptoms`, `observations`, `diagnosis`, `treatment`, `notes`, `createdAt`, `updatedAt`
+  - `problems` — `id`, `patientId` (FK → patients), `condition`, `status` (enum: `active | resolved`), `onsetDate`, `createdAt`
+  - `appointments` — `id`, `clinicId`, `patientId`, `doctorId` (FK → `user.id`), `scheduledAt`, `status` (enum: `scheduled | checked-in | completed | no-show | cancelled`), `isWalkIn`, `reason`, `createdAt`
+  - `consultations` — `id`, `patientId`, `doctorId` (FK → `user.id`), `appointmentId` (unique FK), `chiefComplaint`, `symptoms`, `observations`, `diagnosis`, `treatment`, `notes`, `createdAt`, `updatedAt`
   - `prescriptions` — `id`, `consultationId` (FK), `createdAt`
   - `prescriptionItems` — `id`, `prescriptionId`, `medication`, `dosage`, `frequency`, `duration`, `instructions`
-- [ ] Export all table references and inferred TypeScript types from `lib/db/schema.ts`.
-- [ ] Run `pnpm db:generate` — migration file created with no errors.
-- [ ] Run `pnpm db:migrate` against the development Supabase database.
+- [x] Import and re-export all generated auth tables (`user`, `session`, `account`, `verification`) from `lib/db/auth-schema.ts` alongside domain tables.
+- [x] Ensure all user foreign keys (`appointments.doctorId`, `consultations.doctorId`) point directly at the generated `user.id`.
+- [x] Export all table references and inferred TypeScript types from `lib/db/schema.ts`.
+- [x] Run `pnpm db:generate` — migration file covering both auth and domain tables created in a single consistent pass.
+- [x] Run `pnpm db:migrate` against the development Supabase database.
 
-### 1.3 Seed Data
+### 1.5 Seed Data
 
-- [ ] Create `lib/db/seed.ts` — inserts:
+- [x] Create `lib/db/seed.ts` — inserts:
   - 1 clinic (`id: "clinic-dev"`)
-  - 1 doctor user (`role: doctor`, linked to clinic)
-  - 1 receptionist user (`role: receptionist`, linked to clinic)
+  - 1 doctor row inserted into the generated `user` table (`role: "doctor"`, `clinicId: "clinic-dev"`)
+  - 1 receptionist row inserted into the generated `user` table (`role: "receptionist"`, `clinicId: "clinic-dev"`)
   - 3 patients with varying allergies and problems
   - 5 appointments (mix of statuses, one walk-in)
-- [ ] Add `"db:seed": "tsx lib/db/seed.ts"` to `package.json`.
-- [ ] Run `pnpm db:seed` — no errors.
+- [x] Add `"db:seed": "tsx lib/db/seed.ts"` to `package.json`.
+- [x] Run `pnpm db:seed` — no errors.
 
-### 1.4 Schema Tests
+### 1.6 Schema Tests
 
-- [ ] `lib/db/__tests__/schema.test.ts` — unit tests verifying:
-  - All required table exports exist (not undefined).
-  - TypeScript types resolve correctly for `NewPatient`, `Appointment`, etc. (compile-only checks via `expectTypeOf`).
-- [ ] **Test:** `pnpm test` — all schema tests pass. ✅
+- [x] `lib/db/__tests__/schema.test.ts` — unit tests verifying:
+  - All required table exports exist (both auth tables `user`, `session`, `account`, `verification` and domain tables).
+  - TypeScript types resolve correctly for `User`, `Session`, `NewPatient`, `Appointment`, etc. (compile-only checks via `expectTypeOf`).
+- [x] **Test:** `pnpm test` — all schema tests pass. ✅
 
 ---
 
 ## Phase 2 — Authentication
 
-Sets up Better Auth with GitHub and Google OAuth, session helpers, and role-gating.
+Sets up auth route handlers, client helpers, session resolution, and role-gating.
 
-### 2.1 Better Auth Server Config
+### 2.1 Route Handler & Client Wiring
 
-- [ ] Create `lib/auth/auth.ts` — initialises Better Auth with:
-  - Drizzle adapter pointing to `lib/db/client.ts`.
-  - GitHub and Google OAuth providers (credentials from env).
-  - Session strategy with `clinicId` and `role` in the session object.
-- [ ] Create `app/api/auth/[...all]/route.ts` — mounts the Better Auth request handler.
-
-### 2.2 Session Helpers
-
-- [ ] Create `lib/auth/session.ts` — `getSession()` (see `docs/ARCHITECTURE.md §3`):
-  - Reads the Better Auth session server-side.
-  - Redirects to `/login` if no session.
-  - Returns `{ user, clinicId, role }` if session is valid and the account has a clinic assignment.
-  - Returns (or redirects to) a "not yet set up" state if the account has no clinic/role assignment.
-  - This is the **sole authoritative** enforcement point for session/role/clinic checks — `proxy.ts` (below) never substitutes for it.
-- [ ] Create `lib/auth/require-doctor.ts` — `requireDoctor()` wraps `getSession()`, throws `ForbiddenError` if `role !== "doctor"`.
-- [ ] Create `lib/auth/client.ts` — Better Auth browser client, used in client components for sign-in/sign-out.
+- [ ] Create `app/api/auth/[...all]/route.ts` — mounts the Better Auth request handler (`toNextJsHandler(auth)`).
+- [ ] Create `lib/auth/client.ts` — Better Auth browser client (`createAuthClient()`), used in client components for sign-in/sign-out.
 
 ### 2.3 Proxy (Soft, Unauthoritative Redirect Layer)
 
@@ -657,8 +660,8 @@ Builds every route as a thin orchestration layer over the feature modules.
 | Phase | Focus               | Key Deliverable                                                          |
 | ----- | ------------------- | ------------------------------------------------------------------------ |
 | 0     | Foundation          | Lightweight Vitest configured, folders scaffolded                        |
-| 1     | Database            | Full schema migrated, seed data live                                     |
-| 2     | Auth                | OAuth login, session helpers, role guards, `proxy.ts` soft redirect      |
+| 1     | Database            | Unified auth & domain schema migrated, seed data live                    |
+| 2     | Auth                | Route handler, client, session helpers, role guards, `proxy.ts` soft redirect |
 | 3     | Patients            | Queries, mutations, form + list UI                                       |
 | 4     | Appointments        | Queries, mutations, day-view UI                                          |
 | 5     | Consultations       | Queries, mutations, full-page form with embedded multi-prescription list |
