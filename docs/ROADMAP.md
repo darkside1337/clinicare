@@ -164,12 +164,12 @@ Sets up auth route handlers, client helpers, session resolution, and role-gating
 
 ### 2.1 Route Handler & Client Wiring
 
-- [ ] Create `app/api/auth/[...all]/route.ts` — mounts the Better Auth request handler (`toNextJsHandler(auth)`).
-- [ ] Create `lib/auth/client.ts` — Better Auth browser client (`createAuthClient()`), used in client components for sign-in/sign-out.
+- [x] Create `app/api/auth/[...all]/route.ts` — mounts the Better Auth request handler (`toNextJsHandler(auth)`).
+- [x] Create `lib/auth/client.ts` — Better Auth browser client (`createAuthClient()`), used in client components for sign-in/sign-out.
 
 ### 2.3 Proxy (Soft, Unauthoritative Redirect Layer)
 
-- [ ] Create `proxy.ts` at project root — a **soft, cookie-presence-only** check that bounces unauthenticated requests toward `/login` before they hit a page. It does **not** check role or `clinicId`, and it is not a substitute for `getSession()`/`requireDoctor()`, which remain the only real enforcement point in every page and Server Action:
+- [x] Create `proxy.ts` at project root — a **soft, cookie-presence-only** check that bounces unauthenticated requests toward `/login` before they hit a page. It does **not** check role or `clinicId`, and it is not a substitute for `getSession()`/`requireDoctor()`, which remain the only real enforcement point in every page and Server Action:
 
   ```ts
   import { NextRequest, NextResponse } from "next/server";
@@ -202,18 +202,18 @@ Sets up auth route handlers, client helpers, session resolution, and role-gating
   };
   ```
 
-- [ ] Confirm the matcher covers every route under `app/(app)/` — expand it as new top-level route segments are added in later phases.
+- [x] Confirm the matcher covers every route under `app/(app)/` — expand it as new top-level route segments are added in later phases.
 
 ### 2.4 Auth Tests
 
-- [ ] `lib/auth/__tests__/session.test.ts`:
+- [x] `lib/auth/__tests__/session.test.ts`:
   - Mock Better Auth session; assert `getSession()` redirects when session is absent.
   - Assert `getSession()` throws/returns "not set up" when user has no clinic.
   - Assert `getSession()` returns `{ user, clinicId, role }` for a valid, clinic-linked session.
-- [ ] `lib/auth/__tests__/require-doctor.test.ts`:
+- [x] `lib/auth/__tests__/require-doctor.test.ts`:
   - Assert `requireDoctor()` passes for `role: doctor`.
   - Assert `requireDoctor()` throws `ForbiddenError` for `role: receptionist`.
-- [ ] **Test:** `pnpm test` — all auth tests pass. ✅
+- [x] **Test:** `pnpm test` — all auth tests pass. ✅
 
 ---
 
