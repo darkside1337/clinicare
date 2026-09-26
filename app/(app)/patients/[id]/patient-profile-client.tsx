@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PatientRecord } from "@/lib/mock-patient";
+import type { PatientRecord } from "@/features/patients/types";
 import { AllergyList } from "@/features/patients/components/allergy-list";
 import { ProblemList } from "@/features/patients/components/problem-list";
 import { ConsultationTimeline } from "@/features/consultations/components/consultation-timeline";
@@ -27,11 +27,18 @@ export function PatientProfileClient({
   sessionRole = "doctor",
   sessionUserName,
 }: PatientProfileClientProps) {
-  const { patient, allergies: mockAllergies, problems: mockProblems, consultations, appointments, prescriptions } = initialData;
+  const {
+    patient,
+    allergies: propAllergies,
+    problems: propProblems,
+    consultations,
+    appointments,
+    prescriptions,
+  } = initialData;
 
   const allergies = useMemo(
     () =>
-      mockAllergies.map((a) => ({
+      propAllergies.map((a) => ({
         id: a.id,
         patientId: patient.id,
         substance: a.substance,
@@ -39,12 +46,12 @@ export function PatientProfileClient({
         reaction: a.reaction ?? null,
         createdAt: new Date(),
       })),
-    [mockAllergies, patient.id]
+    [propAllergies, patient.id]
   );
 
   const problems = useMemo(
     () =>
-      mockProblems.map((p) => ({
+      propProblems.map((p) => ({
         id: p.id,
         patientId: patient.id,
         condition: p.condition,
@@ -52,7 +59,7 @@ export function PatientProfileClient({
         onsetDate: p.onsetDate ?? null,
         createdAt: new Date(),
       })),
-    [mockProblems, patient.id]
+    [propProblems, patient.id]
   );
 
   const upcomingAppointments = useMemo(() => {

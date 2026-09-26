@@ -6,10 +6,10 @@ import { AlertTriangle, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Patient } from "@/lib/db/schema";
-import type { SearchPatient } from "@/lib/mock-patients-directory";
+import type { PatientDirectoryItem } from "@/features/patients/queries";
 import { PatientSearch } from "./patient-search";
 
-type PatientRow = Patient | SearchPatient;
+type PatientRow = Patient | PatientDirectoryItem;
 
 function calculateAge(dob: string): number | null {
   if (!dob) return null;
