@@ -16,10 +16,9 @@ import type { AppointmentStatus } from "@/features/appointments/schema";
 import { updateAppointmentStatusAction } from "@/app/(app)/appointments/actions";
 import { STATUS_METADATA } from "./appointment-status-badge";
 import { DOCTORS, type FormDoctor } from "./appointment-form";
-import type { ClinicAppointment } from "@/lib/mock-appointments";
 
 interface DayViewProps {
-  appointments: (AppointmentDetails | ClinicAppointment)[];
+  appointments: AppointmentDetails[];
   doctors?: FormDoctor[];
   onStatusChange?: (id: string, newStatus: AppointmentStatus) => void;
   onSlotClick?: (doctorName: string, timeSlot: string) => void;
@@ -40,37 +39,21 @@ interface NormalizedAppointment {
   hasSevereAllergy: boolean;
 }
 
-function normalizeAppointment(apt: AppointmentDetails | ClinicAppointment): NormalizedAppointment {
-  if ("patient" in apt && typeof apt.patient === "object") {
-    const d = new Date(apt.scheduledAt);
-    const timeSlot = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-    return {
-      id: apt.id,
-      patientId: apt.patientId,
-      patientName: apt.patient.name,
-      patientDob: apt.patient.dob,
-      doctorName: apt.doctor.name,
-      timeSlot,
-      status: apt.status as AppointmentStatus,
-      reason: apt.reason || "Consultation appointment",
-      isWalkIn: apt.isWalkIn,
-      hasSevereAllergy: !!apt.patient.hasSevereAllergy,
-    };
-  } else {
-    const clinicApt = apt as ClinicAppointment;
-    return {
-      id: clinicApt.id,
-      patientId: clinicApt.patientId,
-      patientName: clinicApt.patientName,
-      patientDob: clinicApt.patientDob,
-      doctorName: clinicApt.doctorName,
-      timeSlot: clinicApt.timeSlot,
-      status: clinicApt.status as AppointmentStatus,
-      reason: clinicApt.reason || "Consultation appointment",
-      isWalkIn: clinicApt.isWalkIn,
-      hasSevereAllergy: !!clinicApt.allergyFlag,
-    };
-  }
+function normalizeAppointment(apt: AppointmentDetails): NormalizedAppointment {
+  const d = new Date(apt.scheduledAt);
+  const timeSlot = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  return {
+    id: apt.id,
+    patientId: apt.patientId,
+    patientName: apt.patient.name,
+    patientDob: apt.patient.dob,
+    doctorName: apt.doctor.name,
+    timeSlot,
+    status: apt.status as AppointmentStatus,
+    reason: apt.reason || "Consultation appointment",
+    isWalkIn: apt.isWalkIn,
+    hasSevereAllergy: !!apt.patient.hasSevereAllergy,
+  };
 }
 
 export function DayView({

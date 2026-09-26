@@ -1,47 +1,110 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import {
   Plus,
-  Search,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  ClinicAppointment,
-  AppointmentStatus,
-  INITIAL_CALENDAR_APPOINTMENTS,
-} from "@/lib/mock-appointments";
 import { DayView } from "@/features/appointments/components/day-view";
 import {
   AppointmentForm,
   DOCTORS,
+  type FormPatient,
 } from "@/features/appointments/components/appointment-form";
+import type { AppointmentDetails } from "@/features/appointments/queries";
+import type { AppointmentStatus } from "@/features/appointments/schema";
 import type { Appointment as DbAppointment } from "@/lib/db/schema";
 
-
 interface AppointmentsClientProps {
-  initialAppointments?: ClinicAppointment[];
+  initialAppointments?: AppointmentDetails[];
+  patients?: FormPatient[];
+  currentDateISO?: string;
+  currentDoctorId?: string;
   sessionRole?: "doctor" | "receptionist";
   sessionUserName?: string;
 }
 
+function formatDateString(d: Date): string {
+  return d.toLocaleDateString("en-GB", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
+function toISODate(d: Date): string {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
 export function AppointmentsClient({
-  initialAppointments = INITIAL_CALENDAR_APPOINTMENTS,
-  sessionRole = "doctor",
-  sessionUserName,
+  initialAppointments = [],
+  patients = [],
+  currentDateISO,
+  currentDoctorId,
 }: AppointmentsClientProps) {
-  const [appointments, setAppointments] = useState<ClinicAppointment[]>(initialAppointments);
-  const [selectedClinician, setSelectedClinician] = useState<string>("All Clinicians");
-  const [currentDateStr, setCurrentDateStr] = useState<string>("Thursday 24/09/2026");
+  const router = useRouter();
+
+  const activeDate = useMemo(() => {
+    if (currentDateISO) {
+      const parsed = new Date(currentDateISO + "T00:00:00");
+      if (!isNaN(parsed.getTime())) return parsed;
+    }
+    return new Date();
+  }, [currentDateISO]);
+
+  const [appointments, setAppointments] =
+    useState<AppointmentDetails[]>(initialAppointments);
   const [clinicianMenuOpen, setClinicianMenuOpen] = useState(false);
+
+  // Sync state if initialAppointments changes on router refresh
+  React.useEffect(() => {
+    setAppointments(initialAppointments);
+  }, [initialAppointments]);
+
+  const activeDoctor = useMemo(() => {
+    if (!currentDoctorId) return "All Clinicians";
+    const found = DOCTORS.find((d) => d.id === currentDoctorId);
+    return found ? found.name : "All Clinicians";
+  }, [currentDoctorId]);
 
   // Booking Modal State
   const [isBookModalOpen, setIsBookModalOpen] = useState(false);
   const [bookDoctor, setBookDoctor] = useState<string>(DOCTORS[0].name);
   const [bookTimeSlot, setBookTimeSlot] = useState<string>("10:00");
+
+  const navigateTo = (targetDate: Date, doctorId?: string) => {
+    const params = new URLSearchParams();
+    params.set("date", toISODate(targetDate));
+    const effectiveDoctorId = doctorId !== undefined ? doctorId : currentDoctorId;
+    if (effectiveDoctorId && effectiveDoctorId !== "all") {
+      params.set("doctorId", effectiveDoctorId);
+    }
+    router.push(`/appointments?${params.toString()}`);
+  };
+
+  const handlePrevDay = () => {
+    const prev = new Date(activeDate);
+    prev.setDate(prev.getDate() - 1);
+    navigateTo(prev);
+  };
+
+  const handleNextDay = () => {
+    const next = new Date(activeDate);
+    next.setDate(next.getDate() + 1);
+    navigateTo(next);
+  };
+
+  const handleToday = () => {
+    navigateTo(new Date());
+  };
 
   const handleStatusChange = (id: string, newStatus: AppointmentStatus) => {
     setAppointments((prev) =>
@@ -55,31 +118,9 @@ export function AppointmentsClient({
     setIsBookModalOpen(true);
   };
 
-  const handleCreateSuccess = (newApt: DbAppointment) => {
-    const d =
-      newApt.scheduledAt instanceof Date
-        ? newApt.scheduledAt
-        : new Date(newApt.scheduledAt);
-    const timeSlot = `${String(d.getHours()).padStart(2, "0")}:${String(
-      d.getMinutes()
-    ).padStart(2, "0")}`;
-    const doctorName =
-      DOCTORS.find((doc) => doc.id === newApt.doctorId)?.name ??
-      newApt.doctorId;
-    const mapped: ClinicAppointment = {
-      id: newApt.id,
-      patientId: newApt.patientId,
-      patientName: newApt.patientId,
-      patientDob: "",
-      doctorName,
-      timeSlot,
-      durationMinutes: 30,
-      status: newApt.status,
-      reason: newApt.reason ?? "",
-      isWalkIn: newApt.isWalkIn,
-      allergyFlag: false,
-    };
-    setAppointments((prev) => [...prev, mapped]);
+  const handleCreateSuccess = (_newApt: DbAppointment) => {
+    setIsBookModalOpen(false);
+    router.refresh();
   };
 
   const metrics = useMemo(() => {
@@ -128,20 +169,20 @@ export function AppointmentsClient({
                 type="button"
                 variant="ghost"
                 size="xs"
-                onClick={() => setCurrentDateStr("Wednesday 23/09/2026")}
+                onClick={handlePrevDay}
                 className="size-8 p-0 rounded-none hover:bg-white text-[#141618]"
               >
                 <ChevronLeft className="size-4" />
                 <span className="sr-only">Previous Day</span>
               </Button>
-              <div className="px-3 py-1 font-mono text-xs font-bold text-[#141618] border-x border-[#141618] bg-white min-w-[180px] text-center">
-                {currentDateStr}
+              <div className="px-3 py-1 font-mono text-xs font-bold text-[#141618] border-x border-[#141618] bg-white min-w-[200px] text-center">
+                {formatDateString(activeDate)}
               </div>
               <Button
                 type="button"
                 variant="ghost"
                 size="xs"
-                onClick={() => setCurrentDateStr("Friday 25/09/2026")}
+                onClick={handleNextDay}
                 className="size-8 p-0 rounded-none hover:bg-white text-[#141618]"
               >
                 <ChevronRight className="size-4" />
@@ -153,7 +194,7 @@ export function AppointmentsClient({
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => setCurrentDateStr("Thursday 24/09/2026")}
+              onClick={handleToday}
               className="rounded-none border-[#141618] text-xs font-mono uppercase h-8 hover:bg-[#FAFAF7]"
             >
               Today
@@ -173,29 +214,45 @@ export function AppointmentsClient({
                 onClick={() => setClinicianMenuOpen(!clinicianMenuOpen)}
                 className="rounded-none border-[#141618] bg-white px-3 py-1.5 text-xs font-mono text-[#141618] hover:bg-[#FAFAF7] flex items-center justify-between gap-2 min-w-[200px]"
               >
-                <span className="truncate">{selectedClinician}</span>
+                <span className="truncate">{activeDoctor}</span>
                 <ChevronDown className="size-3.5 text-[#141618] shrink-0" />
               </Button>
 
               {clinicianMenuOpen && (
                 <div className="absolute right-0 top-full mt-1 z-40 w-56 border border-[#141618] bg-white p-1 shadow-[2px_2px_0px_#141618]">
-                  {["All Clinicians", ...DOCTORS.map((d) => d.name)].map((doc) => (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setClinicianMenuOpen(false);
+                      navigateTo(activeDate, "all");
+                    }}
+                    className={`w-full justify-start rounded-none px-2.5 py-1.5 text-xs text-left h-auto font-mono ${
+                      !currentDoctorId
+                        ? "bg-[#141618] text-[#FAFAF7] hover:bg-black hover:text-[#FAFAF7]"
+                        : "text-[#141618] hover:bg-[#FAFAF7]"
+                    }`}
+                  >
+                    All Clinicians
+                  </Button>
+                  {DOCTORS.map((doc) => (
                     <Button
-                      key={doc}
+                      key={doc.id}
                       type="button"
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        setSelectedClinician(doc);
                         setClinicianMenuOpen(false);
+                        navigateTo(activeDate, doc.id);
                       }}
                       className={`w-full justify-start rounded-none px-2.5 py-1.5 text-xs text-left h-auto font-mono ${
-                        selectedClinician === doc
+                        currentDoctorId === doc.id
                           ? "bg-[#141618] text-[#FAFAF7] hover:bg-black hover:text-[#FAFAF7]"
                           : "text-[#141618] hover:bg-[#FAFAF7]"
                       }`}
                     >
-                      {doc}
+                      {doc.name}
                     </Button>
                   ))}
                 </div>
@@ -245,7 +302,7 @@ export function AppointmentsClient({
           appointments={appointments}
           onStatusChange={handleStatusChange}
           onSlotClick={handleSlotClick}
-          selectedClinician={selectedClinician}
+          selectedClinician={activeDoctor}
         />
       </main>
 
@@ -253,8 +310,10 @@ export function AppointmentsClient({
       <AppointmentForm
         open={isBookModalOpen}
         onOpenChange={setIsBookModalOpen}
+        patients={patients}
         initialDoctor={bookDoctor}
         initialTimeSlot={bookTimeSlot}
+        initialDate={activeDate}
         onSuccess={handleCreateSuccess}
       />
     </div>

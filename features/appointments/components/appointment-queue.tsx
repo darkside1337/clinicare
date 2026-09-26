@@ -15,7 +15,6 @@ import { Badge } from "@/components/ui/badge";
 import type { AppointmentDetails } from "@/features/appointments/queries";
 import type { AppointmentStatus } from "@/features/appointments/schema";
 import { updateAppointmentStatusAction } from "@/app/(app)/appointments/actions";
-import type { DashboardAppointment } from "@/lib/mock-dashboard";
 
 export type StatusType = AppointmentStatus;
 
@@ -60,7 +59,7 @@ interface QueueDoctor {
 }
 
 interface AppointmentQueueProps {
-  appointments: (AppointmentDetails | DashboardAppointment)[];
+  appointments: AppointmentDetails[];
   doctors?: QueueDoctor[];
   onStatusChange?: (id: string, newStatus: AppointmentStatus) => void;
   role?: "doctor" | "receptionist";
@@ -99,39 +98,22 @@ function calculateAge(dobStr?: string): number | null {
   return age >= 0 ? age : null;
 }
 
-function normalizeQueueItem(apt: AppointmentDetails | DashboardAppointment): NormalizedQueueAppointment {
-  if ("patient" in apt && typeof apt.patient === "object") {
-    const d = new Date(apt.scheduledAt);
-    const timeSlot = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-    return {
-      id: apt.id,
-      patientId: apt.patientId,
-      patientName: apt.patient.name,
-      patientAge: calculateAge(apt.patient.dob),
-      patientDob: apt.patient.dob,
-      doctorName: apt.doctor.name,
-      timeSlot,
-      status: apt.status as AppointmentStatus,
-      isWalkIn: apt.isWalkIn,
-      allergyFlag: !!apt.patient.hasSevereAllergy,
-      reason: apt.reason || "General Consultation",
-    };
-  } else {
-    const dashApt = apt as DashboardAppointment;
-    return {
-      id: dashApt.id,
-      patientId: dashApt.patientId,
-      patientName: dashApt.patientName,
-      patientAge: dashApt.patientAge,
-      patientDob: dashApt.patientDob,
-      doctorName: dashApt.doctorName,
-      timeSlot: dashApt.timeSlot,
-      status: dashApt.status as AppointmentStatus,
-      isWalkIn: dashApt.isWalkIn,
-      allergyFlag: dashApt.allergyFlag,
-      reason: dashApt.reason || "General Consultation",
-    };
-  }
+function normalizeQueueItem(apt: AppointmentDetails): NormalizedQueueAppointment {
+  const d = new Date(apt.scheduledAt);
+  const timeSlot = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  return {
+    id: apt.id,
+    patientId: apt.patientId,
+    patientName: apt.patient.name,
+    patientAge: calculateAge(apt.patient.dob),
+    patientDob: apt.patient.dob,
+    doctorName: apt.doctor.name,
+    timeSlot,
+    status: apt.status as AppointmentStatus,
+    isWalkIn: apt.isWalkIn,
+    allergyFlag: !!apt.patient.hasSevereAllergy,
+    reason: apt.reason || "General Consultation",
+  };
 }
 
 export function AppointmentQueue({

@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/dialog";
 import { AppointmentForm, DOCTORS, type FormDoctor, type FormPatient } from "./appointment-form";
 import { createWalkInAppointmentAction } from "@/app/(app)/appointments/actions";
-import { MOCK_SEARCH_PATIENTS } from "@/lib/mock-patients-directory";
 
 interface DashboardQuickActionsProps {
   role?: "doctor" | "receptionist";
@@ -30,7 +29,7 @@ interface DashboardQuickActionsProps {
 export function DashboardQuickActions({
   role = "doctor",
   doctors = DOCTORS,
-  patients = MOCK_SEARCH_PATIENTS,
+  patients = [],
   onOpenSearch,
   onStartWalkIn,
   onBookAppointment,

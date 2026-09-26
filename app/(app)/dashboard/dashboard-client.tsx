@@ -4,34 +4,53 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { User, Plus, ArrowRight } from "lucide-react";
-import {
-  DashboardAppointment,
-  MOCK_TODAY_APPOINTMENTS,
-  MOCK_RECENT_PATIENTS,
-} from "@/lib/mock-dashboard";
 import { DashboardQuickActions } from "@/features/appointments/components/dashboard-quick-actions";
 import {
   AppointmentQueue,
   StatusType,
 } from "@/features/appointments/components/appointment-queue";
-
+import type { AppointmentDetails } from "@/features/appointments/queries";
+import type { PatientDirectoryItem } from "@/features/patients/queries";
+import type { FormPatient } from "@/features/appointments/components/appointment-form";
 
 interface DashboardClientProps {
-  initialAppointments?: DashboardAppointment[];
+  initialAppointments?: AppointmentDetails[];
+  recentPatients?: PatientDirectoryItem[];
+  patients?: FormPatient[];
   sessionRole?: "doctor" | "receptionist";
   sessionUserName?: string;
 }
 
+function calculateAge(dobStr?: string): number {
+  if (!dobStr) return 0;
+  const parts = dobStr.includes("/") ? dobStr.split("/") : dobStr.split("-");
+  let birthDate: Date;
+  if (dobStr.includes("/")) {
+    birthDate = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+  } else {
+    birthDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+  }
+  if (isNaN(birthDate.getTime())) return 0;
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age >= 0 ? age : 0;
+}
+
 export function DashboardClient({
-  initialAppointments = MOCK_TODAY_APPOINTMENTS,
+  initialAppointments = [],
+  recentPatients = [],
+  patients = [],
   sessionRole,
-  sessionUserName,
 }: DashboardClientProps) {
   const searchParams = useSearchParams();
   const paramRole = searchParams?.get("role") as "doctor" | "receptionist" | null;
   const role = paramRole || sessionRole || "doctor";
 
-  const [appointments, setAppointments] = useState<DashboardAppointment[]>(initialAppointments);
+  const [appointments, setAppointments] = useState<AppointmentDetails[]>(initialAppointments);
 
   const handleStatusChange = (id: string, newStatus: StatusType) => {
     setAppointments((prev) =>
@@ -56,7 +75,7 @@ export function DashboardClient({
             Daily Appointment Queue & Clinic Census
           </p>
         </div>
-        <DashboardQuickActions role={role} />
+        <DashboardQuickActions role={role} patients={patients} />
       </div>
 
       {/* Main Two-Column Dashboard Workspace */}
@@ -191,37 +210,43 @@ export function DashboardClient({
                 Recent Patients
               </h2>
               <span className="text-[11px] font-mono text-[#5A5D61]">
-                LAST ACCESSED
+                DIRECTORY CENSUS
               </span>
             </div>
 
             <div className="border border-[#141618] divide-y divide-[#D8D4CC] bg-white">
-              {MOCK_RECENT_PATIENTS.map((rp) => (
-                <Link
-                  key={rp.id}
-                  href={`/patients/${rp.id}`}
-                  className="p-3 block hover:bg-[#FAFAF7] transition-colors group"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-[#141618] group-hover:underline">
-                      {rp.name}
-                    </span>
-                    <span className="text-[11px] font-mono text-[#5A5D61]">
-                      {rp.lastSeen}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-[11px] font-mono text-[#5A5D61] mt-1">
-                    <span>
-                      ID: {rp.id} • {rp.age}y
-                    </span>
-                    {rp.hasSevereAllergy && (
-                      <span className="text-[#B91C1C] font-bold uppercase text-[10px]">
-                        Allergy Flag
+              {recentPatients.length === 0 ? (
+                <div className="p-4 text-center text-xs font-mono text-[#5A5D61]">
+                  No patients registered yet.
+                </div>
+              ) : (
+                recentPatients.map((rp) => (
+                  <Link
+                    key={rp.id}
+                    href={`/patients/${rp.id}`}
+                    className="p-3 block hover:bg-[#FAFAF7] transition-colors group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#141618] group-hover:underline">
+                        {rp.name}
                       </span>
-                    )}
-                  </div>
-                </Link>
-              ))}
+                      <span className="text-[11px] font-mono text-[#5A5D61]">
+                        {rp.phone || "No phone"}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] font-mono text-[#5A5D61] mt-1">
+                      <span>
+                        DOB: {rp.dob} • {calculateAge(rp.dob)}y
+                      </span>
+                      {rp.hasSevereAllergy && (
+                        <span className="text-[#B91C1C] font-bold uppercase text-[10px]">
+                          Allergy Flag
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                ))
+              )}
             </div>
           </div>
         </aside>
