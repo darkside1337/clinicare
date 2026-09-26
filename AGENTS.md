@@ -3,7 +3,7 @@ CliniCare is a fast, focused practice-management web app for individual doctors 
 Package manager: pnpm
 
 For phased task breakdown and current progress, see docs/ROADMAP.md
-For visual design system, tokens, and layout specs, see docs/DESIGN.md
+For visual design system, tokens, and layout specs, see /DESIGN.md
 For project architecture, multi-tenancy model, and patterns, see docs/ARCHITECTURE.md
 For data model, feature specs, and acceptance criteria, see docs/PRD.md
 For product positioning, principles, and target audience, see PRODUCT.md
