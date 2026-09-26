@@ -1,10 +1,9 @@
 import React from "react";
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
-import { Prescription } from "@/lib/mock-consultations";
 
 const styles = StyleSheet.create({
   page: {
-    padding: 36,
+    padding: 32,
     fontFamily: "Helvetica",
     backgroundColor: "#FFFFFF",
     color: "#141618",
@@ -13,13 +12,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1.5,
     borderBottomColor: "#141618",
     paddingBottom: 10,
-    marginBottom: 16,
+    marginBottom: 14,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
   },
   clinicTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "bold",
     textTransform: "uppercase",
     letterSpacing: 0.5,
@@ -32,7 +31,10 @@ const styles = StyleSheet.create({
   rxLabelBox: {
     borderWidth: 1,
     borderColor: "#141618",
-    padding: "4 8",
+    paddingTop: 3,
+    paddingBottom: 3,
+    paddingLeft: 6,
+    paddingRight: 6,
     alignItems: "center",
   },
   rxText: {
@@ -42,32 +44,32 @@ const styles = StyleSheet.create({
   patientBox: {
     borderWidth: 1,
     borderColor: "#141618",
-    padding: 10,
-    marginBottom: 16,
+    padding: 8,
+    marginBottom: 14,
     backgroundColor: "#FAFAF7",
   },
   patientRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 4,
+    marginBottom: 3,
   },
   patientName: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "bold",
   },
   patientMeta: {
-    fontSize: 9,
+    fontSize: 8.5,
     color: "#5A5D61",
   },
   prescriptionBody: {
     borderWidth: 1,
     borderColor: "#141618",
-    padding: 14,
-    minHeight: 260,
-    marginBottom: 16,
+    padding: 12,
+    minHeight: 250,
+    marginBottom: 14,
   },
   sectionTitle: {
-    fontSize: 9,
+    fontSize: 8.5,
     fontWeight: "bold",
     textTransform: "uppercase",
     letterSpacing: 0.8,
@@ -78,17 +80,17 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
   medicationRow: {
-    marginBottom: 12,
-    paddingBottom: 8,
+    marginBottom: 10,
+    paddingBottom: 6,
     borderBottomWidth: 0.5,
     borderBottomColor: "#EFECE6",
   },
   medName: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "bold",
   },
   medDosage: {
-    fontSize: 9,
+    fontSize: 8.5,
     marginTop: 2,
   },
   medInstructions: {
@@ -100,7 +102,7 @@ const styles = StyleSheet.create({
   footerSignBox: {
     borderTopWidth: 1.5,
     borderTopColor: "#141618",
-    paddingTop: 12,
+    paddingTop: 10,
     flexDirection: "row",
     justifyContent: "space-between",
   },
@@ -108,10 +110,10 @@ const styles = StyleSheet.create({
     width: "48%",
   },
   signTitle: {
-    fontSize: 8,
+    fontSize: 7.5,
     color: "#5A5D61",
     textTransform: "uppercase",
-    marginBottom: 20,
+    marginBottom: 18,
   },
   signatureLine: {
     borderBottomWidth: 1,
@@ -119,23 +121,52 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   doctorText: {
-    fontSize: 9,
+    fontSize: 8.5,
     fontWeight: "bold",
   },
 });
 
+export interface PrescriptionPdfItem {
+  id?: string;
+  medication: string;
+  dosage: string;
+  frequency: string;
+  duration: string;
+  instructions?: string | null;
+}
+
+export interface PrescriptionPdfData {
+  id: string;
+  prescriptionNumber?: string;
+  createdAt?: Date | string;
+  issuedAt?: string;
+  items?: PrescriptionPdfItem[];
+}
+
 export interface PrescriptionPdfProps {
-  prescription: Prescription;
+  prescription: PrescriptionPdfData;
   patientName: string;
   patientDob: string;
   patientAge: number;
-  patientAddress?: string;
+  patientAddress?: string | null;
   doctorName: string;
   clinicName: string;
-  clinicAddress?: string;
+  clinicAddress?: string | null;
+  clinicLogoUrl?: string | null;
 }
 
-export default function PrescriptionPdfDocument({
+function formatDate(dateVal?: Date | string, fallback?: string): string {
+  if (fallback) return fallback;
+  if (!dateVal) return "";
+  const d = typeof dateVal === "string" ? new Date(dateVal) : dateVal;
+  if (isNaN(d.getTime())) return String(dateVal);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
+export function PrescriptionPdfDocument({
   prescription,
   patientName,
   patientDob,
@@ -146,6 +177,10 @@ export default function PrescriptionPdfDocument({
   clinicAddress,
 }: PrescriptionPdfProps) {
   const items = prescription.items || [];
+  const rxNumber =
+    prescription.prescriptionNumber ||
+    `RX-${prescription.id.slice(0, 8).toUpperCase()}`;
+  const issueDate = formatDate(prescription.createdAt, prescription.issuedAt);
 
   return (
     <Document>
@@ -154,13 +189,15 @@ export default function PrescriptionPdfDocument({
         <View style={styles.headerBox}>
           <View>
             <Text style={styles.clinicTitle}>{clinicName}</Text>
-            {clinicAddress && <Text style={styles.clinicSubtitle}>{clinicAddress}</Text>}
+            {clinicAddress && (
+              <Text style={styles.clinicSubtitle}>{clinicAddress}</Text>
+            )}
             <Text style={styles.clinicSubtitle}>OUTPATIENT PRESCRIPTION ORDER</Text>
           </View>
           <View style={styles.rxLabelBox}>
             <Text style={styles.rxText}>RX</Text>
             <Text style={{ fontSize: 7, color: "#5A5D61", marginTop: 1 }}>
-              {prescription.prescriptionNumber || "RECORD"}
+              {rxNumber}
             </Text>
           </View>
         </View>
@@ -169,7 +206,7 @@ export default function PrescriptionPdfDocument({
         <View style={styles.patientBox}>
           <View style={styles.patientRow}>
             <Text style={styles.patientName}>{patientName}</Text>
-            <Text style={styles.patientMeta}>Date: {prescription.issuedAt}</Text>
+            <Text style={styles.patientMeta}>Date: {issueDate}</Text>
           </View>
           <View style={styles.patientRow}>
             <Text style={styles.patientMeta}>
@@ -196,7 +233,11 @@ export default function PrescriptionPdfDocument({
               <Text style={styles.medDosage}>
                 Dosage: {item.dosage} • Frequency: {item.frequency} • Duration: {item.duration}
               </Text>
-              <Text style={styles.medInstructions}>Instructions: {item.instructions}</Text>
+              {item.instructions && (
+                <Text style={styles.medInstructions}>
+                  Instructions: {item.instructions}
+                </Text>
+              )}
             </View>
           ))}
         </View>
@@ -207,13 +248,15 @@ export default function PrescriptionPdfDocument({
             <Text style={styles.signTitle}>Prescriber Signature</Text>
             <View style={styles.signatureLine} />
             <Text style={styles.doctorText}>{doctorName}</Text>
-            <Text style={{ fontSize: 8, color: "#5A5D61" }}>Authorized Medical Practitioner</Text>
+            <Text style={{ fontSize: 7.5, color: "#5A5D61" }}>
+              Authorized Medical Practitioner
+            </Text>
           </View>
 
           <View style={styles.signBlock}>
             <Text style={styles.signTitle}>Dispensing Pharmacy Verification</Text>
             <View style={styles.signatureLine} />
-            <Text style={{ fontSize: 8, color: "#5A5D61", marginTop: 2 }}>
+            <Text style={{ fontSize: 7.5, color: "#5A5D61", marginTop: 2 }}>
               Date &amp; Signature
             </Text>
           </View>
@@ -222,3 +265,5 @@ export default function PrescriptionPdfDocument({
     </Document>
   );
 }
+
+export default PrescriptionPdfDocument;
