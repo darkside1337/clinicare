@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
+    "@hookform/resolvers": "^5.9.1",
     "@react-pdf/renderer": "^4.9.0",
     "@supabase/supabase-js": "^2.117.1",
     "better-auth": "^1.7.5",
