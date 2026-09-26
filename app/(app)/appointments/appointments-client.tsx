@@ -17,7 +17,6 @@ import {
 } from "@/features/appointments/components/appointment-form";
 import type { AppointmentDetails } from "@/features/appointments/queries";
 import type { AppointmentStatus } from "@/features/appointments/schema";
-import type { Appointment as DbAppointment } from "@/lib/db/schema";
 
 interface AppointmentsClientProps {
   initialAppointments?: AppointmentDetails[];
@@ -62,12 +61,14 @@ export function AppointmentsClient({
 
   const [appointments, setAppointments] =
     useState<AppointmentDetails[]>(initialAppointments);
+  const [prevInitial, setPrevInitial] = useState(initialAppointments);
   const [clinicianMenuOpen, setClinicianMenuOpen] = useState(false);
 
-  // Sync state if initialAppointments changes on router refresh
-  React.useEffect(() => {
+  // Sync state if initialAppointments changes on router refresh without triggering cascading effect renders
+  if (initialAppointments !== prevInitial) {
+    setPrevInitial(initialAppointments);
     setAppointments(initialAppointments);
-  }, [initialAppointments]);
+  }
 
   const activeDoctor = useMemo(() => {
     if (!currentDoctorId) return "All Clinicians";
@@ -118,7 +119,7 @@ export function AppointmentsClient({
     setIsBookModalOpen(true);
   };
 
-  const handleCreateSuccess = (_newApt: DbAppointment) => {
+  const handleCreateSuccess = () => {
     setIsBookModalOpen(false);
     router.refresh();
   };

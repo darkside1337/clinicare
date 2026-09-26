@@ -22,10 +22,9 @@ vi.mock("@/lib/db/client", () => ({
 
 import { listPatients, getPatient } from "@/features/patients/queries";
 import { createPatient, updatePatient, softDeletePatient } from "@/features/patients/mutations";
-import { listAppointmentsForDay, getAppointment } from "@/features/appointments/queries";
-import { createAppointment, updateAppointment } from "@/features/appointments/mutations";
-import { listConsultationsForPatient, getConsultation } from "@/features/consultations/queries";
-import { getPrescription, listPrescriptionsForPatient } from "@/features/prescriptions/queries";
+import { listAppointmentsForDay } from "@/features/appointments/queries";
+import { listConsultationsForPatient } from "@/features/consultations/queries";
+import { getPrescription } from "@/features/prescriptions/queries";
 
 describe("Multi-Tenancy Audit (Two-Clinic Isolation Unit Tests)", () => {
   beforeEach(() => {
