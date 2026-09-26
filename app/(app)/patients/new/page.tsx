@@ -4,13 +4,25 @@ import Link from "next/link";
 import { UserPlus, ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { PatientForm } from "@/features/patients/components/patient-form";
+import { getSession } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
   title: "Register New Patient | CliniCare",
   description: "New patient medical intake and registration form",
 };
 
-export default function NewPatientPage() {
+export default async function NewPatientPage() {
+  // Authoritative session check, consistent with every other (app) page.
+  // Broad route protection lives in the (app) layout + proxy; this keeps
+  // the page compliant with the Phase 9 multi-tenancy audit.
+  await getSession();
+
+  const todayDate = new Date().toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+
   return (
     <div className="min-h-screen bg-[#FAFAF7] text-[#141618] selection:bg-[#141618] selection:text-[#FAFAF7]">
       {/* Top Clinical Navigation Bar */}
@@ -30,7 +42,7 @@ export default function NewPatientPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-mono text-[#5A5D61]">DATE: 24/09/2026</span>
+          <span className="text-xs font-mono text-[#5A5D61]">DATE: {todayDate}</span>
         </div>
       </header>
 

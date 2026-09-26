@@ -74,12 +74,20 @@ export function DayView({
       : doctors.filter((d) => d.name === selectedClinician || d.id === selectedClinician);
 
   const handleStatusChange = async (id: string, newStatus: AppointmentStatus) => {
+    const previousStatus = normalized.find((a) => a.id === id)?.status;
     onStatusChange?.(id, newStatus);
     setActiveStatusMenuId(null);
     try {
-      await updateAppointmentStatusAction(id, newStatus);
+      const result = await updateAppointmentStatusAction(id, newStatus);
+      if (!result.success && previousStatus) {
+        // Roll back the optimistic update so UI never diverges from the server.
+        onStatusChange?.(id, previousStatus);
+      }
     } catch (err) {
       console.error("Failed to update appointment status:", err);
+      if (previousStatus) {
+        onStatusChange?.(id, previousStatus);
+      }
     }
   };
 

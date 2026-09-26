@@ -18,14 +18,12 @@ import { ConsultationTimeline } from "@/features/consultations/components/consul
 
 interface PatientProfileClientProps {
   initialData: PatientRecord;
-  sessionRole?: "doctor" | "receptionist";
-  sessionUserName?: string;
+  canStartConsultation: boolean;
 }
 
 export function PatientProfileClient({
   initialData,
-  sessionRole = "doctor",
-  sessionUserName,
+  canStartConsultation,
 }: PatientProfileClientProps) {
   const {
     patient,
@@ -90,7 +88,7 @@ export function PatientProfileClient({
           </div>
         </div>
 
-        {sessionRole === "doctor" && (
+        {canStartConsultation && (
           <Button
             asChild
             className="min-h-[32px] rounded-none border border-[#141618] bg-[#141618] px-3.5 text-xs font-semibold uppercase tracking-wider text-[#FAFAF7] transition-colors hover:bg-black"

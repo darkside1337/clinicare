@@ -142,12 +142,20 @@ export function AppointmentQueue({
   });
 
   const handleStatusSelect = async (id: string, newStatus: AppointmentStatus) => {
+    const previousStatus = normalized.find((a) => a.id === id)?.status;
     onStatusChange?.(id, newStatus);
     setStatusMenuOpenId(null);
     try {
-      await updateAppointmentStatusAction(id, newStatus);
+      const result = await updateAppointmentStatusAction(id, newStatus);
+      if (!result.success && previousStatus) {
+        // Roll back the optimistic update so UI never diverges from the server.
+        onStatusChange?.(id, previousStatus);
+      }
     } catch (err) {
       console.error("Failed to update status:", err);
+      if (previousStatus) {
+        onStatusChange?.(id, previousStatus);
+      }
     }
   };
 

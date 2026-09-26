@@ -110,7 +110,8 @@ export default function LoginView() {
             </Button>
           </div>
 
-          {/* Sandbox Test Personas Quick Access */}
+          {/* Sandbox Test Personas Quick Access (dev-only; never rendered in production) */}
+          {process.env.NODE_ENV !== "production" && (
           <div className="border border-[#141618] bg-[#FAFAF7] p-3.5 space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-mono uppercase tracking-widest font-bold text-[#141618]">
@@ -146,6 +147,7 @@ export default function LoginView() {
               </Button>
             </div>
           </div>
+          )}
 
           {/* Help & Practice Assignment Link */}
           <div className="border-t border-[#D8D4CC] pt-4 text-xs font-mono space-y-2">

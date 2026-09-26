@@ -127,11 +127,14 @@ export default async function PatientPage({ params }: PageProps) {
     })),
   };
 
+  // Server-side role decision: only doctors may start consultations.
+  // The client receives a plain boolean and must not re-derive authorization.
+  const canStartConsultation = session.role === "doctor";
+
   return (
     <PatientProfileClient
       initialData={record}
-      sessionRole={session.role}
-      sessionUserName={session.user.name}
+      canStartConsultation={canStartConsultation}
     />
   );
 }

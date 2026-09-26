@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { User, Plus, ArrowRight } from "lucide-react";
 import { DashboardQuickActions } from "@/features/appointments/components/dashboard-quick-actions";
 import {
@@ -44,11 +43,10 @@ export function DashboardClient({
   initialAppointments = [],
   recentPatients = [],
   patients = [],
-  sessionRole,
+  sessionRole = "doctor",
 }: DashboardClientProps) {
-  const searchParams = useSearchParams();
-  const paramRole = searchParams?.get("role") as "doctor" | "receptionist" | null;
-  const role = paramRole || sessionRole || "doctor";
+  // Server-resolved role is the only source of truth — never trust URL params.
+  const role = sessionRole;
 
   const [appointments, setAppointments] = useState<AppointmentDetails[]>(initialAppointments);
 

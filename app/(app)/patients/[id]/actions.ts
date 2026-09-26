@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getSession } from "@/lib/auth/session";
+import { requireDoctor } from "@/lib/auth/require-doctor";
 import type { ActionResult } from "@/lib/actions";
 import {
   patientSchema,
@@ -15,6 +16,7 @@ import {
   updatePatient,
   softDeletePatient,
   createAllergy,
+  updateAllergy,
   deleteAllergy,
   createProblem,
   updateProblem,
@@ -30,7 +32,7 @@ export async function updatePatientAction(
 ): Promise<ActionResult<Patient>> {
   const session = await getSession();
 
-  const parsed = patientSchema.safeParse(input);
+  const parsed = patientSchema.partial().safeParse(input);
   if (!parsed.success) {
     const errorMsg = parsed.error.issues
       .map((issue) => issue.message)
@@ -118,6 +120,46 @@ export async function addAllergyAction(
         error instanceof Error
           ? error.message
           : "Failed to add allergy. Please try again.",
+    };
+  }
+}
+
+/**
+ * Server Action to update an allergy.
+ * Server-enforced doctor role check; multi-tenant verified via clinicId.
+ */
+export async function updateAllergyAction(
+  allergyId: string,
+  patientId: string,
+  input: Partial<AllergyInput>
+): Promise<ActionResult<Allergy>> {
+  try {
+    const session = await requireDoctor();
+
+    const parsed = allergySchema.partial().safeParse(input);
+    if (!parsed.success) {
+      const errorMsg = parsed.error.issues
+        .map((issue) => issue.message)
+        .join(", ");
+      return { success: false, error: errorMsg };
+    }
+
+    const allergy = await updateAllergy(
+      session.clinicId,
+      allergyId,
+      parsed.data
+    );
+
+    revalidatePath(`/patients/${patientId}`);
+
+    return { success: true, data: allergy };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to update allergy. Please try again.",
     };
   }
 }
