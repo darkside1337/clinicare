@@ -4,12 +4,12 @@ import React, { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   Search,
-  User,
   Stethoscope,
   ArrowRight,
   Loader2,
   Calendar,
   Phone,
+  AlertCircle,
 } from "lucide-react";
 import {
   CommandDialog,
@@ -43,6 +43,7 @@ export default function CommandPalette({
   const [query, setQuery] = useState("");
   const [patients, setPatients] = useState<CommandPalettePatientResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [activeConsultationPatientId, setActiveConsultationPatientId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
   const router = useRouter();
@@ -60,6 +61,7 @@ export default function CommandPalette({
       if (!nextOpen) {
         setQuery("");
         setPatients([]);
+        setActionError(null);
         setActiveConsultationPatientId(null);
       }
     },
@@ -88,22 +90,34 @@ export default function CommandPalette({
     };
   }, [isOpen, setIsOpen]);
 
+  // Query change handler owns loading/empty state so the debounced
+  // effect below never calls setState synchronously in its body.
+  const handleQueryChange = (value: string) => {
+    setQuery(value);
+    setActionError(null);
+    if (!value.trim()) {
+      setPatients([]);
+      setIsSearching(false);
+    } else {
+      setIsSearching(true);
+    }
+  };
+
   // Debounced patient search querying real DB via Server Action
   useEffect(() => {
     const cleanQuery = query.trim();
     if (!cleanQuery) {
-      setPatients([]);
-      setIsSearching(false);
       return;
     }
 
-    setIsSearching(true);
     const timeoutId = setTimeout(async () => {
       try {
         const results = await searchPatientsAction(cleanQuery);
         setPatients(results);
       } catch (err) {
         console.error("Failed to search patients:", err);
+        setPatients([]);
+        setActionError("Patient search failed. Check connectivity and try again.");
       } finally {
         setIsSearching(false);
       }
@@ -112,7 +126,8 @@ export default function CommandPalette({
     return () => clearTimeout(timeoutId);
   }, [query]);
 
-  const handleSelectPatient = (patientId: string) => {
+  const handleSelectPatient = (patientId: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
     setIsOpen(false);
     startTransition(() => {
       router.push(`/patients/${patientId}`);
@@ -127,6 +142,7 @@ export default function CommandPalette({
     if (activeConsultationPatientId) return;
 
     setActiveConsultationPatientId(patientId);
+    setActionError(null);
     try {
       const result = await startWalkInConsultationAction(patientId);
       if (result.success && result.data?.redirectUrl) {
@@ -135,11 +151,12 @@ export default function CommandPalette({
           router.push(result.data!.redirectUrl);
         });
       } else {
-        alert(result.error || "Unable to start walk-in consultation.");
+        setActionError(result.error || "Unable to start walk-in consultation.");
         setActiveConsultationPatientId(null);
       }
     } catch (err) {
       console.error("Error starting consultation:", err);
+      setActionError("Unexpected error starting walk-in consultation.");
       setActiveConsultationPatientId(null);
     }
   };
@@ -151,8 +168,8 @@ export default function CommandPalette({
       title="PATIENT RECORD SEARCH"
       description="Search clinical patient directory and trigger walk-in consultations"
     >
-      <div className="flex items-center justify-between border-b border-[#141618] bg-[#FAFAF7] px-4 py-2 text-xs font-mono">
-        <div className="flex items-center gap-2 font-bold uppercase text-[#141618]">
+      <div className="flex items-center justify-between border-b border-primary bg-background px-4 py-2 text-xs font-mono">
+        <div className="flex items-center gap-2 font-bold uppercase text-foreground">
           <Search className="size-4" />
           <span>Patient Record Search</span>
         </div>
@@ -160,7 +177,7 @@ export default function CommandPalette({
           <Badge variant={role === "doctor" ? "outline" : "amber"} className="text-[10px] uppercase font-mono">
             Access: {role}
           </Badge>
-          <span className="border border-[#D8D4CC] bg-white px-1.5 py-0.5 text-[10px] text-[#5A5D61]">
+          <span className="border border-neutral-border bg-card px-1.5 py-0.5 text-[10px] text-text-muted">
             ESC TO CLOSE
           </span>
         </div>
@@ -169,20 +186,39 @@ export default function CommandPalette({
       <CommandInput
         placeholder="Type patient name, DOB, phone, or email to search..."
         value={query}
-        onValueChange={setQuery}
-        className="font-mono text-xs placeholder:text-[#5A5D61]"
+        onValueChange={handleQueryChange}
+        className="font-mono text-xs placeholder:text-text-muted"
       />
+
+      {actionError && (
+        <div
+          role="alert"
+          className="mx-2 mt-2 flex items-start gap-2 border border-clinical-critical bg-clinical-critical-bg p-2.5 text-xs font-mono text-clinical-critical"
+        >
+          <AlertCircle className="mt-0.5 size-4 shrink-0" />
+          <span className="flex-1">{actionError}</span>
+          <Button
+            type="button"
+            variant="ghost"
+            size="xs"
+            onClick={() => setActionError(null)}
+            className="h-6 shrink-0 px-1.5 text-clinical-critical hover:bg-card hover:text-clinical-critical"
+          >
+            Dismiss
+          </Button>
+        </div>
+      )}
 
       <CommandList className="max-h-[380px] p-2">
         {isSearching && (
-          <div className="flex items-center justify-center gap-2 py-6 text-xs font-mono text-[#5A5D61]">
-            <Loader2 className="size-4 animate-spin text-[#141618]" />
+          <div className="flex items-center justify-center gap-2 py-6 text-xs font-mono text-text-muted">
+            <Loader2 className="size-4 animate-spin text-foreground" />
             <span>Searching tenant database...</span>
           </div>
         )}
 
         {!isSearching && query.trim() !== "" && patients.length === 0 && (
-          <CommandEmpty className="py-6 text-center text-xs font-mono text-[#5A5D61]">
+          <CommandEmpty className="py-6 text-center text-xs font-mono text-text-muted">
             No patient records matched &quot;{query}&quot;.
             <div className="mt-3">
               <Button
@@ -192,7 +228,7 @@ export default function CommandPalette({
                   setIsOpen(false);
                   router.push("/patients/new");
                 }}
-                className="rounded-none border-[#141618] font-mono text-xs"
+                className="rounded-none border-primary font-mono text-xs"
               >
                 Register New Patient
               </Button>
@@ -201,7 +237,7 @@ export default function CommandPalette({
         )}
 
         {!isSearching && query.trim() === "" && (
-          <div className="py-8 text-center text-xs font-mono text-[#5A5D61]">
+          <div className="py-8 text-center text-xs font-mono text-text-muted">
             Enter a search term above to find patients across the practice.
           </div>
         )}
@@ -216,26 +252,26 @@ export default function CommandPalette({
                   key={patient.id}
                   value={`${patient.name} ${patient.dob} ${patient.phone ?? ""} ${patient.email ?? ""}`}
                   onSelect={() => handleSelectPatient(patient.id)}
-                  className="flex items-center justify-between border-b border-[#D8D4CC]/60 p-2.5 hover:bg-[#EFECE6] cursor-pointer"
+                  className="flex items-center justify-between border-b border-neutral-border/60 p-2.5 hover:bg-muted cursor-pointer"
                 >
                   <div className="flex items-start gap-3">
-                    <div className="mt-0.5 flex size-6 shrink-0 items-center justify-center border border-[#141618] bg-white font-mono text-[10px] font-bold uppercase text-[#141618]">
+                    <div className="mt-0.5 flex size-6 shrink-0 items-center justify-center border border-primary bg-card font-mono text-[10px] font-bold uppercase text-foreground">
                       {patient.sex?.charAt(0) || "P"}
                     </div>
                     <div className="space-y-0.5">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-[#141618] uppercase">
+                        <span className="font-bold text-foreground uppercase">
                           {patient.name}
                         </span>
                         <Badge
                           variant="outline"
-                          className="font-mono text-[10px] px-1 py-0 h-4 border-[#D8D4CC] text-[#5A5D61]"
+                          className="font-mono text-[10px] px-1 py-0 h-4 border-neutral-border text-text-muted"
                         >
                           <Calendar className="size-2.5 mr-0.5 inline" />
                           DOB: {patient.dob}
                         </Badge>
                       </div>
-                      <div className="flex items-center gap-3 text-[11px] font-mono text-[#5A5D61]">
+                      <div className="flex items-center gap-3 text-[11px] font-mono text-text-muted">
                         {patient.phone && (
                           <span className="flex items-center gap-1">
                             <Phone className="size-3" />
@@ -252,8 +288,8 @@ export default function CommandPalette({
                       type="button"
                       variant="ghost"
                       size="xs"
-                      onClick={() => handleSelectPatient(patient.id)}
-                      className="rounded-none font-mono text-[11px] text-[#5A5D61] hover:text-[#141618] hover:bg-white h-7 px-2"
+                      onClick={(e) => handleSelectPatient(patient.id, e)}
+                      className="rounded-none font-mono text-[11px] text-text-muted hover:text-foreground hover:bg-card h-7 px-2"
                     >
                       <span>Profile</span>
                       <ArrowRight className="size-3 ml-1" />
@@ -267,7 +303,7 @@ export default function CommandPalette({
                         size="xs"
                         disabled={isConsultingThis || !!activeConsultationPatientId}
                         onClick={(e) => handleStartConsultation(e, patient.id)}
-                        className="rounded-none border border-[#141618] bg-[#141618] font-mono text-[11px] text-[#FAFAF7] hover:bg-black h-7 px-2.5"
+                        className="rounded-none border border-primary bg-primary font-mono text-[11px] text-primary-foreground hover:bg-black h-7 px-2.5"
                       >
                         {isConsultingThis ? (
                           <>
@@ -290,8 +326,8 @@ export default function CommandPalette({
         )}
       </CommandList>
 
-      <CommandSeparator className="bg-[#D8D4CC]" />
-      <div className="flex items-center justify-between bg-[#FAFAF7] px-4 py-2 text-[10px] font-mono text-[#5A5D61]">
+      <CommandSeparator className="bg-border" />
+      <div className="flex items-center justify-between bg-background px-4 py-2 text-[10px] font-mono text-text-muted">
         <span>↑↓ Navigate • ↵ View Profile</span>
         <span>Doctor: Start Consult creates Walk-In appointment</span>
       </div>
