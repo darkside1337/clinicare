@@ -1,5 +1,6 @@
 import { and, desc, eq, ilike, inArray, isNull, or, gte } from "drizzle-orm";
 import { db } from "@/lib/db/client";
+import type { UserRole } from "@/lib/auth/session";
 import {
   patients,
   allergies,
@@ -55,14 +56,26 @@ export interface PatientDirectoryItem extends Patient {
 
 /**
  * List patients with their allergy flags and active problems for directory display.
+ * Clinical safety data (allergies, active conditions) is strictly gated to doctor callers.
  */
 export async function listPatientsDirectory(
   clinicId: string,
+  role: UserRole,
   search?: string,
 ): Promise<PatientDirectoryItem[]> {
   const patientList = await listPatients(clinicId, search);
   if (patientList.length === 0) {
     return [];
+  }
+
+  // Receptionists never receive allergy flags or active conditions, and never run clinical sub-queries
+  if (role !== "doctor") {
+    return patientList.map((p) => ({
+      ...p,
+      hasSevereAllergy: false,
+      allergySummary: undefined,
+      activeConditions: [],
+    }));
   }
 
   const patientIds = patientList.map((p) => p.id);

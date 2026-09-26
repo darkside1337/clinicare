@@ -14,8 +14,8 @@ export default async function DashboardPage() {
   const session = await getSession();
 
   const [dbAppointments, directoryPatients] = await Promise.all([
-    listAppointmentsForDay(session.clinicId, new Date()),
-    listPatientsDirectory(session.clinicId),
+    listAppointmentsForDay(session.clinicId, new Date(), session.role),
+    listPatientsDirectory(session.clinicId, session.role),
   ]);
 
   const formPatients = directoryPatients.map((p) => ({

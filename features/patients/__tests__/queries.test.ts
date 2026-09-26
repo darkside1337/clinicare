@@ -12,7 +12,12 @@ vi.mock("@/lib/db/client", () => ({
   },
 }));
 
-import { listPatients, getPatient, getPatientSummary } from "../queries";
+import {
+  listPatients,
+  listPatientsDirectory,
+  getPatient,
+  getPatientSummary,
+} from "../queries";
 
 describe("features/patients/queries.ts", () => {
   beforeEach(() => {
@@ -132,5 +137,83 @@ describe("features/patients/queries.ts", () => {
     expect(summary?.patient.name).toBe("John Doe");
     expect(summary?.allergies).toHaveLength(1);
     expect(summary?.problems).toHaveLength(1);
+  });
+
+  describe("listPatientsDirectory", () => {
+    it("returns patients without querying allergies or problems for receptionist role", async () => {
+      const mockPatient = {
+        id: "pat-1",
+        clinicId: "clinic-test",
+        name: "Alice Smith",
+        dob: "1990-01-01",
+        deletedAt: null,
+      };
+
+      const chain: any = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockResolvedValue([mockPatient]),
+      };
+      mockSelect.mockReturnValue(chain);
+
+      const result = await listPatientsDirectory("clinic-test", "receptionist");
+
+      // mockSelect should be called only once for listPatients, never for allergies or problems
+      expect(mockSelect).toHaveBeenCalledTimes(1);
+      expect(result).toHaveLength(1);
+      expect(result[0].hasSevereAllergy).toBe(false);
+      expect(result[0].allergySummary).toBeUndefined();
+      expect(result[0].activeConditions).toEqual([]);
+    });
+
+    it("enriches allergy and problem data for doctor role", async () => {
+      const mockPatient = {
+        id: "pat-1",
+        clinicId: "clinic-test",
+        name: "Alice Smith",
+        dob: "1990-01-01",
+        deletedAt: null,
+      };
+
+      let callCount = 0;
+      mockSelect.mockImplementation(() => {
+        callCount++;
+        const currentCall = callCount;
+        const chain: any = {
+          from: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          orderBy: vi.fn().mockReturnThis(),
+          then: (resolve: (val: any) => void) => {
+            if (currentCall === 1) return resolve([mockPatient]);
+            if (currentCall === 2)
+              return resolve([
+                {
+                  patientId: "pat-1",
+                  substance: "Peanuts",
+                  severity: "severe",
+                  reaction: "Anaphylaxis",
+                },
+              ]);
+            if (currentCall === 3)
+              return resolve([
+                {
+                  patientId: "pat-1",
+                  condition: "Asthma",
+                },
+              ]);
+            return resolve([]);
+          },
+        };
+        return chain;
+      });
+
+      const result = await listPatientsDirectory("clinic-test", "doctor");
+
+      expect(mockSelect).toHaveBeenCalledTimes(3);
+      expect(result).toHaveLength(1);
+      expect(result[0].hasSevereAllergy).toBe(true);
+      expect(result[0].allergySummary).toBe("Peanuts (Anaphylaxis)");
+      expect(result[0].activeConditions).toEqual(["Asthma"]);
+    });
   });
 });

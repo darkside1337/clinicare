@@ -1,5 +1,6 @@
 import { and, asc, desc, eq, gte, inArray, lte } from "drizzle-orm";
 import { db } from "@/lib/db/client";
+import type { UserRole } from "@/lib/auth/session";
 import {
   appointments,
   patients,
@@ -25,10 +26,12 @@ export interface AppointmentDetails extends Appointment {
 /**
  * List all appointments for a given calendar day within a clinic.
  * Can optionally be filtered by a specific doctorId.
+ * Allergy safety data is strictly gated to doctor callers.
  */
 export async function listAppointmentsForDay(
   clinicId: string,
   date: Date | string,
+  role: UserRole,
   doctorId?: string
 ): Promise<AppointmentDetails[]> {
   const targetDate = typeof date === "string" ? new Date(date) : new Date(date.getTime());
@@ -79,6 +82,17 @@ export async function listAppointmentsForDay(
     return [];
   }
 
+  // Receptionists never receive allergy flags or trigger clinical allergy sub-queries
+  if (role !== "doctor") {
+    return rows.map((r) => ({
+      ...r,
+      patient: {
+        ...r.patient,
+        hasSevereAllergy: false,
+      },
+    }));
+  }
+
   const patientIds = [...new Set(rows.map((r) => r.patient.id))];
   const severeAllergies = await db
     .select({ patientId: allergies.patientId })
@@ -107,7 +121,8 @@ export async function listAppointmentsForDay(
  */
 export async function listAppointmentsForPatient(
   clinicId: string,
-  patientId: string
+  patientId: string,
+  role?: UserRole
 ): Promise<AppointmentDetails[]> {
   const rows = await db
     .select({
@@ -146,6 +161,16 @@ export async function listAppointmentsForPatient(
     return [];
   }
 
+  if (role && role !== "doctor") {
+    return rows.map((r) => ({
+      ...r,
+      patient: {
+        ...r.patient,
+        hasSevereAllergy: false,
+      },
+    }));
+  }
+
   const severeAllergies = await db
     .select({ id: allergies.id })
     .from(allergies)
@@ -173,7 +198,8 @@ export async function listAppointmentsForPatient(
  */
 export async function getAppointment(
   clinicId: string,
-  appointmentId: string
+  appointmentId: string,
+  role?: UserRole
 ): Promise<AppointmentDetails | null> {
   const rows = await db
     .select({
@@ -211,6 +237,16 @@ export async function getAppointment(
   const apt = rows[0];
   if (!apt) {
     return null;
+  }
+
+  if (role && role !== "doctor") {
+    return {
+      ...apt,
+      patient: {
+        ...apt.patient,
+        hasSevereAllergy: false,
+      },
+    };
   }
 
   const severeAllergies = await db

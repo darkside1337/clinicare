@@ -270,7 +270,7 @@ export function AppointmentQueue({
                             Walk-In
                           </Badge>
                         )}
-                        {apt.allergyFlag && (
+                        {role === "doctor" && apt.allergyFlag && (
                           <Badge
                             variant="destructive"
                             className="flex items-center gap-1 font-mono text-[10px]"

@@ -236,7 +236,7 @@ export function DashboardClient({
                       <span>
                         DOB: {rp.dob} • {calculateAge(rp.dob)}y
                       </span>
-                      {rp.hasSevereAllergy && (
+                      {role === "doctor" && rp.hasSevereAllergy && (
                         <span className="text-[#B91C1C] font-bold uppercase text-[10px]">
                           Allergy Flag
                         </span>

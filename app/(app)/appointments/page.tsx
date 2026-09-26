@@ -36,8 +36,8 @@ export default async function AppointmentsPage({ searchParams }: PageProps) {
   const effectiveDoctorId = doctorId && doctorId !== "all" ? doctorId : undefined;
 
   const [dbAppointments, directoryPatients] = await Promise.all([
-    listAppointmentsForDay(session.clinicId, targetDate, effectiveDoctorId),
-    listPatientsDirectory(session.clinicId),
+    listAppointmentsForDay(session.clinicId, targetDate, session.role, effectiveDoctorId),
+    listPatientsDirectory(session.clinicId, session.role),
   ]);
 
   const formPatients = directoryPatients.map((p) => ({
