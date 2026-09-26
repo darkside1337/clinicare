@@ -8,7 +8,7 @@ import {
   index,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { user, session, account, verification } from "./auth-schema";
+import { user, session } from "./auth-schema";
 
 // Re-export all Better Auth tables and relations
 export * from "./auth-schema";

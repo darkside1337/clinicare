@@ -3,10 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireDoctor } from "@/lib/auth/require-doctor";
 import type { ActionResult } from "@/lib/actions";
-import {
-  updateConsultationSchema,
-  type UpdateConsultationInput,
-} from "@/features/consultations/schema";
+import { updateConsultationSchema } from "@/features/consultations/schema";
 import { updateConsultation } from "@/features/consultations/mutations";
 import { createPrescriptionSchema } from "@/features/prescriptions/schema";
 import { createPrescription } from "@/features/prescriptions/mutations";

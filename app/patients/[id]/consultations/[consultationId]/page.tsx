@@ -1,6 +1,5 @@
 import React from "react";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { requireDoctor } from "@/lib/auth/require-doctor";
 import { getConsultation } from "@/features/consultations/queries";
 import { ConsultationDetailClient } from "./consultation-detail-client";
@@ -61,7 +60,7 @@ export default async function ConsultationDetailPage({ params }: PageProps) {
       diagnosis: record.diagnosis || "",
       treatment: record.treatment || "",
       notes: record.notes || "",
-      prescriptions: record.prescriptions.map((rx, idx) => ({
+      prescriptions: record.prescriptions.map((rx) => ({
         id: rx.id,
         consultationId: record.id,
         prescriptionNumber: `RX-${rx.id.slice(0, 8).toUpperCase()}`,

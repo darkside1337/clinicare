@@ -80,7 +80,7 @@ export function PrescriptionForm({
 
   const handleAddMedication = (data: PrescriptionItemInput) => {
     const newItem: PrescriptionItemDraft = {
-      id: `item-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      id: `item-${crypto.randomUUID()}`,
       medication: data.medication,
       dosage: data.dosage,
       frequency: data.frequency,

@@ -44,7 +44,7 @@ export async function GET(
     });
 
     const nodeStream = await renderToStream(
-      pdfDocument as unknown as React.ReactElement<any>
+      pdfDocument as unknown as React.ReactElement<Record<string, unknown>>
     );
     const webStream = Readable.toWeb(nodeStream as unknown as Readable);
 

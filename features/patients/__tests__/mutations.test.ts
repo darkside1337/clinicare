@@ -19,7 +19,6 @@ vi.mock("@/lib/db/client", () => ({
 
 import {
   createPatient,
-  updatePatient,
   softDeletePatient,
   createAllergy,
   deleteAllergy,

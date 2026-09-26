@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { User, Plus, ArrowRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import {
   DashboardAppointment,
   MOCK_TODAY_APPOINTMENTS,

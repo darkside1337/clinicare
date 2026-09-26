@@ -21,11 +21,14 @@ export function PatientSearch({
   className,
 }: PatientSearchProps) {
   const [internalValue, setInternalValue] = useState(value);
+  const [prevValue, setPrevValue] = useState(value);
 
-  // Sync internal state if external value changes
-  useEffect(() => {
+  // Sync internal state if external value changes (render-time adjustment,
+  // avoids cascading renders from setState-in-effect)
+  if (value !== prevValue) {
+    setPrevValue(value);
     setInternalValue(value);
-  }, [value]);
+  }
 
   // Debounce the search callback
   useEffect(() => {

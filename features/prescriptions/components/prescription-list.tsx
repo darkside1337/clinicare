@@ -41,13 +41,16 @@ export function PrescriptionList({
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [showAddForm, setShowAddForm] = useState(false);
   const [prescriptions, setPrescriptions] = useState<PrescriptionSummaryData[]>(
-    initialPrescriptions || []
+    initialPrescriptions ?? []
   );
+  const [prevInitial, setPrevInitial] =
+    useState<PrescriptionSummaryData[]>(initialPrescriptions);
 
-  // Sync if prop updates
-  React.useEffect(() => {
-    setPrescriptions(initialPrescriptions || []);
-  }, [initialPrescriptions]);
+  // Sync if prop updates (render-time adjustment, avoids setState-in-effect)
+  if (initialPrescriptions !== prevInitial) {
+    setPrevInitial(initialPrescriptions);
+    setPrescriptions(initialPrescriptions ?? []);
+  }
 
   const handleCreated = (newRx: PrescriptionWithItems) => {
     const summaryData: PrescriptionSummaryData = {
