@@ -89,22 +89,23 @@ export async function softDeletePatientAction(
 
 /**
  * Server Action to add an allergy to a patient.
+ * Server-enforced doctor role check; multi-tenant verified.
  */
 export async function addAllergyAction(
   patientId: string,
   input: AllergyInput
 ): Promise<ActionResult<Allergy>> {
-  const session = await getSession();
-
-  const parsed = allergySchema.safeParse(input);
-  if (!parsed.success) {
-    const errorMsg = parsed.error.issues
-      .map((issue) => issue.message)
-      .join(", ");
-    return { success: false, error: errorMsg };
-  }
-
   try {
+    const session = await requireDoctor();
+
+    const parsed = allergySchema.safeParse(input);
+    if (!parsed.success) {
+      const errorMsg = parsed.error.issues
+        .map((issue) => issue.message)
+        .join(", ");
+      return { success: false, error: errorMsg };
+    }
+
     const allergy = await createAllergy(session.clinicId, {
       ...parsed.data,
       patientId,
@@ -166,14 +167,15 @@ export async function updateAllergyAction(
 
 /**
  * Server Action to delete an allergy.
+ * Server-enforced doctor role check; multi-tenant verified.
  */
 export async function deleteAllergyAction(
   allergyId: string,
   patientId: string
 ): Promise<ActionResult<{ id: string }>> {
-  const session = await getSession();
-
   try {
+    const session = await requireDoctor();
+
     const result = await deleteAllergy(session.clinicId, allergyId);
 
     revalidatePath(`/patients/${patientId}`);
@@ -192,22 +194,23 @@ export async function deleteAllergyAction(
 
 /**
  * Server Action to add a chronic problem to a patient.
+ * Server-enforced doctor role check; multi-tenant verified.
  */
 export async function addProblemAction(
   patientId: string,
   input: ProblemInput
 ): Promise<ActionResult<Problem>> {
-  const session = await getSession();
-
-  const parsed = problemSchema.safeParse(input);
-  if (!parsed.success) {
-    const errorMsg = parsed.error.issues
-      .map((issue) => issue.message)
-      .join(", ");
-    return { success: false, error: errorMsg };
-  }
-
   try {
+    const session = await requireDoctor();
+
+    const parsed = problemSchema.safeParse(input);
+    if (!parsed.success) {
+      const errorMsg = parsed.error.issues
+        .map((issue) => issue.message)
+        .join(", ");
+      return { success: false, error: errorMsg };
+    }
+
     const problem = await createProblem(session.clinicId, {
       ...parsed.data,
       patientId,
@@ -229,23 +232,24 @@ export async function addProblemAction(
 
 /**
  * Server Action to update a chronic problem.
+ * Server-enforced doctor role check; multi-tenant verified.
  */
 export async function updateProblemAction(
   problemId: string,
   patientId: string,
   input: Partial<ProblemInput>
 ): Promise<ActionResult<Problem>> {
-  const session = await getSession();
-
-  const parsed = problemSchema.partial().safeParse(input);
-  if (!parsed.success) {
-    const errorMsg = parsed.error.issues
-      .map((issue) => issue.message)
-      .join(", ");
-    return { success: false, error: errorMsg };
-  }
-
   try {
+    const session = await requireDoctor();
+
+    const parsed = problemSchema.partial().safeParse(input);
+    if (!parsed.success) {
+      const errorMsg = parsed.error.issues
+        .map((issue) => issue.message)
+        .join(", ");
+      return { success: false, error: errorMsg };
+    }
+
     const problem = await updateProblem(
       session.clinicId,
       problemId,

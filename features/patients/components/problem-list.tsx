@@ -22,6 +22,7 @@ interface ProblemListProps {
   patientId?: string;
   onAddProblem?: (problem: Problem) => void;
   onUpdateProblem?: (problem: Problem) => void;
+  readOnly?: boolean;
   className?: string;
 }
 
@@ -30,6 +31,7 @@ export function ProblemList({
   patientId,
   onAddProblem,
   onUpdateProblem,
+  readOnly = false,
   className,
 }: ProblemListProps) {
   const [problems, setProblems] = useState<Problem[]>(initialProblems);
@@ -128,19 +130,21 @@ export function ProblemList({
           <span className="text-[11px] font-mono text-[#5A5D61]">
             {problems.filter((p) => p.status === "active").length} ACTIVE
           </span>
-          <Button
-            type="button"
-            variant="outline"
-            size="xs"
-            onClick={() => {
-              setFormError(null);
-              setIsAddProblemOpen(true);
-            }}
-            className="h-5 rounded-none border-[#141618] px-1.5 text-[11px] font-mono uppercase tracking-wider hover:bg-[#141618] hover:text-[#FAFAF7]"
-          >
-            <Plus className="size-2.5 mr-0.5" />
-            Add
-          </Button>
+          {!readOnly && (
+            <Button
+              type="button"
+              variant="outline"
+              size="xs"
+              onClick={() => {
+                setFormError(null);
+                setIsAddProblemOpen(true);
+              }}
+              className="h-5 rounded-none border-[#141618] px-1.5 text-[11px] font-mono uppercase tracking-wider hover:bg-[#141618] hover:text-[#FAFAF7]"
+            >
+              <Plus className="size-2.5 mr-0.5" />
+              Add
+            </Button>
+          )}
         </div>
       </div>
 
@@ -169,28 +173,45 @@ export function ProblemList({
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="xs"
-                      disabled={isToggling}
-                      onClick={() => handleToggleStatus(problem)}
-                      title={isActive ? "Mark resolved" : "Re-activate"}
-                      className={`h-5 text-[11px] font-mono uppercase px-2 py-0 border shrink-0 tracking-wider rounded-none ${
-                        isActive
-                          ? "border-[#141618] bg-[#141618] text-[#FAFAF7] hover:bg-black"
-                          : "border-[#166534] bg-[#F0FDF4] text-[#166534] hover:bg-[#DCFCE7]"
-                      }`}
-                    >
-                      {isToggling ? (
-                        <RefreshCw className="size-2.5 animate-spin mr-1" />
-                      ) : isActive ? (
-                        <Activity className="size-2.5 mr-1" />
-                      ) : (
-                        <CheckCircle2 className="size-2.5 mr-1" />
-                      )}
-                      <span>{problem.status}</span>
-                    </Button>
+                    {readOnly ? (
+                      <span
+                        className={`h-5 text-[11px] font-mono uppercase px-2 py-0 border shrink-0 tracking-wider flex items-center ${
+                          isActive
+                            ? "border-[#141618] bg-[#141618] text-[#FAFAF7]"
+                            : "border-[#166534] bg-[#F0FDF4] text-[#166534]"
+                        }`}
+                      >
+                        {isActive ? (
+                          <Activity className="size-2.5 mr-1" />
+                        ) : (
+                          <CheckCircle2 className="size-2.5 mr-1" />
+                        )}
+                        <span>{problem.status}</span>
+                      </span>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="xs"
+                        disabled={isToggling}
+                        onClick={() => handleToggleStatus(problem)}
+                        title={isActive ? "Mark resolved" : "Re-activate"}
+                        className={`h-5 text-[11px] font-mono uppercase px-2 py-0 border shrink-0 tracking-wider rounded-none ${
+                          isActive
+                            ? "border-[#141618] bg-[#141618] text-[#FAFAF7] hover:bg-black"
+                            : "border-[#166534] bg-[#F0FDF4] text-[#166534] hover:bg-[#DCFCE7]"
+                        }`}
+                      >
+                        {isToggling ? (
+                          <RefreshCw className="size-2.5 animate-spin mr-1" />
+                        ) : isActive ? (
+                          <Activity className="size-2.5 mr-1" />
+                        ) : (
+                          <CheckCircle2 className="size-2.5 mr-1" />
+                        )}
+                        <span>{problem.status}</span>
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>

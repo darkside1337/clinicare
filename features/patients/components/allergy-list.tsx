@@ -22,6 +22,7 @@ interface AllergyListProps {
   patientId?: string;
   onAddAllergy?: (allergy: Allergy) => void;
   onDeleteAllergy?: (allergyId: string) => void;
+  readOnly?: boolean;
   className?: string;
 }
 
@@ -30,6 +31,7 @@ export function AllergyList({
   patientId,
   onAddAllergy,
   onDeleteAllergy,
+  readOnly = false,
   className,
 }: AllergyListProps) {
   const [allergies, setAllergies] = useState<Allergy[]>(initialAllergies);
@@ -115,19 +117,21 @@ export function AllergyList({
           <span className="text-[11px] font-mono text-[#B91C1C] font-semibold">
             {allergies.length} RECORDED
           </span>
-          <Button
-            type="button"
-            variant="outline"
-            size="xs"
-            onClick={() => {
-              setFormError(null);
-              setIsAddAllergyOpen(true);
-            }}
-            className="h-5 rounded-none border-[#141618] px-1.5 text-[11px] font-mono uppercase tracking-wider hover:bg-[#141618] hover:text-[#FAFAF7]"
-          >
-            <Plus className="size-2.5 mr-0.5" />
-            Log
-          </Button>
+          {!readOnly && (
+            <Button
+              type="button"
+              variant="outline"
+              size="xs"
+              onClick={() => {
+                setFormError(null);
+                setIsAddAllergyOpen(true);
+              }}
+              className="h-5 rounded-none border-[#141618] px-1.5 text-[11px] font-mono uppercase tracking-wider hover:bg-[#141618] hover:text-[#FAFAF7]"
+            >
+              <Plus className="size-2.5 mr-0.5" />
+              Log
+            </Button>
+          )}
         </div>
       </div>
 
@@ -177,21 +181,23 @@ export function AllergyList({
                     >
                       {allergy.severity}
                     </span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="xs"
-                      disabled={isDeleting}
-                      onClick={() => handleDeleteAllergy(allergy.id)}
-                      className="size-6 p-0 text-[#5A5D61] hover:text-[#B91C1C] hover:bg-transparent opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      {isDeleting ? (
-                        <Loader2 className="size-3 animate-spin" />
-                      ) : (
-                        <Trash2 className="size-3" />
-                      )}
-                      <span className="sr-only">Delete allergy</span>
-                    </Button>
+                    {!readOnly && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="xs"
+                        disabled={isDeleting}
+                        onClick={() => handleDeleteAllergy(allergy.id)}
+                        className="size-6 p-0 text-[#5A5D61] hover:text-[#B91C1C] hover:bg-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        {isDeleting ? (
+                          <Loader2 className="size-3 animate-spin" />
+                        ) : (
+                          <Trash2 className="size-3" />
+                        )}
+                        <span className="sr-only">Delete allergy</span>
+                      </Button>
+                    )}
                   </div>
                 </div>
                 {allergy.reaction && (
