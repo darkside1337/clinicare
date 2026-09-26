@@ -11,7 +11,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ClinicalConsultationDetail, Prescription } from "@/lib/mock-consultations";
+import type {
+  ClinicalConsultationDetail,
+  ConsultationPrescription,
+} from "@/features/consultations/types";
 import { PrescriptionList } from "@/features/prescriptions/components/prescription-list";
 
 interface ConsultationDetailClientProps {
@@ -24,7 +27,7 @@ export function ConsultationDetailClient({
   const [activeTab, setActiveTab] = useState<"notes" | "prescriptions">("notes");
 
   const prescriptions = consultation.prescriptions || [];
-  const currentRx: Prescription | undefined = prescriptions[0];
+  const currentRx: ConsultationPrescription | undefined = prescriptions[0];
 
   return (
     <div className="min-h-screen bg-[#FAFAF7] text-[#141618] selection:bg-[#141618] selection:text-[#FAFAF7]">
