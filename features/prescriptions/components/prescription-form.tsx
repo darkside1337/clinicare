@@ -17,7 +17,7 @@ import {
   prescriptionItemSchema,
   type PrescriptionItemInput,
 } from "../schema";
-import { createPrescriptionAction } from "@/app/(app)/patients/[id]/consultations/[consultationId]/actions";
+import { createPrescriptionAction } from "../actions";
 import type { PrescriptionWithItems } from "../queries";
 
 export interface PrescriptionItemDraft {
@@ -119,11 +119,7 @@ export function PrescriptionForm({
         })),
       };
 
-      const result = await createPrescriptionAction(
-        patientId,
-        consultationId,
-        payload
-      );
+      const result = await createPrescriptionAction(patientId, payload);
 
       if (!result.success) {
         setServerError(result.error);

@@ -5,10 +5,9 @@ import { requireDoctor } from "@/lib/auth/require-doctor";
 import type { ActionResult } from "@/lib/actions";
 import { updateConsultationSchema } from "@/features/consultations/schema";
 import { updateConsultation } from "@/features/consultations/mutations";
-import { createPrescriptionSchema } from "@/features/prescriptions/schema";
-import { createPrescription } from "@/features/prescriptions/mutations";
-import type { PrescriptionWithItems } from "@/features/prescriptions/queries";
 import type { Consultation } from "@/lib/db/schema";
+import { createPrescriptionAction as domainCreatePrescriptionAction } from "@/features/prescriptions/actions";
+import type { PrescriptionWithItems } from "@/features/prescriptions/queries";
 
 /**
  * Server Action to update clinical notes on an existing consultation encounter.
@@ -54,41 +53,13 @@ export async function updateConsultationAction(
 
 /**
  * Server Action to create an itemized prescription for a consultation encounter.
- * Server-enforced doctor role check; multi-tenant verified.
+ * Backwards-compatible route wrapper delegating to domain action in features/prescriptions/actions.
  */
 export async function createPrescriptionAction(
   patientId: string,
-  consultationId: string,
-  input: unknown
+  consultationIdOrInput: string | unknown,
+  optionalInput?: unknown
 ): Promise<ActionResult<PrescriptionWithItems>> {
-  try {
-    const session = await requireDoctor();
-
-    const parsed = createPrescriptionSchema.safeParse(input);
-
-    if (!parsed.success) {
-      const errorMsg = parsed.error.issues
-        .map((issue) => issue.message)
-        .join(", ");
-      return { success: false, error: errorMsg };
-    }
-
-    const prescription = await createPrescription(
-      session.clinicId,
-      parsed.data
-    );
-
-    revalidatePath(`/patients/${patientId}`);
-    revalidatePath(`/patients/${patientId}/consultations/${consultationId}`);
-
-    return { success: true, data: prescription };
-  } catch (error) {
-    return {
-      success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : "Failed to create prescription. Please try again.",
-    };
-  }
+  const input = optionalInput !== undefined ? optionalInput : consultationIdOrInput;
+  return domainCreatePrescriptionAction(patientId, input);
 }

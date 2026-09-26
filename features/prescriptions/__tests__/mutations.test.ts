@@ -60,7 +60,7 @@ describe("features/prescriptions/mutations.ts", () => {
       expect(sql).toContain('"patients"."deleted_at" is null');
     });
 
-    it("inserts prescription and all items atomically in a single transaction", async () => {
+    it("executes prescription and item inserts within a database transaction context", async () => {
       // 1. Mock consultation verification
       const chain: any = {
         from: vi.fn().mockReturnThis(),

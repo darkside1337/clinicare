@@ -242,23 +242,18 @@ export function PrescriptionPdfDocument({
           ))}
         </View>
 
-        {/* Doctor Signature & Dispensing Stamp */}
+        {/* Prescriber Signature & Date */}
         <View style={styles.footerSignBox}>
           <View style={styles.signBlock}>
             <Text style={styles.signTitle}>Prescriber Signature</Text>
             <View style={styles.signatureLine} />
             <Text style={styles.doctorText}>{doctorName}</Text>
-            <Text style={{ fontSize: 7.5, color: "#5A5D61" }}>
-              Authorized Medical Practitioner
-            </Text>
           </View>
 
           <View style={styles.signBlock}>
-            <Text style={styles.signTitle}>Dispensing Pharmacy Verification</Text>
+            <Text style={styles.signTitle}>Date</Text>
             <View style={styles.signatureLine} />
-            <Text style={{ fontSize: 7.5, color: "#5A5D61", marginTop: 2 }}>
-              Date &amp; Signature
-            </Text>
+            <Text style={styles.doctorText}>{issueDate}</Text>
           </View>
         </View>
       </Page>
