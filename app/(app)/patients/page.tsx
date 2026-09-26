@@ -2,7 +2,7 @@ import React from "react";
 import type { Metadata } from "next";
 import { Users } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
-import { listPatientsDirectory } from "@/features/patients/queries";
+import { listPatients, listPatientsDirectory } from "@/features/patients/queries";
 import { PatientTable } from "@/features/patients/components/patient-table";
 
 export const metadata: Metadata = {
@@ -17,11 +17,13 @@ export default async function PatientsPage({
 }) {
   const session = await getSession();
   const { search } = await searchParams;
+  const isDoctor = session.role === "doctor";
 
-  const patientsData = await listPatientsDirectory(
-    session.clinicId,
-    search?.trim() || undefined
-  );
+  // Doctors receive directory with allergy flags & active conditions.
+  // Receptionists receive basic patient demographics without running clinical sub-queries.
+  const patientsData = isDoctor
+    ? await listPatientsDirectory(session.clinicId, session.role, search?.trim() || undefined)
+    : await listPatients(session.clinicId, search?.trim() || undefined);
 
   return (
     <div className="min-h-full bg-[#FAFAF7] text-[#141618] selection:bg-[#141618] selection:text-[#FAFAF7]">
@@ -50,7 +52,7 @@ export default async function PatientsPage({
         </div>
 
         {/* Master Clinical Table (client boundary lives in PatientTable) */}
-        <PatientTable initialPatients={patientsData} />
+        <PatientTable initialPatients={patientsData} role={session.role} />
       </main>
     </div>
   );

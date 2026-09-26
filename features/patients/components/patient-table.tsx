@@ -54,9 +54,13 @@ type FilterTab = "all" | "allergies" | "recent";
 
 interface PatientTableProps {
   initialPatients?: PatientRow[];
+  role?: "doctor" | "receptionist";
 }
 
-export function PatientTable({ initialPatients = [] }: PatientTableProps) {
+export function PatientTable({
+  initialPatients = [],
+  role = "doctor",
+}: PatientTableProps) {
   const [patients] = useState<PatientRow[]>(initialPatients);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<FilterTab>("all");
@@ -116,7 +120,7 @@ export function PatientTable({ initialPatients = [] }: PatientTableProps) {
             All Records ({stats.all})
           </Button>
 
-          {stats.allergies > 0 && (
+          {role === "doctor" && stats.allergies > 0 && (
             <Button
               type="button"
               variant={activeTab === "allergies" ? "default" : "ghost"}
@@ -152,7 +156,9 @@ export function PatientTable({ initialPatients = [] }: PatientTableProps) {
                 <th className="py-2.5 px-4 font-bold">Patient / Age</th>
                 <th className="py-2.5 px-4 font-bold">Sex / DOB</th>
                 <th className="py-2.5 px-4 font-bold">Contact Info</th>
-                <th className="py-2.5 px-4 font-bold">Safety / Conditions</th>
+                {role === "doctor" && (
+                  <th className="py-2.5 px-4 font-bold">Safety / Conditions</th>
+                )}
                 <th className="py-2.5 px-4 font-bold">Registered</th>
                 <th className="py-2.5 px-4 font-bold text-right">Actions</th>
               </tr>
@@ -160,7 +166,7 @@ export function PatientTable({ initialPatients = [] }: PatientTableProps) {
             <tbody className="divide-y divide-[#D8D4CC] text-xs">
               {filteredPatients.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-[#5A5D61]">
+                  <td colSpan={role === "doctor" ? 6 : 5} className="py-12 text-center text-[#5A5D61]">
                     <div className="max-w-md mx-auto space-y-1">
                       <p className="font-bold text-[#141618] text-sm">No matching clinical records</p>
                       <p className="text-[11px] font-mono">
@@ -217,33 +223,35 @@ export function PatientTable({ initialPatients = [] }: PatientTableProps) {
                         )}
                       </td>
 
-                      {/* Clinical Safety Flags / Conditions */}
-                      <td className="py-3 px-4">
-                        {hasSevere ? (
-                          <Badge
-                            variant="destructive"
-                            className="flex items-center gap-1 w-fit font-mono text-[11px]"
-                          >
-                            <AlertTriangle className="size-3" />
-                            <span>{allergySummary || "Severe Allergy"}</span>
-                          </Badge>
-                        ) : conditions && conditions.length > 0 ? (
-                          <div className="flex flex-wrap gap-1 max-w-xs">
-                            {conditions.map((cond, idx) => (
-                              <span
-                                key={idx}
-                                className="border border-[#D8D4CC] bg-[#FAFAF7] px-1.5 py-0.5 text-[11px] font-mono text-[#141618]"
-                              >
-                                {cond}
-                              </span>
-                            ))}
-                          </div>
-                        ) : (
-                          <span className="text-[11px] font-mono text-[#5A5D61]">
-                            Standard record
-                          </span>
-                        )}
-                      </td>
+                      {/* Clinical Safety Flags / Conditions (Doctor only) */}
+                      {role === "doctor" && (
+                        <td className="py-3 px-4">
+                          {hasSevere ? (
+                            <Badge
+                              variant="destructive"
+                              className="flex items-center gap-1 w-fit font-mono text-[11px]"
+                            >
+                              <AlertTriangle className="size-3" />
+                              <span>{allergySummary || "Severe Allergy"}</span>
+                            </Badge>
+                          ) : conditions && conditions.length > 0 ? (
+                            <div className="flex flex-wrap gap-1 max-w-xs">
+                              {conditions.map((cond, idx) => (
+                                <span
+                                  key={idx}
+                                  className="border border-[#D8D4CC] bg-[#FAFAF7] px-1.5 py-0.5 text-[11px] font-mono text-[#141618]"
+                                >
+                                  {cond}
+                                </span>
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="text-[11px] font-mono text-[#5A5D61]">
+                              Standard record
+                            </span>
+                          )}
+                        </td>
+                      )}
 
                       {/* Registered Date */}
                       <td className="py-3 px-4 text-[11px] font-mono text-[#5A5D61]">
@@ -267,17 +275,19 @@ export function PatientTable({ initialPatients = [] }: PatientTableProps) {
                               Profile
                             </Link>
                           </Button>
-                          <Button
-                            asChild
-                            variant="default"
-                            size="xs"
-                            className="rounded-none border border-[#141618] bg-[#141618] px-2 py-1 text-[11px] font-mono uppercase font-bold text-[#FAFAF7] hover:bg-black"
-                          >
-                            <Link href={`/patients/${patient.id}/consultations/new`}>
-                              <Stethoscope className="size-3 mr-0.5" />
-                              <span>Consult</span>
-                            </Link>
-                          </Button>
+                          {role === "doctor" && (
+                            <Button
+                              asChild
+                              variant="default"
+                              size="xs"
+                              className="rounded-none border border-[#141618] bg-[#141618] px-2 py-1 text-[11px] font-mono uppercase font-bold text-[#FAFAF7] hover:bg-black"
+                            >
+                              <Link href={`/patients/${patient.id}/consultations/new`}>
+                                <Stethoscope className="size-3 mr-0.5" />
+                                <span>Consult</span>
+                              </Link>
+                            </Button>
+                          )}
                         </div>
                       </td>
                     </tr>

@@ -13,17 +13,33 @@ import { Badge } from "@/components/ui/badge";
 import type { PatientRecord } from "@/features/patients/types";
 import { AllergyList } from "@/features/patients/components/allergy-list";
 import { ProblemList } from "@/features/patients/components/problem-list";
-import { ConsultationTimeline } from "@/features/consultations/components/consultation-timeline";
+import dynamic from "next/dynamic";
+
+const ConsultationTimeline = dynamic(
+  () =>
+    import("@/features/consultations/components/consultation-timeline").then(
+      (m) => m.ConsultationTimeline
+    ),
+  {
+    loading: () => (
+      <div className="border border-[#141618] bg-white p-6 font-mono text-xs text-[#5A5D61]">
+        Loading consultations...
+      </div>
+    ),
+  }
+);
 
 
 interface PatientProfileClientProps {
   initialData: PatientRecord;
   canStartConsultation: boolean;
+  role?: "doctor" | "receptionist";
 }
 
 export function PatientProfileClient({
   initialData,
   canStartConsultation,
+  role = "doctor",
 }: PatientProfileClientProps) {
   const {
     patient,
@@ -154,112 +170,192 @@ export function PatientProfileClient({
               </div>
             </section>
 
-            {/* ALLERGIES: High-priority clinical flags (PRD §8.4: Always visible) */}
-            <AllergyList initialAllergies={allergies} />
-
-            {/* PROBLEM LIST: Pre-existing medical conditions (PRD §8.4) */}
-            <ProblemList initialProblems={problems} />
+            {/* ALLERGIES & PROBLEMS: Doctor only per PRD §6 */}
+            {role === "doctor" ? (
+              <>
+                <AllergyList initialAllergies={allergies} />
+                <ProblemList initialProblems={problems} />
+              </>
+            ) : (
+              <div className="border border-[#141618] bg-white p-4 shadow-[1px_1px_0px_#141618] space-y-2">
+                <div className="flex items-center justify-between border-b border-[#141618] pb-1">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-[#5A5D61]">
+                    Clinical Medical History
+                  </span>
+                  <Badge variant="outline" className="font-mono text-[9px] uppercase">
+                    Restricted
+                  </Badge>
+                </div>
+                <p className="text-[11px] font-mono text-[#5A5D61]">
+                  Allergies, chronic conditions, and diagnostic records are restricted to attending clinicians.
+                </p>
+              </div>
+            )}
           </div>
         </aside>
 
-        {/* RIGHT COLUMN: Clinical Work Canvas (70% width on desktop) */}
+        {/* RIGHT COLUMN: Work Canvas (70% width on desktop) */}
         <section className="flex-1 p-6 lg:p-8 space-y-8">
-          {/* SECTION A: Above-the-fold Quick Clinical Status Strip (PRD §8.4 / §12) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* 1. Upcoming Appointments */}
-            <div className="border border-[#141618] bg-white p-5 shadow-[1px_1px_0px_#141618] space-y-3">
-              <div className="flex items-center justify-between border-b border-[#141618] pb-1.5">
-                <div className="flex items-center gap-2">
-                  <Calendar className="size-4 text-[#141618]" />
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#141618]">
-                    Appointments
-                  </h3>
-                </div>
-                <Badge variant="outline" className="font-mono text-[11px]">
-                  {upcomingAppointments.length} UPCOMING
-                </Badge>
-              </div>
+          {role === "doctor" ? (
+            <>
+              {/* SECTION A: Above-the-fold Quick Clinical Status Strip (PRD §8.4 / §12) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* 1. Upcoming Appointments */}
+                <div className="border border-[#141618] bg-white p-5 shadow-[1px_1px_0px_#141618] space-y-3">
+                  <div className="flex items-center justify-between border-b border-[#141618] pb-1.5">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="size-4 text-[#141618]" />
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-[#141618]">
+                        Appointments
+                      </h3>
+                    </div>
+                    <Badge variant="outline" className="font-mono text-[11px]">
+                      {upcomingAppointments.length} UPCOMING
+                    </Badge>
+                  </div>
 
-              {upcomingAppointments.length === 0 ? (
-                <div className="border border-dashed border-[#D8D4CC] p-4 text-center text-xs font-mono text-[#5A5D61]">
-                  No upcoming appointments scheduled
-                </div>
-              ) : (
-                <div className="space-y-2.5">
-                  {upcomingAppointments.map((apt) => (
-                    <div
-                      key={apt.id}
-                      className="border border-[#D8D4CC] bg-[#FAFAF7] p-2.5 space-y-1"
-                    >
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="font-mono font-bold text-[#141618]">
-                          {apt.scheduledAt}
-                        </span>
-                        <Badge
-                          variant={apt.status === "checked-in" ? "amber" : "outline"}
-                          className="font-mono text-[10px] uppercase"
+                  {upcomingAppointments.length === 0 ? (
+                    <div className="border border-dashed border-[#D8D4CC] p-4 text-center text-xs font-mono text-[#5A5D61]">
+                      No upcoming appointments scheduled
+                    </div>
+                  ) : (
+                    <div className="space-y-2.5">
+                      {upcomingAppointments.map((apt) => (
+                        <div
+                          key={apt.id}
+                          className="border border-[#D8D4CC] bg-[#FAFAF7] p-2.5 space-y-1"
                         >
-                          {apt.status}
-                        </Badge>
-                      </div>
-                      <div className="text-xs text-[#5A5D61]">
-                        Clinician: <strong className="text-[#141618]">{apt.doctorName}</strong>
-                      </div>
-                      {apt.reason && (
-                        <div className="text-[11px] text-[#141618] font-medium">
-                          {apt.reason}
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-mono font-bold text-[#141618]">
+                              {apt.scheduledAt}
+                            </span>
+                            <Badge
+                              variant={apt.status === "checked-in" ? "amber" : "outline"}
+                              className="font-mono text-[10px] uppercase"
+                            >
+                              {apt.status}
+                            </Badge>
+                          </div>
+                          <div className="text-xs text-[#5A5D61]">
+                            Clinician: <strong className="text-[#141618]">{apt.doctorName}</strong>
+                          </div>
+                          {apt.reason && (
+                            <div className="text-[11px] text-[#141618] font-medium">
+                              {apt.reason}
+                            </div>
+                          )}
                         </div>
-                      )}
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </div>
-              )}
-            </div>
 
-            {/* 2. Active Medications (Derived from Prescriptions) */}
-            <div className="border border-[#141618] bg-white p-5 shadow-[1px_1px_0px_#141618] space-y-3">
-              <div className="flex items-center justify-between border-b border-[#141618] pb-1.5">
-                <div className="flex items-center gap-2">
-                  <Pill className="size-4 text-[#141618]" />
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#141618]">
-                    Active Medications
-                  </h3>
+                {/* 2. Active Medications (Derived from Prescriptions) */}
+                <div className="border border-[#141618] bg-white p-5 shadow-[1px_1px_0px_#141618] space-y-3">
+                  <div className="flex items-center justify-between border-b border-[#141618] pb-1.5">
+                    <div className="flex items-center gap-2">
+                      <Pill className="size-4 text-[#141618]" />
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-[#141618]">
+                        Active Medications
+                      </h3>
+                    </div>
+                    <Badge variant="outline" className="font-mono text-[11px]">
+                      {activeMedications.length} ACTIVE
+                    </Badge>
+                  </div>
+
+                  {activeMedications.length === 0 ? (
+                    <div className="border border-dashed border-[#D8D4CC] p-4 text-center text-xs font-mono text-[#5A5D61]">
+                      No active prescribed medications recorded
+                    </div>
+                  ) : (
+                    <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
+                      {activeMedications.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="border border-[#D8D4CC] bg-[#FAFAF7] p-2.5 text-xs space-y-0.5"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-[#141618]">{item.medication}</span>
+                            <span className="font-mono text-[11px] text-[#5A5D61]">{item.dosage}</span>
+                          </div>
+                          <div className="text-[11px] text-[#5A5D61] font-mono">
+                            {item.frequency} • {item.duration}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <Badge variant="outline" className="font-mono text-[11px]">
-                  {activeMedications.length} ACTIVE
-                </Badge>
               </div>
 
-              {activeMedications.length === 0 ? (
-                <div className="border border-dashed border-[#D8D4CC] p-4 text-center text-xs font-mono text-[#5A5D61]">
-                  No active prescribed medications recorded
+              {/* SECTION B: Consultation Timeline (Reverse Chronological) */}
+              <ConsultationTimeline
+                consultations={consultations}
+                patientId={patient.id}
+              />
+            </>
+          ) : (
+            /* RECEPTIONIST VIEW: Front-Desk Patient Administration */
+            <div className="space-y-6">
+              <div className="border border-[#141618] bg-white p-6 shadow-[1px_1px_0px_#141618] space-y-4">
+                <div className="flex items-center justify-between border-b border-[#141618] pb-2">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="size-4 text-[#141618]" />
+                    <h2 className="text-xs font-bold uppercase tracking-wider text-[#141618]">
+                      Patient Appointments &amp; Bookings
+                    </h2>
+                  </div>
+                  <Badge variant="outline" className="font-mono text-[11px]">
+                    {upcomingAppointments.length} ACTIVE
+                  </Badge>
                 </div>
-              ) : (
-                <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
-                  {activeMedications.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="border border-[#D8D4CC] bg-[#FAFAF7] p-2.5 text-xs space-y-0.5"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-[#141618]">{item.medication}</span>
-                        <span className="font-mono text-[11px] text-[#5A5D61]">{item.dosage}</span>
-                      </div>
-                      <div className="text-[11px] text-[#5A5D61] font-mono">
-                        {item.frequency} • {item.duration}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
 
-          {/* SECTION B: Consultation Timeline (Reverse Chronological) */}
-          <ConsultationTimeline
-            consultations={consultations}
-            patientId={patient.id}
-          />
+                {upcomingAppointments.length === 0 ? (
+                  <div className="border border-dashed border-[#D8D4CC] p-6 text-center text-xs font-mono text-[#5A5D61]">
+                    No upcoming appointments scheduled for this patient.
+                  </div>
+                ) : (
+                  <div className="divide-y divide-[#D8D4CC] border border-[#D8D4CC]">
+                    {upcomingAppointments.map((apt) => (
+                      <div key={apt.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FAFAF7]">
+                        <div className="space-y-1 text-xs">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono font-bold text-[#141618] text-sm">
+                              {apt.scheduledAt}
+                            </span>
+                            <Badge
+                              variant={apt.status === "checked-in" ? "amber" : "outline"}
+                              className="font-mono text-[10px] uppercase"
+                            >
+                              {apt.status}
+                            </Badge>
+                          </div>
+                          <div className="text-xs text-[#5A5D61]">
+                            Practitioner: <strong className="text-[#141618]">{apt.doctorName}</strong>
+                          </div>
+                          {apt.reason && (
+                            <div className="text-xs text-[#141618]">
+                              Reason: {apt.reason}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="border border-dashed border-[#D8D4CC] bg-[#FAFAF7] p-5 text-center space-y-1">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#141618]">
+                  Front-Desk Administration View
+                </p>
+                <p className="text-[11px] font-mono text-[#5A5D61]">
+                  Clinical encounter notes, consultations, and prescriptions are restricted to medical practitioners.
+                </p>
+              </div>
+            </div>
+          )}
         </section>
       </main>
     </div>
