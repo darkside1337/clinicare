@@ -34,30 +34,9 @@ export default function LoginView() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAF7] text-[#141618] selection:bg-[#141618] selection:text-[#FAFAF7] flex flex-col justify-between">
-      {/* Top Header */}
-      <header className="border-b border-[#141618] px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/"
-            className="font-mono text-xs uppercase font-bold tracking-widest text-[#141618] hover:opacity-75 transition-opacity"
-          >
-            CLINICARE
-          </Link>
-          <span className="text-[#D8D4CC]">/</span>
-          <span className="text-xs font-mono text-[#5A5D61]">PRACTICE AUTHENTICATION</span>
-        </div>
-        <div className="flex items-center gap-1.5 text-xs font-mono text-[#5A5D61]">
-          <Lock className="size-3 text-[#141618]" />
-          <span>TLS 1.3 ENCRYPTED</span>
-        </div>
-      </header>
-
-      {/* Main Sign-In Card Container */}
-      <main className="flex-1 flex items-center justify-center p-4 sm:p-6">
-        <div className="w-full max-w-md border border-[#141618] bg-white p-6 sm:p-8 shadow-[2px_2px_0px_#141618] space-y-6">
-          {/* Card Header */}
-          <div className="space-y-2 border-b border-[#141618] pb-4">
+    <div className="w-full max-w-md border border-[#141618] bg-white p-6 sm:p-8 shadow-[2px_2px_0px_#141618] space-y-6">
+      {/* Card Header */}
+      <div className="space-y-2 border-b border-[#141618] pb-4">
             <div className="flex items-center justify-between">
               <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#5A5D61]">
                 PRACTICE ACCESS
@@ -185,13 +164,5 @@ export default function LoginView() {
             </p>
           </div>
         </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="border-t border-[#141618] px-6 py-3 flex flex-wrap items-center justify-between text-xs font-mono text-[#5A5D61]">
-        <span>CliniCare Practice Management System</span>
-        <span>Authorized Personnel Only • TLS Encrypted</span>
-      </footer>
-    </div>
   );
 }
