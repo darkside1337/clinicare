@@ -89,6 +89,8 @@ function DialogDescription({
   )
 }
 
+const DialogContent = DialogPopup
+
 export {
   Dialog,
   DialogTrigger,
@@ -96,6 +98,7 @@ export {
   DialogClose,
   DialogBackdrop,
   DialogPopup,
+  DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
