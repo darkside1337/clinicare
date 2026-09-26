@@ -40,19 +40,19 @@ export function PracticeNav({
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-auto min-h-12 w-full flex-wrap items-center justify-between gap-3 border-b border-[#141618] bg-[#FAFAF7] px-4 py-2 sm:px-6">
+    <header className="sticky top-0 z-30 flex h-auto min-h-12 w-full flex-wrap items-center justify-between gap-3 border-b border-primary bg-background px-4 py-2 sm:px-6">
       {/* Brand & Clinic Identifier */}
       <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-mono tracking-tight">
         <Link
           href="/dashboard"
-          className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[#141618] hover:opacity-75 transition-opacity"
+          className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-foreground hover:opacity-75 transition-opacity"
         >
           <span>CLINICARE</span>
-          <span className="text-[11px] text-[#5A5D61] hidden sm:inline flex items-center gap-1">
+          <span className="text-[11px] text-text-muted hidden sm:inline flex items-center gap-1">
             / <Building2 className="size-3 inline" /> {clinicName}
           </span>
         </Link>
-        <span className="text-[#D8D4CC] hidden md:inline">|</span>
+        <span className="text-neutral-border hidden md:inline">|</span>
 
         {/* Core Top Nav Links */}
         <nav className="hidden md:flex items-center gap-1 sm:gap-1.5 text-xs font-mono uppercase">
@@ -68,8 +68,8 @@ export function PracticeNav({
                 size="xs"
                 className={`rounded-none px-2.5 py-1 text-xs font-mono uppercase ${
                   isActive
-                    ? "bg-[#141618] text-[#FAFAF7] font-bold"
-                    : "text-[#5A5D61] hover:text-[#141618] hover:bg-[#EFECE6]"
+                    ? "bg-primary text-primary-foreground font-bold"
+                    : "text-text-muted hover:text-foreground hover:bg-muted"
                 }`}
               >
                 <Link href={link.href}>{link.label}</Link>
@@ -87,12 +87,12 @@ export function PracticeNav({
           variant="outline"
           size="xs"
           onClick={handleOpenSearch}
-          className="rounded-none border border-[#141618] bg-white px-2.5 py-1 text-xs font-mono font-medium text-[#141618] hover:bg-[#FAFAF7] flex items-center gap-1.5 h-7"
+          className="rounded-none border border-primary bg-card px-2.5 py-1 text-xs font-mono font-medium text-foreground hover:bg-background flex items-center gap-1.5 h-7"
           title="Search patients (⌘K)"
         >
-          <Search className="size-3 text-[#5A5D61]" />
+          <Search className="size-3 text-text-muted" />
           <span className="hidden sm:inline">Search Records</span>
-          <kbd className="border border-[#D8D4CC] bg-[#FAFAF7] px-1 text-[10px] text-[#5A5D61]">
+          <kbd className="border border-neutral-border bg-background px-1 text-[10px] text-text-muted">
             ⌘K
           </kbd>
         </Button>
@@ -100,7 +100,7 @@ export function PracticeNav({
         {/* User & Role Badge */}
         <Badge
           variant={sessionRole === "receptionist" ? "amber" : "outline"}
-          className="font-mono text-[11px] uppercase rounded-none border-[#141618]"
+          className="font-mono text-[11px] uppercase rounded-none border-primary"
         >
           {sessionUserName ? `${sessionUserName} • ` : ""}
           Role: {sessionRole}
@@ -115,7 +115,7 @@ export function PracticeNav({
             variant="ghost"
             size="xs"
             title="Sign out of session"
-            className="text-xs font-mono text-[#5A5D61] hover:text-[#B91C1C] hover:bg-[#FFF5F5] rounded-none h-7"
+            className="text-xs font-mono text-text-muted hover:text-clinical-critical hover:bg-clinical-critical-bg rounded-none h-7"
           >
             <LogOut className="size-3 mr-1" />
             <span className="hidden sm:inline">Sign Out</span>

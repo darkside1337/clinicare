@@ -29,7 +29,7 @@ export default async function AppLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAF7] text-[#141618] selection:bg-[#141618] selection:text-[#FAFAF7] flex flex-col">
+    <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground flex flex-col">
       {/* Persistent Top Navigation Bar */}
       <PracticeNav
         clinicName={clinicName}

@@ -8,21 +8,21 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-[#FAFAF7] text-[#141618] selection:bg-[#141618] selection:text-[#FAFAF7] flex flex-col justify-between">
+    <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground flex flex-col justify-between">
       {/* Top Minimal Clinical Header */}
-      <header className="border-b border-[#141618] px-4 py-3 sm:px-6 flex items-center justify-between">
+      <header className="border-b border-primary px-4 py-3 sm:px-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link
             href="/"
-            className="font-mono text-xs uppercase font-bold tracking-widest text-[#141618] hover:opacity-75 transition-opacity"
+            className="font-mono text-xs uppercase font-bold tracking-widest text-foreground hover:opacity-75 transition-opacity"
           >
             CLINICARE
           </Link>
-          <span className="text-[#D8D4CC]">/</span>
-          <span className="text-xs font-mono text-[#5A5D61]">SECURE GATEWAY</span>
+          <span className="text-neutral-border">/</span>
+          <span className="text-xs font-mono text-text-muted">SECURE GATEWAY</span>
         </div>
-        <div className="flex items-center gap-1.5 text-xs font-mono text-[#5A5D61]">
-          <Lock className="size-3 text-[#141618]" />
+        <div className="flex items-center gap-1.5 text-xs font-mono text-text-muted">
+          <Lock className="size-3 text-foreground" />
           <span>TLS 1.3 ENCRYPTED</span>
         </div>
       </header>
@@ -33,7 +33,7 @@ export default function AuthLayout({
       </main>
 
       {/* Bottom Minimal Footer */}
-      <footer className="border-t border-[#D8D4CC] px-4 py-3 sm:px-6 flex items-center justify-between text-[11px] font-mono text-[#5A5D61]">
+      <footer className="border-t border-neutral-border px-4 py-3 sm:px-6 flex items-center justify-between text-[11px] font-mono text-text-muted">
         <span>CLINICARE PRACTICE MANAGEMENT SYSTEM</span>
         <span>AUDITED CLINICAL ENCRYPTED SESSION</span>
       </footer>

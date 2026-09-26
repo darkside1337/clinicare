@@ -60,13 +60,13 @@ export function AppSidebar({
   return (
     <aside
       className={cn(
-        "flex flex-col border-r border-[#141618] bg-[#FAFAF7] w-full md:w-64 shrink-0 selection:bg-[#141618] selection:text-[#FAFAF7]",
+        "flex flex-col border-r border-primary bg-background w-full md:w-64 shrink-0 selection:bg-primary selection:text-primary-foreground",
         className
       )}
     >
       {/* Primary Navigation Section */}
-      <div className="p-4 space-y-1 border-b border-[#D8D4CC]">
-        <div className="px-2 pb-2 text-[10px] font-mono uppercase tracking-wider text-[#5A5D61]">
+      <div className="p-4 space-y-1 border-b border-neutral-border">
+        <div className="px-2 pb-2 text-[10px] font-mono uppercase tracking-wider text-text-muted">
           Clinical Modules
         </div>
         <nav className="space-y-1">
@@ -84,8 +84,8 @@ export function AppSidebar({
                 className={cn(
                   "w-full justify-start gap-2.5 rounded-none px-3 py-2 text-xs font-mono uppercase tracking-tight h-auto",
                   isActive
-                    ? "bg-[#141618] text-[#FAFAF7] font-bold hover:bg-[#141618] hover:text-[#FAFAF7]"
-                    : "text-[#141618] hover:bg-[#EFECE6]"
+                    ? "bg-primary text-primary-foreground font-bold hover:bg-primary hover:text-primary-foreground"
+                    : "text-foreground hover:bg-muted"
                 )}
               >
                 <Link href={item.href}>
@@ -99,9 +99,9 @@ export function AppSidebar({
       </div>
 
       {/* Role-Specific Quick Shortcuts Section */}
-      <div className="p-4 space-y-2 border-b border-[#D8D4CC]">
+      <div className="p-4 space-y-2 border-b border-neutral-border">
         <div className="flex items-center justify-between px-2 pb-1">
-          <span className="text-[10px] font-mono uppercase tracking-wider text-[#5A5D61]">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-text-muted">
             {role === "doctor" ? "Doctor Shortcuts" : "Reception Desk"}
           </span>
           <Badge
@@ -119,13 +119,13 @@ export function AppSidebar({
             variant="outline"
             size="xs"
             onClick={handleOpenSearch}
-            className="w-full justify-between rounded-none border border-[#D8D4CC] bg-white px-2.5 py-1.5 text-xs font-mono text-[#141618] hover:bg-[#FAFAF7] h-auto"
+            className="w-full justify-between rounded-none border border-neutral-border bg-card px-2.5 py-1.5 text-xs font-mono text-foreground hover:bg-background h-auto"
           >
             <div className="flex items-center gap-2">
-              <Search className="size-3.5 text-[#5A5D61]" />
+              <Search className="size-3.5 text-text-muted" />
               <span>Search Records</span>
             </div>
-            <kbd className="border border-[#D8D4CC] bg-[#FAFAF7] px-1 text-[10px] text-[#5A5D61]">
+            <kbd className="border border-neutral-border bg-background px-1 text-[10px] text-text-muted">
               ⌘K
             </kbd>
           </Button>
@@ -135,10 +135,10 @@ export function AppSidebar({
             asChild
             variant="outline"
             size="xs"
-            className="w-full justify-start gap-2 rounded-none border border-[#D8D4CC] bg-white px-2.5 py-1.5 text-xs font-mono text-[#141618] hover:bg-[#FAFAF7] h-auto"
+            className="w-full justify-start gap-2 rounded-none border border-neutral-border bg-card px-2.5 py-1.5 text-xs font-mono text-foreground hover:bg-background h-auto"
           >
             <Link href="/patients/new">
-              <UserPlus className="size-3.5 text-[#5A5D61]" />
+              <UserPlus className="size-3.5 text-text-muted" />
               <span>Register Patient</span>
             </Link>
           </Button>
@@ -150,9 +150,9 @@ export function AppSidebar({
               variant="outline"
               size="xs"
               onClick={handleOpenSearch}
-              className="w-full justify-start gap-2 rounded-none border border-[#141618] bg-[#FAFAF7] px-2.5 py-1.5 text-xs font-mono font-bold text-[#141618] hover:bg-[#EFECE6] h-auto"
+              className="w-full justify-start gap-2 rounded-none border border-primary bg-background px-2.5 py-1.5 text-xs font-mono font-bold text-foreground hover:bg-muted h-auto"
             >
-              <Stethoscope className="size-3.5 text-[#141618]" />
+              <Stethoscope className="size-3.5 text-foreground" />
               <span>Start Walk-In (⌘K)</span>
             </Button>
           )}
@@ -160,10 +160,10 @@ export function AppSidebar({
       </div>
 
       {/* Sidebar Footer Metadata */}
-      <div className="mt-auto p-4 border-t border-[#D8D4CC] text-[10px] font-mono text-[#5A5D61] space-y-1">
+      <div className="mt-auto p-4 border-t border-neutral-border text-[10px] font-mono text-text-muted space-y-1">
         <div className="flex items-center justify-between">
           <span>SYSTEM AUDIT</span>
-          <span className="text-[#166534]">● ONLINE</span>
+          <span className="text-clinical-resolved">● ONLINE</span>
         </div>
         <div>TENANT SCOPE: VERIFIED</div>
       </div>
