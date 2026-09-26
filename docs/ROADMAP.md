@@ -452,76 +452,76 @@ Builds every route as a thin orchestration layer over the feature modules.
 
 ### 8.1 Login Page
 
-- [ ] Create `app/(auth)/login/page.tsx`:
+- [x] Create `app/(auth)/login/page.tsx`:
   - Two Shadcn `Button` components: "Continue with GitHub", "Continue with Google".
   - Calls Better Auth client `signIn.social({ provider: "github" | "google" })`.
   - No email/password fields.
-- [ ] Create `app/(auth)/login/not-set-up/page.tsx` — static "Contact your clinic admin" screen for unprovisioned OAuth users.
+- [x] Create `app/(auth)/login/not-set-up/page.tsx` — static "Contact your clinic admin" screen for unprovisioned OAuth users.
 
 ### 8.2 Dashboard (`/dashboard`)
 
-- [ ] Create `app/(app)/dashboard/page.tsx`:
+- [x] Create `app/(app)/dashboard/page.tsx`:
   - Calls `getSession()`.
   - Fetches today's appointments via `listAppointmentsForDay`.
   - Renders `<DayView>` and quick-action buttons.
   - Role-aware: receptionist does not see "Start walk-in" or consultation shortcuts.
-- [ ] Create `features/appointments/components/dashboard-quick-actions.tsx`.
+- [x] Create `features/appointments/components/dashboard-quick-actions.tsx`.
 
 ### 8.3 Patients List (`/patients`)
 
-- [ ] Create `app/(app)/patients/page.tsx`:
+- [x] Create `app/(app)/patients/page.tsx`:
   - Server Component; accepts `?search=` query param.
   - Calls `listPatients(clinicId, search)`.
   - Renders a Shadcn `Table` with patient rows; each row links to `/patients/[id]`.
-- [ ] Create `app/(app)/patients/actions.ts`:
+- [x] Create `app/(app)/patients/actions.ts`:
   - `createPatientAction(input)` — thin wrapper over `createPatient`.
-- [ ] Create `features/patients/components/patient-table.tsx` — Shadcn `Table` with name, DOB, phone columns.
+- [x] Create `features/patients/components/patient-table.tsx` — Shadcn `Table` with name, DOB, phone columns.
 
 ### 8.4 Patient Profile (`/patients/[id]`)
 
-- [ ] Create `app/(app)/patients/[id]/page.tsx`:
+- [x] Create `app/(app)/patients/[id]/page.tsx`:
   - Calls `getSession()` + `getPatientSummary(clinicId, id)`.
   - Two-column layout (per `DESIGN.md`): left sticky column (demographics, allergies, problems); right column (consultation timeline, upcoming appointments, active prescriptions).
   - "Start Consultation" CTA visible to doctors only (role check in the Server Component).
   - Allergies and problems are always visible above the fold; never behind a tab.
-- [ ] Create `app/(app)/patients/[id]/actions.ts`:
+- [x] Create `app/(app)/patients/[id]/actions.ts`:
   - `updatePatientAction`, `addAllergyAction`, `updateAllergyAction`, `deleteAllergyAction`, `addProblemAction`, `updateProblemAction`.
 
 ### 8.5 New Consultation (`/patients/[id]/consultations/new`)
 
-- [ ] Create `app/(app)/patients/[id]/consultations/new/page.tsx`:
+- [x] Create `app/(app)/patients/[id]/consultations/new/page.tsx`:
   - Calls `requireDoctor()` — redirects/throws if receptionist or unauthenticated.
   - Accepts optional `?appointmentId=` query param (pre-linked walk-in or scheduled).
   - Renders `<ConsultationForm>` (with its embedded multi-prescription list, per 5.5) in a dedicated full-page layout (no modal).
-- [ ] Create `app/(app)/patients/[id]/consultations/new/actions.ts`:
+- [x] Create `app/(app)/patients/[id]/consultations/new/actions.ts`:
   - `createConsultationAction(input)` — calls `createConsultation`, then navigates to the saved consultation.
 
 ### 8.6 View/Edit Consultation (`/patients/[id]/consultations/[id]`)
 
-- [ ] Create `app/(app)/patients/[id]/consultations/[id]/page.tsx`:
+- [x] Create `app/(app)/patients/[id]/consultations/[id]/page.tsx`:
   - Calls `requireDoctor()`.
   - Fetches consultation + all linked prescriptions (plural).
   - Renders `<ConsultationForm>` pre-populated; `<PrescriptionList>` with an "Add another prescription" CTA.
-- [ ] Create `app/(app)/patients/[id]/consultations/[id]/actions.ts`:
+- [x] Create `app/(app)/patients/[id]/consultations/[id]/actions.ts`:
   - `updateConsultationAction`, `createPrescriptionAction`.
 
 ### 8.7 Appointments (`/appointments`)
 
-- [ ] Create `app/(app)/appointments/page.tsx`:
+- [x] Create `app/(app)/appointments/page.tsx`:
   - Accepts `?date=` and `?doctorId=` query params.
   - Renders `<DayView>` + filter controls.
-- [ ] Create `app/(app)/appointments/actions.ts`:
+- [x] Create `app/(app)/appointments/actions.ts`:
   - `createAppointmentAction`, `updateAppointmentStatusAction`.
 
 ### 8.8 Error Boundaries
 
-- [ ] Create `app/(app)/error.tsx` — generic error boundary (unexpected server errors).
-- [ ] Create `app/(app)/patients/[id]/consultations/error.tsx` — handles `ForbiddenError` with a "not authorised" message.
-- [ ] Create `app/not-found.tsx`.
+- [x] Create `app/(app)/error.tsx` — generic error boundary (unexpected server errors).
+- [x] Create `app/(app)/patients/[id]/consultations/error.tsx` — handles `ForbiddenError` with a "not authorised" message.
+- [x] Create `app/not-found.tsx`.
 
 ### 8.9 Client Wrapper Cleanup
 
-- [ ] Confirm every intermediate `*-client.tsx` file introduced during the pre-Phase-0 decomposition pass (`dashboard-client.tsx`, `appointments-client.tsx`, `patients-client.tsx`, `patient-profile-client.tsx`, `consultation-new-client.tsx`, `consultation-detail-client.tsx`) has been either absorbed into its `page.tsx` (if the interactivity was mockup-only and is now replaced by real Server Actions) or is still genuinely necessary as a Client Component boundary — and that no file remains solely because of leftover `localStorage`/mock-data logic that real queries/mutations have since replaced.
+- [x] Confirm every intermediate `*-client.tsx` file introduced during the pre-Phase-0 decomposition pass (`dashboard-client.tsx`, `appointments-client.tsx`, `patients-client.tsx`, `patient-profile-client.tsx`, `consultation-new-client.tsx`, `consultation-detail-client.tsx`) has been either absorbed into its `page.tsx` (if the interactivity was mockup-only and is now replaced by real Server Actions) or is still genuinely necessary as a Client Component boundary — and that no file remains solely because of leftover `localStorage`/mock-data logic that real queries/mutations have since replaced.
 
 ---
 
