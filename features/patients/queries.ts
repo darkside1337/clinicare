@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, isNull, or, gte } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, isNull, or, gte } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
   patients,
@@ -46,6 +46,80 @@ export async function listPatients(
     .where(and(...conditions))
     .orderBy(desc(patients.createdAt));
 }
+
+export interface PatientDirectoryItem extends Patient {
+  hasSevereAllergy: boolean;
+  allergySummary?: string;
+  activeConditions: string[];
+}
+
+/**
+ * List patients with their allergy flags and active problems for directory display.
+ */
+export async function listPatientsDirectory(
+  clinicId: string,
+  search?: string,
+): Promise<PatientDirectoryItem[]> {
+  const patientList = await listPatients(clinicId, search);
+  if (patientList.length === 0) {
+    return [];
+  }
+
+  const patientIds = patientList.map((p) => p.id);
+
+  const allergyRows = await db
+    .select({
+      patientId: allergies.patientId,
+      substance: allergies.substance,
+      severity: allergies.severity,
+      reaction: allergies.reaction,
+    })
+    .from(allergies)
+    .where(inArray(allergies.patientId, patientIds));
+
+  const problemRows = await db
+    .select({
+      patientId: problems.patientId,
+      condition: problems.condition,
+    })
+    .from(problems)
+    .where(
+      and(
+        inArray(problems.patientId, patientIds),
+        eq(problems.status, "active"),
+      ),
+    );
+
+  const allergiesByPatient = new Map<string, typeof allergyRows>();
+  for (const a of allergyRows) {
+    const arr = allergiesByPatient.get(a.patientId) || [];
+    arr.push(a);
+    allergiesByPatient.set(a.patientId, arr);
+  }
+
+  const problemsByPatient = new Map<string, string[]>();
+  for (const pr of problemRows) {
+    const arr = problemsByPatient.get(pr.patientId) || [];
+    arr.push(pr.condition);
+    problemsByPatient.set(pr.patientId, arr);
+  }
+
+  return patientList.map((p) => {
+    const pAllergies = allergiesByPatient.get(p.id) || [];
+    const severeAllergy = pAllergies.find((a) => a.severity === "severe");
+    const activeConditions = problemsByPatient.get(p.id) || [];
+
+    return {
+      ...p,
+      hasSevereAllergy: !!severeAllergy,
+      allergySummary: severeAllergy
+        ? `${severeAllergy.substance}${severeAllergy.reaction ? ` (${severeAllergy.reaction})` : ""}`
+        : undefined,
+      activeConditions,
+    };
+  });
+}
+
 
 /**
  * Get a single patient by ID within a clinic, excluding soft-deleted.

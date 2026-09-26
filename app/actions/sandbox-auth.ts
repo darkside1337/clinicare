@@ -56,6 +56,10 @@ export async function loginAsReceptionistAction() {
   return loginAsDemoPersona("receptionist");
 }
 
+export async function loginAsPersonaAction(role: DemoRole) {
+  return loginAsDemoPersona(role);
+}
+
 export async function logoutSandboxAction() {
   try {
     const reqHeaders = await headers();

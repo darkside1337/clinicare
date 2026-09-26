@@ -7,6 +7,10 @@ import { ArrowRight, Lock, HelpCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { authClient } from "@/lib/auth/client";
+import {
+  loginAsDoctorAction,
+  loginAsReceptionistAction,
+} from "@/app/actions/sandbox-auth";
 
 export default function LoginView() {
   const searchParams = useSearchParams();
@@ -125,6 +129,43 @@ export default function LoginView() {
               </div>
               <ArrowRight className="size-3.5 text-[#5A5D61]" />
             </Button>
+          </div>
+
+          {/* Sandbox Test Personas Quick Access */}
+          <div className="border border-[#141618] bg-[#FAFAF7] p-3.5 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase tracking-widest font-bold text-[#141618]">
+                Sandbox Quick Access
+              </span>
+              <Badge variant="outline" className="font-mono text-[9px] uppercase">
+                Demo Mode
+              </Badge>
+            </div>
+            <p className="text-[11px] text-[#5A5D61]">
+              Instant access with provisioned clinic credentials:
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+              <Button
+                type="button"
+                size="xs"
+                variant="outline"
+                onClick={() => loginAsDoctorAction()}
+                className="rounded-none border border-[#141618] bg-white text-[#141618] hover:bg-[#141618] hover:text-[#FAFAF7] font-mono text-[11px] h-8 justify-between px-2"
+              >
+                <span>Dr. Sarah Mitchell</span>
+                <span className="text-[9px] text-[#5A5D61] uppercase">GP</span>
+              </Button>
+              <Button
+                type="button"
+                size="xs"
+                variant="outline"
+                onClick={() => loginAsReceptionistAction()}
+                className="rounded-none border border-[#141618] bg-white text-[#141618] hover:bg-[#141618] hover:text-[#FAFAF7] font-mono text-[11px] h-8 justify-between px-2"
+              >
+                <span>Alex Rivera</span>
+                <span className="text-[9px] text-[#5A5D61] uppercase">Rec</span>
+              </Button>
+            </div>
           </div>
 
           {/* Help & Practice Assignment Link */}

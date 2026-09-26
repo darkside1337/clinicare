@@ -6,11 +6,12 @@ import { Users, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PatientTable } from "@/features/patients/components/patient-table";
 import { SearchPatient } from "@/lib/mock-patients-directory";
-
+import type { PatientDirectoryItem } from "@/features/patients/queries";
+import type { Patient } from "@/lib/db/schema";
 import { PracticeNav } from "@/components/layout/nav";
 
 interface PatientsClientProps {
-  initialPatients: SearchPatient[];
+  initialPatients: (SearchPatient | PatientDirectoryItem | Patient)[];
   sessionRole?: "doctor" | "receptionist";
   sessionUserName?: string;
 }
