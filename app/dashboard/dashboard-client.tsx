@@ -16,15 +16,22 @@ import {
   StatusType,
 } from "@/features/appointments/components/appointment-queue";
 
+import { PracticeNav } from "@/components/layout/nav";
+
 interface DashboardClientProps {
   initialAppointments?: DashboardAppointment[];
+  sessionRole?: "doctor" | "receptionist";
+  sessionUserName?: string;
 }
 
 export function DashboardClient({
   initialAppointments = MOCK_TODAY_APPOINTMENTS,
+  sessionRole,
+  sessionUserName,
 }: DashboardClientProps) {
   const searchParams = useSearchParams();
-  const role = searchParams?.get("role") === "receptionist" ? "receptionist" : "doctor";
+  const paramRole = searchParams?.get("role") as "doctor" | "receptionist" | null;
+  const role = paramRole || sessionRole || "doctor";
 
   const [appointments, setAppointments] = useState<DashboardAppointment[]>(initialAppointments);
 
@@ -42,36 +49,11 @@ export function DashboardClient({
   return (
     <div className="min-h-screen bg-[#FAFAF7] text-[#141618] selection:bg-[#141618] selection:text-[#FAFAF7]">
       {/* Top Clinical System Navigation Bar */}
-      <header className="sticky top-0 z-30 flex h-auto min-h-12 w-full flex-wrap items-center justify-between gap-3 border-b border-[#141618] bg-[#FAFAF7] px-4 py-2 sm:px-6">
-        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-mono tracking-tight">
-          <Link
-            href="/"
-            className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[#141618] hover:opacity-75 transition-opacity"
-          >
-            <span>CLINICARE</span>
-            <span className="text-[11px] text-[#5A5D61] hidden sm:inline">
-              / PRACTICE
-            </span>
-          </Link>
-          <span className="text-[#D8D4CC] hidden sm:inline">|</span>
-          <div className="flex items-center gap-2">
-            <span className="text-[#5A5D61] uppercase tracking-wider text-[11px]">
-              DATE:
-            </span>
-            <span className="font-semibold text-[#141618]">
-              THURSDAY 24/09/2026
-            </span>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
-          <Badge variant="outline" className="font-mono text-[11px] uppercase">
-            Session Role: {role}
-          </Badge>
-
-          <DashboardQuickActions role={role} />
-        </div>
-      </header>
+      <PracticeNav
+        sessionRole={role}
+        sessionUserName={sessionUserName}
+        rightSlot={<DashboardQuickActions role={role} />}
+      />
 
       {/* Main Two-Column Dashboard Workspace */}
       <main className="mx-auto flex w-full max-w-[1536px] flex-col lg:flex-row">
