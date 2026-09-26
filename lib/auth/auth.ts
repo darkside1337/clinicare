@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
+import { testUtils } from "better-auth/plugins";
 import { db } from "@/lib/db/client";
 
 export const auth = betterAuth({
@@ -30,7 +31,7 @@ export const auth = betterAuth({
       },
     },
   },
-  plugins: [nextCookies()],
+  plugins: [nextCookies(), testUtils()],
 });
 
 export type Auth = typeof auth;

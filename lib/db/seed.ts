@@ -30,32 +30,42 @@ export async function seed() {
   console.log("Inserting staff users...");
   await db
     .insert(user)
-    .values([
-      {
-        id: "user-doctor-1",
-        name: "Dr. Sarah Mitchell, MD",
-        email: "doctor@clinicare.dev",
-        emailVerified: true,
-        clinicId: "clinic-dev",
-        role: "doctor",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: "user-receptionist-1",
-        name: "Alex Rivera",
-        email: "receptionist@clinicare.dev",
-        emailVerified: true,
-        clinicId: "clinic-dev",
-        role: "receptionist",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ])
+    .values({
+      id: "user-doctor-1",
+      name: "Dr. Sarah Mitchell, MD",
+      email: "doctor@clinicare.dev",
+      emailVerified: true,
+      clinicId: "clinic-dev",
+      role: "doctor",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
     .onConflictDoUpdate({
       target: user.id,
       set: {
+        name: "Dr. Sarah Mitchell, MD",
         role: "doctor",
+        clinicId: "clinic-dev",
+      },
+    });
+
+  await db
+    .insert(user)
+    .values({
+      id: "user-receptionist-1",
+      name: "Alex Rivera",
+      email: "receptionist@clinicare.dev",
+      emailVerified: true,
+      clinicId: "clinic-dev",
+      role: "receptionist",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: user.id,
+      set: {
+        name: "Alex Rivera",
+        role: "receptionist",
         clinicId: "clinic-dev",
       },
     });
