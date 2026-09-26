@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { CLINIC_HOURS } from "@/features/appointments/constants";
 import { createAppointmentSchema } from "@/features/appointments/schema";
-import { createAppointmentAction } from "@/app/appointments/actions";
+import { createAppointmentAction } from "@/app/(app)/appointments/actions";
 import { MOCK_SEARCH_PATIENTS } from "@/lib/mock-patients-directory";
 import type { Appointment } from "@/lib/db/schema";
 

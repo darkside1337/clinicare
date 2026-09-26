@@ -15,7 +15,6 @@ import { AllergyList } from "@/features/patients/components/allergy-list";
 import { ProblemList } from "@/features/patients/components/problem-list";
 import { ConsultationTimeline } from "@/features/consultations/components/consultation-timeline";
 
-import { PracticeNav } from "@/components/layout/nav";
 
 interface PatientProfileClientProps {
   initialData: PatientRecord;
@@ -67,41 +66,35 @@ export function PatientProfileClient({
   }, [prescriptions]);
 
   return (
-    <div className="min-h-screen bg-[#FAFAF7] text-[#141618] selection:bg-[#141618] selection:text-[#FAFAF7]">
-      {/* Top Clinical Navigation Bar */}
-      <PracticeNav
-        sessionRole={sessionRole}
-        sessionUserName={sessionUserName}
-        rightSlot={
-          <>
-            <Button
-              type="button"
-              variant="ghost"
-              size="xs"
-              onClick={() =>
-                window.dispatchEvent(new CustomEvent("clinicare:open-search"))
-              }
-              className="hidden md:flex items-center gap-1.5 rounded-none border border-[#141618] bg-white px-2.5 py-1 text-xs font-mono text-[#5A5D61] hover:bg-[#FAFAF7] hover:text-[#141618] h-auto"
-            >
-              <Search className="size-3.5 text-[#141618]" />
-              <span>Search (Cmd+K)</span>
-            </Button>
+    <div className="min-h-full bg-[#FAFAF7] text-[#141618] selection:bg-[#141618] selection:text-[#FAFAF7]">
+      {/* Patient Profile Action Bar */}
+      <div className="border-b border-[#141618] bg-white px-4 py-3 sm:px-6 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="flex size-7 shrink-0 items-center justify-center border border-[#141618] bg-[#FAFAF7] font-mono text-xs font-bold uppercase text-[#141618]">
+            {patient.sex?.charAt(0) || "P"}
+          </div>
+          <div>
+            <h1 className="text-base font-bold uppercase tracking-tight text-[#141618]">
+              {patient.name}
+            </h1>
+            <p className="text-[11px] font-mono text-[#5A5D61]">
+              DOB: {patient.dob} • RECORD REF: {patient.id.slice(0, 8).toUpperCase()}
+            </p>
+          </div>
+        </div>
 
-            {sessionRole === "doctor" && (
-              <Button
-                asChild
-                className="min-h-[38px] rounded-none border border-[#141618] bg-[#141618] px-3.5 text-xs font-semibold uppercase tracking-wider text-[#FAFAF7] transition-colors hover:bg-black"
-              >
-                <Link href={`/patients/${patient.id}/consultations/new`}>
-                  <Plus className="size-3.5 stroke-[2.5]" />
-                  <span className="hidden xs:inline sm:inline">Start Consultation</span>
-                  <span className="xs:hidden sm:hidden inline">Consult</span>
-                </Link>
-              </Button>
-            )}
-          </>
-        }
-      />
+        {sessionRole === "doctor" && (
+          <Button
+            asChild
+            className="min-h-[32px] rounded-none border border-[#141618] bg-[#141618] px-3.5 text-xs font-semibold uppercase tracking-wider text-[#FAFAF7] transition-colors hover:bg-black"
+          >
+            <Link href={`/patients/${patient.id}/consultations/new`}>
+              <Plus className="size-3.5 stroke-[2.5] mr-1.5" />
+              <span>Start Consultation</span>
+            </Link>
+          </Button>
+        )}
+      </div>
 
       {/* Main Two-Column Document Canvas */}
       <main className="mx-auto flex w-full max-w-[1536px] flex-col lg:flex-row">

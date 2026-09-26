@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { AppointmentDetails } from "@/features/appointments/queries";
 import type { AppointmentStatus } from "@/features/appointments/schema";
-import { updateAppointmentStatusAction } from "@/app/appointments/actions";
+import { updateAppointmentStatusAction } from "@/app/(app)/appointments/actions";
 import type { DashboardAppointment } from "@/lib/mock-dashboard";
 
 export type StatusType = AppointmentStatus;

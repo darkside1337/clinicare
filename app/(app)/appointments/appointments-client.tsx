@@ -21,7 +21,6 @@ import {
 } from "@/features/appointments/components/appointment-form";
 import type { Appointment as DbAppointment } from "@/lib/db/schema";
 
-import { PracticeNav } from "@/components/layout/nav";
 
 interface AppointmentsClientProps {
   initialAppointments?: ClinicAppointment[];
@@ -93,39 +92,30 @@ export function AppointmentsClient({
   }, [appointments]);
 
   return (
-    <div className="min-h-screen bg-[#FAFAF7] text-[#141618] selection:bg-[#141618] selection:text-[#FAFAF7]">
-      {/* Top Clinical Navigation Bar */}
-      <PracticeNav
-        sessionRole={sessionRole}
-        sessionUserName={sessionUserName}
-        rightSlot={
-          <>
-            <Button
-              type="button"
-              variant="ghost"
-              size="xs"
-              onClick={() => window.dispatchEvent(new CustomEvent("clinicare:open-search"))}
-              className="hidden md:flex items-center gap-1.5 rounded-none border border-[#141618] bg-white px-2.5 py-1 text-xs font-mono text-[#5A5D61] hover:bg-[#FAFAF7] hover:text-[#141618] h-auto"
-            >
-              <Search className="size-3.5 text-[#141618]" />
-              <span>Search Patient (Cmd+K)</span>
-            </Button>
-
-            <Button
-              type="button"
-              onClick={() => {
-                setBookDoctor(DOCTORS[0].name);
-                setBookTimeSlot("10:00");
-                setIsBookModalOpen(true);
-              }}
-              className="min-h-[36px] rounded-none border border-[#141618] bg-[#141618] px-3.5 text-xs font-semibold uppercase tracking-wider text-[#FAFAF7] transition-colors hover:bg-black"
-            >
-              <Plus className="size-3.5 stroke-[2.5]" />
-              <span>Book Appointment</span>
-            </Button>
-          </>
-        }
-      />
+    <div className="min-h-full bg-[#FAFAF7] text-[#141618] selection:bg-[#141618] selection:text-[#FAFAF7]">
+      {/* Page Header */}
+      <div className="border-b border-[#141618] bg-white px-4 py-3 sm:px-6 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-base font-bold uppercase tracking-tight text-[#141618]">
+            Appointments & Schedule
+          </h1>
+          <p className="text-[11px] font-mono text-[#5A5D61]">
+            Day View, Practitioner Timetable & Slot Booking
+          </p>
+        </div>
+        <Button
+          type="button"
+          onClick={() => {
+            setBookDoctor(DOCTORS[0].name);
+            setBookTimeSlot("10:00");
+            setIsBookModalOpen(true);
+          }}
+          className="min-h-[32px] rounded-none border border-[#141618] bg-[#141618] px-3.5 text-xs font-semibold uppercase tracking-wider text-[#FAFAF7] transition-colors hover:bg-black"
+        >
+          <Plus className="size-3.5 stroke-[2.5] mr-1.5" />
+          <span>Book Appointment</span>
+        </Button>
+      </div>
 
       {/* Main Workspace */}
       <main className="mx-auto max-w-[1536px] p-4 sm:p-6 lg:p-8 space-y-6">

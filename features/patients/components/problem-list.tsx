@@ -15,7 +15,7 @@ import { problemSchema } from "@/features/patients/schema";
 import {
   addProblemAction,
   updateProblemAction,
-} from "@/app/patients/[id]/actions";
+} from "@/app/(app)/patients/[id]/actions";
 
 interface ProblemListProps {
   initialProblems?: Problem[];

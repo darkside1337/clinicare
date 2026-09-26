@@ -15,7 +15,6 @@ import {
   StatusType,
 } from "@/features/appointments/components/appointment-queue";
 
-import { PracticeNav } from "@/components/layout/nav";
 
 interface DashboardClientProps {
   initialAppointments?: DashboardAppointment[];
@@ -46,13 +45,19 @@ export function DashboardClient({
   const noShowCount = appointments.filter((a) => a.status === "no-show").length;
 
   return (
-    <div className="min-h-screen bg-[#FAFAF7] text-[#141618] selection:bg-[#141618] selection:text-[#FAFAF7]">
-      {/* Top Clinical System Navigation Bar */}
-      <PracticeNav
-        sessionRole={role}
-        sessionUserName={sessionUserName}
-        rightSlot={<DashboardQuickActions role={role} />}
-      />
+    <div className="min-h-full bg-[#FAFAF7] text-[#141618] selection:bg-[#141618] selection:text-[#FAFAF7]">
+      {/* Dashboard Sub-Header with Quick Actions */}
+      <div className="border-b border-[#141618] bg-white px-4 py-3 sm:px-6 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-base font-bold uppercase tracking-tight text-[#141618]">
+            Practice Dashboard
+          </h1>
+          <p className="text-[11px] font-mono text-[#5A5D61]">
+            Daily Appointment Queue & Clinic Census
+          </p>
+        </div>
+        <DashboardQuickActions role={role} />
+      </div>
 
       {/* Main Two-Column Dashboard Workspace */}
       <main className="mx-auto flex w-full max-w-[1536px] flex-col lg:flex-row">

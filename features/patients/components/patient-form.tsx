@@ -8,8 +8,8 @@ import { User, Home, Save, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { patientSchema, type PatientInput } from "@/features/patients/schema";
-import { createPatientAction } from "@/app/patients/actions";
-import { updatePatientAction } from "@/app/patients/[id]/actions";
+import { createPatientAction } from "@/app/(app)/patients/actions";
+import { updatePatientAction } from "@/app/(app)/patients/[id]/actions";
 import type { Patient } from "@/lib/db/schema";
 
 interface PatientFormProps {

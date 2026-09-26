@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { CLINIC_HOURS } from "@/features/appointments/constants";
 import type { AppointmentDetails } from "@/features/appointments/queries";
 import type { AppointmentStatus } from "@/features/appointments/schema";
-import { updateAppointmentStatusAction } from "@/app/appointments/actions";
+import { updateAppointmentStatusAction } from "@/app/(app)/appointments/actions";
 import { STATUS_METADATA } from "./appointment-status-badge";
 import { DOCTORS, type FormDoctor } from "./appointment-form";
 import type { ClinicAppointment } from "@/lib/mock-appointments";

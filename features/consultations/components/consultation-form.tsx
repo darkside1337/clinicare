@@ -11,8 +11,8 @@ import {
   consultationSchema,
   type ConsultationInput,
 } from "@/features/consultations/schema";
-import { createConsultationAction } from "@/app/patients/[id]/consultations/new/actions";
-import { updateConsultationAction } from "@/app/patients/[id]/consultations/[consultationId]/actions";
+import { createConsultationAction } from "@/app/(app)/patients/[id]/consultations/new/actions";
+import { updateConsultationAction } from "@/app/(app)/patients/[id]/consultations/[consultationId]/actions";
 import type { Consultation } from "@/lib/db/schema";
 
 export interface ConsultationFormProps {

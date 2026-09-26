@@ -15,7 +15,7 @@ import { allergySchema } from "@/features/patients/schema";
 import {
   addAllergyAction,
   deleteAllergyAction,
-} from "@/app/patients/[id]/actions";
+} from "@/app/(app)/patients/[id]/actions";
 
 interface AllergyListProps {
   initialAllergies?: Allergy[];
