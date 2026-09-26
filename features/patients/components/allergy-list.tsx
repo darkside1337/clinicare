@@ -18,7 +18,7 @@ import {
 } from "@/app/patients/[id]/actions";
 
 interface AllergyListProps {
-  initialAllergies?: (Allergy | any)[];
+  initialAllergies?: Allergy[];
   patientId?: string;
   onAddAllergy?: (allergy: Allergy) => void;
   onDeleteAllergy?: (allergyId: string) => void;

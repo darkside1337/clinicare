@@ -14,17 +14,17 @@ import type { Patient } from "@/lib/db/schema";
 export async function createPatientAction(
   input: PatientInput
 ): Promise<ActionResult<Patient>> {
+  const session = await getSession();
+
+  const parsed = patientSchema.safeParse(input);
+  if (!parsed.success) {
+    const errorMsg = parsed.error.issues
+      .map((issue) => issue.message)
+      .join(", ");
+    return { success: false, error: errorMsg };
+  }
+
   try {
-    const session = await getSession();
-
-    const parsed = patientSchema.safeParse(input);
-    if (!parsed.success) {
-      const errorMsg = parsed.error.issues
-        .map((issue) => issue.message)
-        .join(", ");
-      return { success: false, error: errorMsg };
-    }
-
     const patient = await createPatient(session.clinicId, parsed.data);
     revalidatePath("/patients");
 

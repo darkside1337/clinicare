@@ -31,16 +31,18 @@ function DialogPopup({
   return (
     <DialogPortal>
       <DialogBackdrop />
-      <DialogPrimitive.Popup
-        data-slot="dialog-popup"
-        className={cn(
-          "fixed left-[50%] top-[20%] sm:top-[25%] z-50 w-[94vw] max-w-2xl translate-x-[-50%] border border-[#141618] bg-[#FAFAF7] p-0 shadow-[2px_2px_0px_#141618] outline-none",
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </DialogPrimitive.Popup>
+      <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4">
+        <DialogPrimitive.Popup
+          data-slot="dialog-popup"
+          className={cn(
+            "relative max-h-[90vh] w-[94vw] max-w-2xl overflow-y-auto border border-[#141618] bg-[#FAFAF7] p-0 shadow-[2px_2px_0px_#141618] outline-none",
+            className
+          )}
+          {...props}
+        >
+          {children}
+        </DialogPrimitive.Popup>
+      </div>
     </DialogPortal>
   )
 }

@@ -18,7 +18,7 @@ import {
 } from "@/app/patients/[id]/actions";
 
 interface ProblemListProps {
-  initialProblems?: (Problem | any)[];
+  initialProblems?: Problem[];
   patientId?: string;
   onAddProblem?: (problem: Problem) => void;
   onUpdateProblem?: (problem: Problem) => void;

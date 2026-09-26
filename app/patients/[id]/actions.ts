@@ -28,17 +28,17 @@ export async function updatePatientAction(
   patientId: string,
   input: Partial<PatientInput>
 ): Promise<ActionResult<Patient>> {
+  const session = await getSession();
+
+  const parsed = patientSchema.safeParse(input);
+  if (!parsed.success) {
+    const errorMsg = parsed.error.issues
+      .map((issue) => issue.message)
+      .join(", ");
+    return { success: false, error: errorMsg };
+  }
+
   try {
-    const session = await getSession();
-
-    const parsed = patientSchema.safeParse(input);
-    if (!parsed.success) {
-      const errorMsg = parsed.error.issues
-        .map((issue) => issue.message)
-        .join(", ");
-      return { success: false, error: errorMsg };
-    }
-
     const patient = await updatePatient(
       session.clinicId,
       patientId,
@@ -66,8 +66,9 @@ export async function updatePatientAction(
 export async function softDeletePatientAction(
   patientId: string
 ): Promise<ActionResult<{ id: string }>> {
+  const session = await getSession();
+
   try {
-    const session = await getSession();
     await softDeletePatient(session.clinicId, patientId);
 
     revalidatePath("/patients");
@@ -91,17 +92,17 @@ export async function addAllergyAction(
   patientId: string,
   input: AllergyInput
 ): Promise<ActionResult<Allergy>> {
+  const session = await getSession();
+
+  const parsed = allergySchema.safeParse(input);
+  if (!parsed.success) {
+    const errorMsg = parsed.error.issues
+      .map((issue) => issue.message)
+      .join(", ");
+    return { success: false, error: errorMsg };
+  }
+
   try {
-    const session = await getSession();
-
-    const parsed = allergySchema.safeParse(input);
-    if (!parsed.success) {
-      const errorMsg = parsed.error.issues
-        .map((issue) => issue.message)
-        .join(", ");
-      return { success: false, error: errorMsg };
-    }
-
     const allergy = await createAllergy(session.clinicId, {
       ...parsed.data,
       patientId,
@@ -128,8 +129,9 @@ export async function deleteAllergyAction(
   allergyId: string,
   patientId: string
 ): Promise<ActionResult<{ id: string }>> {
+  const session = await getSession();
+
   try {
-    const session = await getSession();
     const result = await deleteAllergy(session.clinicId, allergyId);
 
     revalidatePath(`/patients/${patientId}`);
@@ -153,17 +155,17 @@ export async function addProblemAction(
   patientId: string,
   input: ProblemInput
 ): Promise<ActionResult<Problem>> {
+  const session = await getSession();
+
+  const parsed = problemSchema.safeParse(input);
+  if (!parsed.success) {
+    const errorMsg = parsed.error.issues
+      .map((issue) => issue.message)
+      .join(", ");
+    return { success: false, error: errorMsg };
+  }
+
   try {
-    const session = await getSession();
-
-    const parsed = problemSchema.safeParse(input);
-    if (!parsed.success) {
-      const errorMsg = parsed.error.issues
-        .map((issue) => issue.message)
-        .join(", ");
-      return { success: false, error: errorMsg };
-    }
-
     const problem = await createProblem(session.clinicId, {
       ...parsed.data,
       patientId,
@@ -191,17 +193,17 @@ export async function updateProblemAction(
   patientId: string,
   input: Partial<ProblemInput>
 ): Promise<ActionResult<Problem>> {
+  const session = await getSession();
+
+  const parsed = problemSchema.partial().safeParse(input);
+  if (!parsed.success) {
+    const errorMsg = parsed.error.issues
+      .map((issue) => issue.message)
+      .join(", ");
+    return { success: false, error: errorMsg };
+  }
+
   try {
-    const session = await getSession();
-
-    const parsed = problemSchema.partial().safeParse(input);
-    if (!parsed.success) {
-      const errorMsg = parsed.error.issues
-        .map((issue) => issue.message)
-        .join(", ");
-      return { success: false, error: errorMsg };
-    }
-
     const problem = await updateProblem(
       session.clinicId,
       problemId,

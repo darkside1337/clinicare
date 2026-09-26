@@ -28,17 +28,17 @@ import type { Appointment } from "@/lib/db/schema";
 export async function createAppointmentAction(
   input: CreateAppointmentInput
 ): Promise<ActionResult<Appointment>> {
+  const session = await getSession();
+
+  const parsed = createAppointmentSchema.safeParse(input);
+  if (!parsed.success) {
+    const errorMsg = parsed.error.issues
+      .map((issue) => issue.message)
+      .join(", ");
+    return { success: false, error: errorMsg };
+  }
+
   try {
-    const session = await getSession();
-
-    const parsed = createAppointmentSchema.safeParse(input);
-    if (!parsed.success) {
-      const errorMsg = parsed.error.issues
-        .map((issue) => issue.message)
-        .join(", ");
-      return { success: false, error: errorMsg };
-    }
-
     const appointment = await createAppointment(session.clinicId, parsed.data);
     revalidatePath("/appointments");
     revalidatePath("/dashboard");
@@ -62,17 +62,17 @@ export async function updateAppointmentStatusAction(
   appointmentId: string,
   status: AppointmentStatus
 ): Promise<ActionResult<Appointment>> {
+  const session = await getSession();
+
+  const parsed = updateAppointmentStatusSchema.safeParse({ status });
+  if (!parsed.success) {
+    const errorMsg = parsed.error.issues
+      .map((issue) => issue.message)
+      .join(", ");
+    return { success: false, error: errorMsg };
+  }
+
   try {
-    const session = await getSession();
-
-    const parsed = updateAppointmentStatusSchema.safeParse({ status });
-    if (!parsed.success) {
-      const errorMsg = parsed.error.issues
-        .map((issue) => issue.message)
-        .join(", ");
-      return { success: false, error: errorMsg };
-    }
-
     const appointment = await updateAppointmentStatus(
       session.clinicId,
       appointmentId,
@@ -99,17 +99,17 @@ export async function updateAppointmentStatusAction(
 export async function createWalkInAppointmentAction(
   input: CreateWalkInInput
 ): Promise<ActionResult<Appointment>> {
+  const session = await getSession();
+
+  const parsed = createWalkInSchema.safeParse(input);
+  if (!parsed.success) {
+    const errorMsg = parsed.error.issues
+      .map((issue) => issue.message)
+      .join(", ");
+    return { success: false, error: errorMsg };
+  }
+
   try {
-    const session = await getSession();
-
-    const parsed = createWalkInSchema.safeParse(input);
-    if (!parsed.success) {
-      const errorMsg = parsed.error.issues
-        .map((issue) => issue.message)
-        .join(", ");
-      return { success: false, error: errorMsg };
-    }
-
     const appointment = await createWalkInAppointment(
       session.clinicId,
       parsed.data.patientId,
@@ -139,17 +139,17 @@ export async function updateAppointmentAction(
   appointmentId: string,
   input: UpdateAppointmentInput
 ): Promise<ActionResult<Appointment>> {
+  const session = await getSession();
+
+  const parsed = updateAppointmentSchema.safeParse(input);
+  if (!parsed.success) {
+    const errorMsg = parsed.error.issues
+      .map((issue) => issue.message)
+      .join(", ");
+    return { success: false, error: errorMsg };
+  }
+
   try {
-    const session = await getSession();
-
-    const parsed = updateAppointmentSchema.safeParse(input);
-    if (!parsed.success) {
-      const errorMsg = parsed.error.issues
-        .map((issue) => issue.message)
-        .join(", ");
-      return { success: false, error: errorMsg };
-    }
-
     const appointment = await updateAppointment(
       session.clinicId,
       appointmentId,

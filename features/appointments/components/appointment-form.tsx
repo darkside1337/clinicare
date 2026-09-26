@@ -1,9 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Calendar as CalendarIcon, X, Loader2, AlertCircle } from "lucide-react";
+import {
+  Calendar as CalendarIcon,
+  X,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 import {
   Dialog,
   DialogPopup,
@@ -23,9 +28,24 @@ import { MOCK_SEARCH_PATIENTS } from "@/lib/mock-patients-directory";
 import type { Appointment } from "@/lib/db/schema";
 
 export const DOCTORS = [
-  { id: "doc-finch", name: "Dr. Alistair Finch", room: "Consulting Room 1", specialty: "General Practice / Lead GP" },
-  { id: "doc-rostova", name: "Dr. Helen Rostova", room: "Consulting Room 2", specialty: "General Practice / Minor Procedures" },
-  { id: "doc-brody", name: "Dr. Marcus Brody", room: "Consulting Room 3", specialty: "GP / Chronic Disease" },
+  {
+    id: "doc-finch",
+    name: "Dr. Alistair Finch",
+    room: "Consulting Room 1",
+    specialty: "General Practice / Lead GP",
+  },
+  {
+    id: "doc-rostova",
+    name: "Dr. Helen Rostova",
+    room: "Consulting Room 2",
+    specialty: "General Practice / Minor Procedures",
+  },
+  {
+    id: "doc-brody",
+    name: "Dr. Marcus Brody",
+    room: "Consulting Room 3",
+    specialty: "GP / Chronic Disease",
+  },
 ];
 
 export interface FormDoctor {
@@ -51,7 +71,7 @@ interface AppointmentFormProps {
   initialDoctor?: string; // backwards compatibility
   initialTimeSlot?: string;
   initialDate?: string | Date;
-  onSuccess?: (appointment: any) => void;
+  onSuccess?: (appointment: Appointment) => void;
 }
 
 interface AppointmentFormInnerProps {
@@ -62,7 +82,7 @@ interface AppointmentFormInnerProps {
   initialTimeSlot?: string;
   initialDate?: string | Date;
   onClose: () => void;
-  onSuccess?: (appointment: any) => void;
+  onSuccess?: (appointment: Appointment) => void;
 }
 
 interface AppointmentFormData {
@@ -77,24 +97,34 @@ interface AppointmentFormData {
 function resolveInitialDoctor(
   doctors: FormDoctor[],
   initialDoctorId?: string,
-  initialDoctor?: string
+  initialDoctor?: string,
 ): FormDoctor {
   if (initialDoctorId) {
     const found = doctors.find((d) => d.id === initialDoctorId);
     if (found) return found;
   }
   if (initialDoctor) {
-    const found = doctors.find((d) => d.name === initialDoctor || d.id === initialDoctor);
+    const found = doctors.find(
+      (d) => d.name === initialDoctor || d.id === initialDoctor,
+    );
     if (found) return found;
   }
   return doctors[0] || { id: "doc-default", name: "Default Doctor" };
 }
 
-function computeScheduledAt(timeSlot: string, initialDate?: string | Date): Date {
+function computeScheduledAt(
+  timeSlot: string,
+  initialDate?: string | Date,
+): Date {
   const [hours, minutes] = timeSlot.split(":").map(Number);
   const base = initialDate ? new Date(initialDate) : new Date();
   const scheduled = new Date(base);
-  scheduled.setHours(isNaN(hours) ? 9 : hours, isNaN(minutes) ? 0 : minutes, 0, 0);
+  scheduled.setHours(
+    isNaN(hours) ? 9 : hours,
+    isNaN(minutes) ? 0 : minutes,
+    0,
+    0,
+  );
   return scheduled;
 }
 
@@ -109,19 +139,30 @@ function AppointmentFormInner({
   onSuccess,
 }: AppointmentFormInnerProps) {
   const [serverError, setServerError] = useState<string | null>(null);
-  const defaultDoctor = resolveInitialDoctor(doctors, initialDoctorId, initialDoctor);
-  const defaultPatient = patients[0] || { id: "pat-default", name: "Default Patient", dob: "01/01/1990" };
+  const defaultDoctor = resolveInitialDoctor(
+    doctors,
+    initialDoctorId,
+    initialDoctor,
+  );
+  const defaultPatient = patients[0] || {
+    id: "pat-default",
+    name: "Default Patient",
+    dob: "01/01/1990",
+  };
 
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>(initialTimeSlot);
+  const [selectedTimeSlot, setSelectedTimeSlot] =
+    useState<string>(initialTimeSlot);
 
   const {
     handleSubmit,
-    watch,
+    control,
     setValue,
     register,
     formState: { errors, isSubmitting },
   } = useForm<AppointmentFormData>({
-    resolver: zodResolver(createAppointmentSchema) as any,
+    resolver: zodResolver(createAppointmentSchema) as unknown as Resolver<
+      AppointmentFormData
+    >,
     defaultValues: {
       patientId: defaultPatient.id,
       doctorId: defaultDoctor.id,
@@ -132,13 +173,15 @@ function AppointmentFormInner({
     },
   });
 
-  const watchedPatientId = watch("patientId");
-  const watchedDoctorId = watch("doctorId");
-  const watchedIsWalkIn = watch("isWalkIn");
+  const watchedPatientId = useWatch({ control, name: "patientId" });
+  const watchedDoctorId = useWatch({ control, name: "doctorId" });
+  const watchedIsWalkIn = useWatch({ control, name: "isWalkIn" });
 
   const handleSelectTimeSlot = (slot: string) => {
     setSelectedTimeSlot(slot);
-    setValue("scheduledAt", computeScheduledAt(slot, initialDate), { shouldValidate: true });
+    setValue("scheduledAt", computeScheduledAt(slot, initialDate), {
+      shouldValidate: true,
+    });
   };
 
   const handleToggleWalkIn = () => {
@@ -160,7 +203,9 @@ function AppointmentFormInner({
       onClose();
     } catch (err) {
       setServerError(
-        err instanceof Error ? err.message : "Failed to book appointment. Please try again."
+        err instanceof Error
+          ? err.message
+          : "Failed to book appointment. Please try again.",
       );
     }
   };
@@ -184,7 +229,10 @@ function AppointmentFormInner({
         </Button>
       </DialogHeader>
 
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="p-4 space-y-4 bg-white">
+      <form
+        onSubmit={handleSubmit(handleFormSubmit)}
+        className="p-4 space-y-4 bg-white"
+      >
         {serverError && (
           <div className="flex items-start gap-2 border border-[#B91C1C] bg-[#FFF5F5] p-3 text-xs text-[#B91C1C]">
             <AlertCircle className="size-4 shrink-0 mt-0.5" />
@@ -205,7 +253,9 @@ function AppointmentFormInner({
                   key={p.id}
                   type="button"
                   variant="ghost"
-                  onClick={() => setValue("patientId", p.id, { shouldValidate: true })}
+                  onClick={() =>
+                    setValue("patientId", p.id, { shouldValidate: true })
+                  }
                   className={`w-full justify-between rounded-none p-2 h-auto text-xs font-mono transition-colors text-left ${
                     isSelected
                       ? "bg-[#141618] text-[#FAFAF7] hover:bg-black hover:text-[#FAFAF7]"
@@ -214,7 +264,9 @@ function AppointmentFormInner({
                 >
                   <div className="truncate">
                     <span className="font-bold">{p.name}</span>
-                    <span className="text-[11px] opacity-75 ml-2">({p.id} • {p.dob})</span>
+                    <span className="text-[11px] opacity-75 ml-2">
+                      ({p.id} • {p.dob})
+                    </span>
                   </div>
                   {p.hasSevereAllergy && (
                     <Badge
@@ -251,7 +303,9 @@ function AppointmentFormInner({
                   type="button"
                   variant={isSelected ? "default" : "outline"}
                   size="xs"
-                  onClick={() => setValue("doctorId", doc.id, { shouldValidate: true })}
+                  onClick={() =>
+                    setValue("doctorId", doc.id, { shouldValidate: true })
+                  }
                   className={`rounded-none border text-xs font-mono text-left justify-start p-2 h-auto flex flex-col items-start ${
                     isSelected
                       ? "border-[#141618] bg-[#141618] text-[#FAFAF7] hover:bg-black"
@@ -260,7 +314,9 @@ function AppointmentFormInner({
                 >
                   <span className="font-bold text-[11px]">{doc.name}</span>
                   {doc.room && (
-                    <span className={`text-[10px] ${isSelected ? "text-[#D8D4CC]" : "text-[#5A5D61]"}`}>
+                    <span
+                      className={`text-[10px] ${isSelected ? "text-[#D8D4CC]" : "text-[#5A5D61]"}`}
+                    >
                       {doc.room}
                     </span>
                   )}
@@ -339,7 +395,9 @@ function AppointmentFormInner({
                 : "border-[#141618] bg-white text-[#141618]"
             }`}
           >
-            {watchedIsWalkIn ? "✓ Patient is Walk-In (Checked-In Now)" : "+ Mark as Walk-In"}
+            {watchedIsWalkIn
+              ? "✓ Patient is Walk-In (Checked-In Now)"
+              : "+ Mark as Walk-In"}
           </Button>
         </div>
 

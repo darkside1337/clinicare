@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { User, Home, Save, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -72,7 +72,7 @@ export function PatientForm({
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     setValue,
     formState: { errors, isSubmitting: formSubmitting },
   } = useForm<PatientInput>({
@@ -88,8 +88,8 @@ export function PatientForm({
   });
 
   const isSubmitting = externalSubmitting ?? formSubmitting;
-  const watchedDob = watch("dob");
-  const watchedSex = watch("sex");
+  const watchedDob = useWatch({ control, name: "dob" });
+  const watchedSex = useWatch({ control, name: "sex" });
   const calculatedAge = calculateAge(watchedDob);
 
   const handleFormSubmit = async (data: PatientInput) => {
