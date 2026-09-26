@@ -1,21 +1,48 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Printer, Download, Pill } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Prescription } from "@/lib/mock-consultations";
-import PrescriptionPdfDocument from "@/features/prescriptions/pdf/prescription-document";
+import { Card } from "@/components/ui/card";
 
-interface PrescriptionSummaryProps {
-  prescription: Prescription;
+export interface PrescriptionSummaryItem {
+  id?: string;
+  medication: string;
+  dosage: string;
+  frequency: string;
+  duration: string;
+  instructions?: string | null;
+}
+
+export interface PrescriptionSummaryData {
+  id: string;
+  prescriptionNumber?: string;
+  createdAt?: Date | string;
+  issuedAt?: string;
+  items?: PrescriptionSummaryItem[];
+}
+
+export interface PrescriptionSummaryProps {
+  prescription: PrescriptionSummaryData;
   patientName: string;
   patientDob: string;
   patientAge: number;
-  patientAddress?: string;
+  patientAddress?: string | null;
   doctorName: string;
   clinicName: string;
-  clinicAddress?: string;
+  clinicAddress?: string | null;
+}
+
+function formatDate(dateVal?: Date | string, fallback?: string): string {
+  if (fallback) return fallback;
+  if (!dateVal) return "";
+  const d = typeof dateVal === "string" ? new Date(dateVal) : dateVal;
+  if (isNaN(d.getTime())) return String(dateVal);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
 }
 
 export function PrescriptionSummary({
@@ -28,41 +55,11 @@ export function PrescriptionSummary({
   clinicName,
   clinicAddress,
 }: PrescriptionSummaryProps) {
-  const [isExportingPdf, setIsExportingPdf] = useState(false);
   const items = prescription?.items || [];
-
-  const handleDownloadPdf = async () => {
-    try {
-      setIsExportingPdf(true);
-      const { pdf } = await import("@react-pdf/renderer");
-      const blob = await pdf(
-        <PrescriptionPdfDocument
-          prescription={prescription}
-          patientName={patientName}
-          patientDob={patientDob}
-          patientAge={patientAge}
-          patientAddress={patientAddress}
-          doctorName={doctorName}
-          clinicName={clinicName}
-          clinicAddress={clinicAddress}
-        />
-      ).toBlob();
-
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `Prescription-${prescription.prescriptionNumber || prescription.id}-${patientName.replace(/\s+/g, "_")}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("PDF generation failed:", err);
-      window.print();
-    } finally {
-      setIsExportingPdf(false);
-    }
-  };
+  const rxNumber =
+    prescription.prescriptionNumber ||
+    `RX-${prescription.id.slice(0, 8).toUpperCase()}`;
+  const issueDate = formatDate(prescription.createdAt, prescription.issuedAt);
 
   const handleBrowserPrint = () => {
     window.print();
@@ -71,31 +68,38 @@ export function PrescriptionSummary({
   return (
     <div className="space-y-4">
       {/* Action Bar (Hidden during print) */}
-      <div className="print:hidden flex flex-wrap items-center justify-between gap-3 border border-[#141618] bg-white p-3 shadow-[1px_1px_0px_#141618]">
+      <Card className="print:hidden rounded-none flex flex-wrap items-center justify-between gap-3 border border-[#141618] bg-white p-3 shadow-[1px_1px_0px_#141618]">
         <div className="flex items-center gap-2">
           <Pill className="size-4 text-[#141618]" />
           <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#141618]">
             Prescription Pad
           </span>
-          <Badge variant="outline" className="font-mono text-[11px]">
-            {prescription.prescriptionNumber || prescription.id}
+          <Badge variant="outline" className="font-mono text-[11px] rounded-none">
+            {rxNumber}
           </Badge>
-          <span className="text-[11px] font-mono text-[#5A5D61]">
-            Issued: {prescription.issuedAt}
-          </span>
+          {issueDate && (
+            <span className="text-[11px] font-mono text-[#5A5D61]">
+              Issued: {issueDate}
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
           <Button
-            type="button"
+            asChild
             variant="outline"
             size="sm"
-            onClick={handleDownloadPdf}
-            disabled={isExportingPdf}
-            className="rounded-none border border-[#141618] bg-white px-3 py-1 text-xs font-mono uppercase font-bold text-[#141618] hover:bg-[#FAFAF7] flex items-center gap-1.5"
+            className="rounded-none border border-[#141618] bg-white px-3 py-1 text-xs font-mono uppercase font-bold text-[#141618] hover:bg-[#FAFAF7]"
           >
-            <Download className="size-3.5" />
-            <span>{isExportingPdf ? "Exporting PDF..." : "Download PDF"}</span>
+            <a
+              href={`/prescriptions/${prescription.id}/pdf`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5"
+            >
+              <Download className="size-3.5" />
+              <span>Download PDF</span>
+            </a>
           </Button>
 
           <Button
@@ -109,7 +113,7 @@ export function PrescriptionSummary({
             <span>Print Sheet (Ctrl+P)</span>
           </Button>
         </div>
-      </div>
+      </Card>
 
       {/* The Prescription Sheet */}
       <div
@@ -135,7 +139,7 @@ export function PrescriptionSummary({
             <div className="border border-[#141618] bg-[#FAFAF7] px-2.5 py-1 inline-block">
               <span className="text-[10px] text-[#5A5D61] uppercase block">Serial No.</span>
               <strong className="text-[#141618] text-xs">
-                {prescription.prescriptionNumber || prescription.id}
+                {rxNumber}
               </strong>
             </div>
           </div>
@@ -167,9 +171,11 @@ export function PrescriptionSummary({
             <div className="font-bold text-[#141618]">
               {doctorName}
             </div>
-            <div className="text-[#5A5D61]">
-              Issue Date: {prescription.issuedAt}
-            </div>
+            {issueDate && (
+              <div className="text-[#5A5D61]">
+                Issue Date: {issueDate}
+              </div>
+            )}
             <div className="text-[#5A5D61] text-[11px]">
               Type: General Outpatient
             </div>
@@ -202,7 +208,7 @@ export function PrescriptionSummary({
                   </tr>
                 ) : (
                   items.map((item, idx) => (
-                    <tr key={item.id} className="hover:bg-[#FAFAF7]">
+                    <tr key={item.id || idx} className="hover:bg-[#FAFAF7]">
                       <td className="py-2.5 px-3 font-mono text-[#5A5D61]">{idx + 1}</td>
                       <td className="py-2.5 px-3 font-bold text-[#141618]">
                         {item.medication}
@@ -214,7 +220,7 @@ export function PrescriptionSummary({
                         {item.duration}
                       </td>
                       <td className="py-2.5 px-3 italic text-[#141618]">
-                        {item.instructions}
+                        {item.instructions || "—"}
                       </td>
                     </tr>
                   ))

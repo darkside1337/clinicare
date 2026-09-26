@@ -363,22 +363,22 @@ Implements the full patients domain — queries, mutations, schema validation, a
 
 ### 6.1 Zod Schemas
 
-- [ ] Create `features/prescriptions/schema.ts`:
+- [x] Create `features/prescriptions/schema.ts`:
   - `prescriptionItemSchema` — medication, dosage, frequency, duration, instructions.
   - `createPrescriptionSchema` — `{ consultationId, items: prescriptionItemSchema[] }` (min 1 item).
 
 ### 6.2 Queries & Mutations
 
-- [ ] Create `features/prescriptions/queries.ts`:
+- [x] Create `features/prescriptions/queries.ts`:
   - `getPrescription(clinicId, prescriptionId)` — includes items, consultation, patient, doctor.
   - `listPrescriptionsForPatient(clinicId, patientId)`.
   - `listPrescriptionsForConsultation(clinicId, consultationId)` — supports the multi-prescription-per-consultation display.
-- [ ] Create `features/prescriptions/mutations.ts`:
+- [x] Create `features/prescriptions/mutations.ts`:
   - `createPrescription(clinicId, input)` — inserts prescription + all items in a transaction. Each call creates one independent prescription row; a consultation may have this called multiple times.
 
 ### 6.3 PDF Template
 
-- [ ] Create `features/prescriptions/pdf/prescription-document.tsx` — `@react-pdf/renderer` component:
+- [x] Create `features/prescriptions/pdf/prescription-document.tsx` — `@react-pdf/renderer` component:
   - Renders clinic name, logo (if available), doctor name, patient name + DOB, date.
   - Items table: medication, dosage, frequency, duration, instructions.
   - Signature line.
@@ -388,7 +388,7 @@ Implements the full patients domain — queries, mutations, schema validation, a
 
 ### 6.4 PDF Route Handler
 
-- [ ] Create `app/(app)/prescriptions/[id]/pdf/route.ts` — Server Route Handler:
+- [x] Create `app/(app)/prescriptions/[id]/pdf/route.ts` — Server Route Handler:
   - Resolves session + `clinicId`.
   - Calls `getPrescription(clinicId, id)`.
   - Renders PDF via `renderToStream` from `@react-pdf/renderer`.
@@ -396,21 +396,21 @@ Implements the full patients domain — queries, mutations, schema validation, a
 
 ### 6.5 Feature Tests
 
-- [ ] `features/prescriptions/__tests__/schema.test.ts`:
+- [x] `features/prescriptions/__tests__/schema.test.ts`:
   - `createPrescriptionSchema` rejects empty `items` array.
   - `prescriptionItemSchema` requires `medication` and `dosage`.
-- [ ] `features/prescriptions/__tests__/mutations.test.ts` (mock DB):
+- [x] `features/prescriptions/__tests__/mutations.test.ts` (mock DB):
   - `createPrescription` inserts all items linked to the new prescription ID.
   - All DB calls receive `clinicId` for scope verification.
   - Calling `createPrescription` twice for the same `consultationId` produces two independent prescription rows, not an overwrite.
-- [ ] **Test:** `pnpm test` — all prescription tests pass. ✅
+- [x] **Test:** `pnpm test` — all prescription tests pass. ✅
 
 ### 6.6 Prescription UI Components
 
-- [ ] `features/prescriptions/components/prescription-form.tsx` — (JSX scaffolded) Wire dynamic item list (add/remove rows) to React Hook Form + `prescriptionItemSchema` resolver and `createPrescription` mutation.
-- [ ] `features/prescriptions/components/prescription-list.tsx` — (JSX scaffolded) Wire multi-prescription switcher/list per consultation to `listPrescriptionsForConsultation` query.
-- [ ] `features/prescriptions/components/prescription-summary.tsx` — (JSX scaffolded) Read-only itemized prescription card with print sheet trigger and PDF download link via route handler.
-- [ ] `features/prescriptions/pdf/prescription-document.tsx` — (JSX scaffolded) Vector PDF template rendered via `@react-pdf/renderer` for single-prescription export.
+- [x] `features/prescriptions/components/prescription-form.tsx` — (JSX scaffolded) Wire dynamic item list (add/remove rows) to React Hook Form + `prescriptionItemSchema` resolver and `createPrescription` mutation.
+- [x] `features/prescriptions/components/prescription-list.tsx` — (JSX scaffolded) Wire multi-prescription switcher/list per consultation to `listPrescriptionsForConsultation` query.
+- [x] `features/prescriptions/components/prescription-summary.tsx` — (JSX scaffolded) Read-only itemized prescription card with print sheet trigger and PDF download link via route handler.
+- [x] `features/prescriptions/pdf/prescription-document.tsx` — (JSX scaffolded) Vector PDF template rendered via `@react-pdf/renderer` for single-prescription export.
 
 ---
 

@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ClinicalConsultationDetail, Prescription } from "@/lib/mock-consultations";
 import { PrescriptionList } from "@/features/prescriptions/components/prescription-list";
-import PrescriptionPdfDocument from "@/features/prescriptions/pdf/prescription-document";
 
 interface ConsultationDetailClientProps {
   consultation: ClinicalConsultationDetail;
@@ -23,46 +22,9 @@ export function ConsultationDetailClient({
   consultation,
 }: ConsultationDetailClientProps) {
   const [activeTab, setActiveTab] = useState<"notes" | "prescriptions">("notes");
-  const [isExportingPdf, setIsExportingPdf] = useState(false);
 
   const prescriptions = consultation.prescriptions || [];
   const currentRx: Prescription | undefined = prescriptions[0];
-
-  const handleDownloadPdf = async (rxToExport?: Prescription) => {
-    const rx = rxToExport || currentRx;
-    if (!rx) return;
-
-    try {
-      setIsExportingPdf(true);
-      const { pdf } = await import("@react-pdf/renderer");
-      const blob = await pdf(
-        <PrescriptionPdfDocument
-          prescription={rx}
-          patientName={consultation.patientName}
-          patientDob={consultation.patientDob}
-          patientAge={consultation.patientAge}
-          patientAddress={consultation.patientContact?.address}
-          doctorName={consultation.doctorName}
-          clinicName={consultation.clinicName}
-          clinicAddress={consultation.clinicAddress}
-        />
-      ).toBlob();
-
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `Prescription-${rx.prescriptionNumber || rx.id}-${consultation.patientName.replace(/\s+/g, "_")}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("PDF generation failed:", err);
-      window.print();
-    } finally {
-      setIsExportingPdf(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-[#FAFAF7] text-[#141618] selection:bg-[#141618] selection:text-[#FAFAF7]">
@@ -89,15 +51,20 @@ export function ConsultationDetailClient({
           {currentRx && (
             <>
               <Button
-                type="button"
+                asChild
                 variant="outline"
                 size="xs"
-                onClick={() => handleDownloadPdf()}
-                disabled={isExportingPdf}
                 className="rounded-none border border-[#141618] bg-white px-2.5 py-1 text-xs font-mono uppercase font-bold text-[#141618] hover:bg-[#FAFAF7] flex items-center gap-1.5 h-auto"
               >
-                <Download className="size-3.5" />
-                <span>{isExportingPdf ? "Generating PDF..." : "Export Prescription PDF"}</span>
+                <a
+                  href={`/prescriptions/${currentRx.id}/pdf`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5"
+                >
+                  <Download className="size-3.5" />
+                  <span>Export Prescription PDF</span>
+                </a>
               </Button>
 
               <Button
@@ -322,6 +289,8 @@ export function ConsultationDetailClient({
             doctorName={consultation.doctorName}
             clinicName={consultation.clinicName}
             clinicAddress={consultation.clinicAddress}
+            patientId={consultation.patientId}
+            consultationId={consultation.id}
           />
         )}
       </main>
