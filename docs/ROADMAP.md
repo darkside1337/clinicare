@@ -324,36 +324,36 @@ Implements the full patients domain — queries, mutations, schema validation, a
 
 ### 5.1 Zod Schemas
 
-- [ ] Create `features/consultations/schema.ts`:
+- [x] Create `features/consultations/schema.ts`:
   - `consultationSchema` — chiefComplaint (required), symptoms, observations, diagnosis, treatment, notes (all optional strings).
 
 ### 5.2 Queries
 
-- [ ] Create `features/consultations/queries.ts`:
+- [x] Create `features/consultations/queries.ts`:
   - `listConsultationsForPatient(clinicId, patientId)` — reverse-chronological.
   - `getConsultation(clinicId, consultationId)` — includes any linked prescriptions.
 
 ### 5.3 Mutations
 
-- [ ] Create `features/consultations/mutations.ts`:
+- [x] Create `features/consultations/mutations.ts`:
   - `createConsultation(clinicId, input)` — also updates linked appointment status to `completed`.
   - `updateConsultation(clinicId, consultationId, input)`.
 
 ### 5.4 Feature Tests
 
-- [ ] `features/consultations/__tests__/schema.test.ts`:
+- [x] `features/consultations/__tests__/schema.test.ts`:
   - `consultationSchema` requires `chiefComplaint`.
   - `consultationSchema` accepts all-optional remaining fields.
-- [ ] `features/consultations/__tests__/mutations.test.ts` (mock DB):
+- [x] `features/consultations/__tests__/mutations.test.ts` (mock DB):
   - `createConsultation` sets appointment status to `"completed"` in the same transaction.
   - `createConsultation` always passes `clinicId` to patient/appointment scope checks.
-- [ ] **Test:** `pnpm test` — all consultation tests pass. ✅
+- [x] **Test:** `pnpm test` — all consultation tests pass. ✅
 
 ### 5.5 Consultation UI Components
 
-- [ ] `features/consultations/components/consultation-form.tsx` — (JSX scaffolded) Wire full-page 6 free-text fields (`chiefComplaint`, `symptoms`, `observations`, `diagnosis`, `treatment`, `notes`) to React Hook Form + `consultationSchema` resolver and `createConsultation` Server Action.
-- [ ] `features/consultations/components/consultation-card.tsx` — (JSX scaffolded) Read-only summary card for the patient timeline (chief complaint, diagnosis, date, doctor name; expandable to show full clinical narrative and prescription status).
-- [ ] `features/consultations/components/consultation-timeline.tsx` — (JSX scaffolded) Reverse-chronological timeline of `consultation-card`s; wire to `listConsultationsForPatient` query.
+- [x] `features/consultations/components/consultation-form.tsx` — (JSX scaffolded) Wire full-page 6 free-text fields (`chiefComplaint`, `symptoms`, `observations`, `diagnosis`, `treatment`, `notes`) to React Hook Form + `consultationSchema` resolver and `createConsultation` Server Action.
+- [x] `features/consultations/components/consultation-card.tsx` — (JSX scaffolded) Read-only summary card for the patient timeline (chief complaint, diagnosis, date, doctor name; expandable to show full clinical narrative and prescription status).
+- [x] `features/consultations/components/consultation-timeline.tsx` — (JSX scaffolded) Reverse-chronological timeline of `consultation-card`s; wire to `listConsultationsForPatient` query.
 
 (No component tests for this phase — see testing scope note at the top of this document.)
 

@@ -8,22 +8,35 @@ import { Button } from "@/components/ui/button";
 import { ConsultationForm } from "@/features/consultations/components/consultation-form";
 import {
   PrescriptionForm,
-  PrescriptionItemDraft,
+  type PrescriptionItemDraft,
 } from "@/features/prescriptions/components/prescription-form";
-import { Patient } from "@/lib/mock-patient";
+import type { Patient, Consultation } from "@/lib/db/schema";
 
 interface ConsultationNewClientProps {
   patient: Patient;
+  appointmentId?: string;
+  doctorName?: string;
 }
 
-export function ConsultationNewClient({ patient }: ConsultationNewClientProps) {
+export function ConsultationNewClient({
+  patient,
+  appointmentId,
+  doctorName,
+}: ConsultationNewClientProps) {
   const router = useRouter();
-  const [prescriptionItems, setPrescriptionItems] = useState<PrescriptionItemDraft[]>([]);
+  const [prescriptionItems, setPrescriptionItems] = useState<
+    PrescriptionItemDraft[]
+  >([]);
 
-  const handleSave = () => {
-    // In mock stage, return to patient profile
-    router.push(`/patients/${patient.id}`);
+  const handleSuccess = (consultation: Consultation) => {
+    router.push(`/patients/${patient.id}/consultations/${consultation.id}`);
   };
+
+  const todayDate = new Date().toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
 
   return (
     <div className="min-h-screen bg-[#FAFAF7] text-[#141618] selection:bg-[#141618] selection:text-[#FAFAF7]">
@@ -39,17 +52,17 @@ export function ConsultationNewClient({ patient }: ConsultationNewClientProps) {
           </Link>
           <span className="text-[#D8D4CC] hidden sm:inline">|</span>
           <span className="text-[#5A5D61] uppercase tracking-wider">
-            NEW CLINICAL ENCOUNTER: <strong>{patient.name}</strong> ({patient.id})
+            NEW CLINICAL ENCOUNTER: <strong>{patient.name}</strong> ({patient.id.slice(0, 8)}…)
           </span>
         </div>
 
         <div className="flex items-center gap-3">
           <span className="text-xs font-mono text-[#5A5D61] hidden sm:inline">
-            DATE: 24/09/2026
+            DATE: {todayDate}
           </span>
           <Button
-            type="button"
-            onClick={handleSave}
+            form="consultation-form"
+            type="submit"
             size="sm"
             className="rounded-none border border-[#141618] bg-[#141618] text-xs font-mono uppercase font-bold text-[#FAFAF7] hover:bg-black flex items-center gap-1.5"
           >
@@ -73,16 +86,22 @@ export function ConsultationNewClient({ patient }: ConsultationNewClientProps) {
             </div>
             <div className="flex items-center gap-2 self-start sm:self-auto">
               <span className="border border-[#141618] bg-white px-2 py-0.5 text-xs font-mono uppercase">
-                Doctor: Dr. Alistair Finch
+                Doctor: {doctorName || "Attending Doctor"}
               </span>
             </div>
           </div>
         </div>
 
         {/* 1. Free-Text Consultation Form (PRD §8.6) */}
-        <ConsultationForm onSubmit={handleSave} />
+        <ConsultationForm
+          patientId={patient.id}
+          appointmentId={appointmentId}
+          doctorName={doctorName}
+          encounterType={appointmentId ? "Scheduled" : "Walk-In"}
+          onSuccess={handleSuccess}
+        />
 
-        {/* 2. Attached Prescriptions Generator (PRD §8.7) */}
+        {/* 2. Attached Prescriptions Generator (PRD §8.7 — Phase 6 scaffold) */}
         <PrescriptionForm
           items={prescriptionItems}
           onChange={setPrescriptionItems}
@@ -92,8 +111,8 @@ export function ConsultationNewClient({ patient }: ConsultationNewClientProps) {
         {/* Bottom Save Action */}
         <div className="flex justify-end pt-2">
           <Button
-            type="button"
-            onClick={handleSave}
+            form="consultation-form"
+            type="submit"
             size="sm"
             className="rounded-none border border-[#141618] bg-[#141618] px-5 py-2 text-xs font-mono uppercase font-bold text-[#FAFAF7] hover:bg-black flex items-center gap-1.5"
           >

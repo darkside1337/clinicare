@@ -1,7 +1,9 @@
 import React from "react";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { requireDoctor } from "@/lib/auth/require-doctor";
+import { getPatient } from "@/features/patients/queries";
 import { ConsultationNewClient } from "./consultation-new-client";
-import { MOCK_PATIENT_RECORD } from "@/lib/mock-patient";
 
 export const metadata: Metadata = {
   title: "New Clinical Consultation | CliniCare",
@@ -10,14 +12,27 @@ export const metadata: Metadata = {
 
 interface PageProps {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ appointmentId?: string }>;
 }
 
-export default async function NewConsultationPage({ params }: PageProps) {
+export default async function NewConsultationPage({
+  params,
+  searchParams,
+}: PageProps) {
+  const session = await requireDoctor();
   const { id } = await params;
-  const patient = {
-    ...MOCK_PATIENT_RECORD.patient,
-    id: id || MOCK_PATIENT_RECORD.patient.id,
-  };
+  const { appointmentId } = await searchParams;
 
-  return <ConsultationNewClient patient={patient} />;
+  const patient = await getPatient(session.clinicId, id);
+  if (!patient) {
+    notFound();
+  }
+
+  return (
+    <ConsultationNewClient
+      patient={patient}
+      appointmentId={appointmentId}
+      doctorName={session.user.name}
+    />
+  );
 }

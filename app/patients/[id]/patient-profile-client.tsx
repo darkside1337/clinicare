@@ -15,12 +15,46 @@ import { AllergyList } from "@/features/patients/components/allergy-list";
 import { ProblemList } from "@/features/patients/components/problem-list";
 import { ConsultationTimeline } from "@/features/consultations/components/consultation-timeline";
 
+import { PracticeNav } from "@/components/layout/nav";
+
 interface PatientProfileClientProps {
   initialData: PatientRecord;
+  sessionRole?: "doctor" | "receptionist";
+  sessionUserName?: string;
 }
 
-export function PatientProfileClient({ initialData }: PatientProfileClientProps) {
-  const { patient, allergies, problems, consultations, appointments, prescriptions } = initialData;
+export function PatientProfileClient({
+  initialData,
+  sessionRole = "doctor",
+  sessionUserName,
+}: PatientProfileClientProps) {
+  const { patient, allergies: mockAllergies, problems: mockProblems, consultations, appointments, prescriptions } = initialData;
+
+  const allergies = useMemo(
+    () =>
+      mockAllergies.map((a) => ({
+        id: a.id,
+        patientId: patient.id,
+        substance: a.substance,
+        severity: a.severity,
+        reaction: a.reaction ?? null,
+        createdAt: new Date(),
+      })),
+    [mockAllergies, patient.id]
+  );
+
+  const problems = useMemo(
+    () =>
+      mockProblems.map((p) => ({
+        id: p.id,
+        patientId: patient.id,
+        condition: p.condition,
+        status: p.status,
+        onsetDate: p.onsetDate ?? null,
+        createdAt: new Date(),
+      })),
+    [mockProblems, patient.id]
+  );
 
   const upcomingAppointments = useMemo(() => {
     return appointments.filter(
@@ -35,55 +69,39 @@ export function PatientProfileClient({ initialData }: PatientProfileClientProps)
   return (
     <div className="min-h-screen bg-[#FAFAF7] text-[#141618] selection:bg-[#141618] selection:text-[#FAFAF7]">
       {/* Top Clinical Navigation Bar */}
-      <header className="sticky top-0 z-30 flex h-auto min-h-12 w-full flex-wrap items-center justify-between gap-3 border-b border-[#141618] bg-[#FAFAF7] px-4 py-2 sm:px-6">
-        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-mono tracking-tight">
-          <Link
-            href="/patients"
-            className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[#141618] hover:opacity-75 transition-opacity"
-          >
-            <span>CLINICARE</span>
-            <span className="text-[11px] text-[#5A5D61] hidden sm:inline">
-              / PATIENT RECORD
-            </span>
-          </Link>
-          <span className="text-[#D8D4CC] hidden sm:inline">|</span>
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <span className="text-[#5A5D61] uppercase tracking-wider text-[11px]">
-              PT:
-            </span>
-            <span className="font-semibold text-[#141618] text-xs sm:text-sm">
-              {patient.name}
-            </span>
-            <span className="text-[#5A5D61] text-[11px]">({patient.id})</span>
-          </div>
-        </div>
+      <PracticeNav
+        sessionRole={sessionRole}
+        sessionUserName={sessionUserName}
+        rightSlot={
+          <>
+            <Button
+              type="button"
+              variant="ghost"
+              size="xs"
+              onClick={() =>
+                window.dispatchEvent(new CustomEvent("clinicare:open-search"))
+              }
+              className="hidden md:flex items-center gap-1.5 rounded-none border border-[#141618] bg-white px-2.5 py-1 text-xs font-mono text-[#5A5D61] hover:bg-[#FAFAF7] hover:text-[#141618] h-auto"
+            >
+              <Search className="size-3.5 text-[#141618]" />
+              <span>Search (Cmd+K)</span>
+            </Button>
 
-        <div className="flex items-center gap-2 sm:gap-3">
-          <Button
-            type="button"
-            variant="ghost"
-            size="xs"
-            onClick={() =>
-              window.dispatchEvent(new CustomEvent("clinicare:open-search"))
-            }
-            className="hidden md:flex items-center gap-1.5 rounded-none border border-[#141618] bg-white px-2.5 py-1 text-xs font-mono text-[#5A5D61] hover:bg-[#FAFAF7] hover:text-[#141618] h-auto"
-          >
-            <Search className="size-3.5 text-[#141618]" />
-            <span>Search (Cmd+K)</span>
-          </Button>
-
-          <Button
-            asChild
-            className="min-h-[38px] rounded-none border border-[#141618] bg-[#141618] px-3.5 text-xs font-semibold uppercase tracking-wider text-[#FAFAF7] transition-colors hover:bg-black"
-          >
-            <Link href={`/patients/${patient.id}/consultations/new`}>
-              <Plus className="size-3.5 stroke-[2.5]" />
-              <span className="hidden xs:inline sm:inline">Start Consultation</span>
-              <span className="xs:hidden sm:hidden inline">Consult</span>
-            </Link>
-          </Button>
-        </div>
-      </header>
+            {sessionRole === "doctor" && (
+              <Button
+                asChild
+                className="min-h-[38px] rounded-none border border-[#141618] bg-[#141618] px-3.5 text-xs font-semibold uppercase tracking-wider text-[#FAFAF7] transition-colors hover:bg-black"
+              >
+                <Link href={`/patients/${patient.id}/consultations/new`}>
+                  <Plus className="size-3.5 stroke-[2.5]" />
+                  <span className="hidden xs:inline sm:inline">Start Consultation</span>
+                  <span className="xs:hidden sm:hidden inline">Consult</span>
+                </Link>
+              </Button>
+            )}
+          </>
+        }
+      />
 
       {/* Main Two-Column Document Canvas */}
       <main className="mx-auto flex w-full max-w-[1536px] flex-col lg:flex-row">
