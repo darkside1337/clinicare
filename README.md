@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CliniCare — Practice Management System
+
+CliniCare is a fast, focused practice-management web application for individual doctors and small multi-doctor clinics — covering patients, appointments, consultations, and prescriptions without hospital/EMR overhead.
+
+Built on Next.js 16 (App Router), React 19, Tailwind CSS v4, Shadcn UI primitives, Drizzle ORM, Supabase Postgres, and Better Auth.
+
+---
+
+## Key Features
+
+- **The Pathology Lab Report Design**: Minimalist clinical document styling prioritizing rapid cognitive scanability over generic SaaS dashboards. High contrast carbon ink (`#141618`) on warm paper ground (`#FAFAF7`) with monospaced tabular figures.
+- **Strict Multi-Tenancy**: Application-level tenancy isolation scoped to `clinic_id` on every clinical query and mutation.
+- **Role-Based Authorization**:
+  - **Doctor (`role: doctor`)**: Complete clinical access — patient profiles, medical problems, allergies, consultation encounters, and itemized prescription authoring.
+  - **Receptionist (`role: receptionist`)**: Front-desk operations — patient registration and appointment scheduling, strictly excluded from clinical consultation documentation.
+- **Global Command Palette (`⌘K` / `Ctrl+K`)**: Instant patient search across name, DOB, phone, and email, with one-click walk-in appointment creation and consultation launch.
+- **Prescriptions & Vector PDF Export**: Atomic multi-item prescription orders attached to consultations with single-prescription vector PDF generation via `@react-pdf/renderer`.
+
+---
+
+## Tech Stack
+
+- **Framework**: Next.js 16.3 (Turbopack, App Router, Server Actions)
+- **UI & Components**: React 19, Tailwind CSS v4, Base UI, Shadcn UI primitives, Lucide Icons
+- **Database & ORM**: Supabase Postgres, Drizzle ORM, Drizzle Zod
+- **Authentication**: Better Auth (OAuth via GitHub/Google + local sandbox testing sessions)
+- **Forms & Validation**: React Hook Form, Zod
+- **PDF Generation**: `@react-pdf/renderer`
+- **Testing**: Vitest, React Testing Library
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Node.js 20+
+- pnpm 12+ (`corepack enable pnpm`)
+- Postgres database (Supabase or local instance)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Install project dependencies:
+   ```bash
+   pnpm install
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Configure environment variables in `.env.local`:
+   ```bash
+   DATABASE_URL="postgres://..."
+   BETTER_AUTH_SECRET="your-auth-secret"
+   BETTER_AUTH_URL="http://localhost:3000"
+   ```
 
-## Learn More
+3. Run migrations and database seed:
+   ```bash
+   pnpm db:generate
+   pnpm db:migrate
+   pnpm db:seed
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+4. Start the development server:
+   ```bash
+   pnpm dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000) to access the landing page and sandbox gateway.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Scripts & Development
 
-## Deploy on Vercel
+| Command | Description |
+| :--- | :--- |
+| `pnpm dev` | Starts Next.js development server with Turbopack |
+| `pnpm build` | Builds optimized production bundle |
+| `pnpm test` | Runs pure-logic Vitest test suite |
+| `pnpm test:watch` | Runs test runner in watch mode |
+| `pnpm db:generate` | Generates SQL migrations from Drizzle schema |
+| `pnpm db:migrate` | Applies migrations to target Postgres database |
+| `pnpm db:seed` | Populates database with sample clinic, staff personas, and patients |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Architecture & Documentation
+
+- [docs/ROADMAP.md](docs/ROADMAP.md) — Phased task breakdown and development progress
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — Multi-tenancy model, folder boundaries, and Server Actions patterns
+- [docs/PRD.md](docs/PRD.md) — Product requirements, domain models, and feature specifications
+- [DESIGN.md](DESIGN.md) — Visual design tokens, typography, and "Pathology Lab Report" layout guidelines
+- [PRODUCT.md](PRODUCT.md) — Product positioning, operational principles, and personas

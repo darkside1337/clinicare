@@ -47,9 +47,8 @@ export async function requireDoctor() {
 Feature-based. Each domain owns its own components, queries, mutations, and validation schemas. Routing structure (`app/`) stays thin and composes from feature folders.
 
 ```
-src/
-  app/
-    api/
+app/
+  api/
       auth/
         [...all]/
           route.ts                -- Better Auth API route handler

@@ -418,24 +418,24 @@ Implements the full patients domain — queries, mutations, schema validation, a
 
 ### 7.1 Design Tokens
 
-- [ ] Apply `DESIGN.md` color tokens to `tailwind.config.ts` (or via CSS variables in `app/globals.css`).
-- [ ] Load fonts specified in `docs/DESIGN.md` via `next/font/google` in `app/layout.tsx`.
-- [ ] Configure Tailwind to use the custom CSS variables per `docs/DESIGN.md`.
+- [x] Apply `DESIGN.md` color tokens to `tailwind.config.ts` (or via CSS variables in `app/globals.css`).
+- [x] Load fonts specified in `docs/DESIGN.md` via `next/font/google` in `app/layout.tsx`.
+- [x] Configure Tailwind to use the custom CSS variables per `docs/DESIGN.md`.
 
 ### 7.2 App Layout
 
-- [ ] Create `app/(auth)/layout.tsx` — minimal centered layout (login page only).
-- [ ] Create `app/(app)/layout.tsx` — calls `getSession()` at the top (the authoritative check — `proxy.ts` only handles the soft pre-redirect); renders the app shell:
+- [x] Create `app/(auth)/layout.tsx` — minimal centered layout (login page only).
+- [x] Create `app/(app)/layout.tsx` — calls `getSession()` at the top (the authoritative check — `proxy.ts` only handles the soft pre-redirect); renders the app shell:
   - Persistent top navigation bar (clinic name, user name, sign-out).
   - Sidebar or top tabs: Dashboard, Patients, Appointments.
   - Cmd+K trigger visible in the nav.
-- [ ] Create `components/layout/nav.tsx` — top navigation bar using Shadcn primitives.
-- [ ] Create `components/layout/sidebar.tsx` — role-aware nav links (receptionist sees no consultation shortcuts).
+- [x] Create `components/layout/nav.tsx` — top navigation bar using Shadcn primitives.
+- [x] Create `components/layout/sidebar.tsx` — role-aware nav links (receptionist sees no consultation shortcuts).
 
 ### 7.3 Command Palette (Cmd+K)
 
-- [ ] Install `pnpm dlx shadcn@latest add command`.
-- [ ] Create `components/layout/command-palette.tsx`:
+- [x] Install `pnpm dlx shadcn@latest add command`.
+- [x] Create `components/layout/command-palette.tsx`:
   - Keyboard shortcut `⌘K` / `Ctrl+K` opens it.
   - Searches patients within `clinicId` (debounced Server Action call).
   - Doctor: shows "View profile" and "Start consultation" actions.
