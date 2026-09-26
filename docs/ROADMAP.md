@@ -529,23 +529,23 @@ Builds every route as a thin orchestration layer over the feature modules.
 
 ### 9.1 Multi-Tenancy Audit (manual checklist, not automated)
 
-- [ ] Run a project-wide grep for any query/mutation call that lacks a `clinicId` argument:
+- [x] Run a project-wide grep for any query/mutation call that lacks a `clinicId` argument:
   ```
   grep -r "db.query\|db.select\|db.insert\|db.update\|db.delete" features/ --include="*.ts" -l
   ```
   Manually verify every file returned passes `clinicId`.
-- [ ] Confirm no route under `app/(app)/` renders clinical data without calling `getSession()` or `requireDoctor()` first.
-- [ ] Confirm `proxy.ts` is never relied upon anywhere as a substitute for these checks — it is redirect-only.
+- [x] Confirm no route under `app/(app)/` renders clinical data without calling `getSession()` or `requireDoctor()` first.
+- [x] Confirm `proxy.ts` is never relied upon anywhere as a substitute for these checks — it is redirect-only.
 
 ### 9.2 Role-Gate Audit (manual checklist, not automated)
 
-- [ ] List all routes under `consultations/` and `prescriptions/`; confirm every `page.tsx` and `actions.ts` calls `requireDoctor()`.
-- [ ] Confirm receptionist-facing pages never import or render consultation/prescription components.
+- [x] List all routes under `consultations/` and `prescriptions/`; confirm every `page.tsx` and `actions.ts` calls `requireDoctor()`.
+- [x] Confirm receptionist-facing pages never import or render consultation/prescription components.
 
 ### 9.3 Build Check
 
 - [x] Run `pnpm build` — exits 0 with no TypeScript or Next.js errors.
-- [ ] Run `pnpm test` — full (lightweight) test suite green. ✅
+- [x] Run `pnpm test` — full (lightweight) test suite green. ✅
 
 ---
 
