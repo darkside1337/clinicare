@@ -49,6 +49,10 @@ Feature-based. Each domain owns its own components, queries, mutations, and vali
 ```
 src/
   app/
+    api/
+      auth/
+        [...all]/
+          route.ts                -- Better Auth API route handler
     (auth)/
       login/
         page.tsx
@@ -100,11 +104,14 @@ src/
         prescription-document.tsx  -- @react-pdf/renderer template
   lib/
     auth/
-      session.ts
-      require-doctor.ts
+      auth.ts                     -- Better Auth server config (drizzleAdapter + additionalFields)
+      client.ts                   -- Better Auth browser client
+      session.ts                  -- getSession helper (authoritative session/role resolution)
+      require-doctor.ts           -- requireDoctor helper
     db/
-      schema.ts                    -- Drizzle table definitions (all tables, one file)
-      client.ts                    -- Drizzle client instance
+      auth-schema.ts              -- Better Auth generated schema (user, session, account, verification)
+      schema.ts                   -- Unified Drizzle schema (domain tables + re-exported auth schema)
+      client.ts                   -- Drizzle client instance
     supabase/
       storage.ts                   -- upload/read helpers for clinic logo, signature
   components/
@@ -124,10 +131,10 @@ Colocated with their route. A Server Action file is a thin orchestration layer, 
 
 import { getSession } from "@/lib/auth/session";
 import { createAllergy } from "@/features/patients/mutations";
-import { allergySchema } from "@/features/patients/schema";
+import { allergySchema, type AllergyInput } from "@/features/patients/schema";
 
 export async function addAllergyAction(
-  input: unknown,
+  input: AllergyInput,
 ): Promise<ActionResult<Allergy>> {
   const session = await getSession();
   const parsed = allergySchema.safeParse(input);

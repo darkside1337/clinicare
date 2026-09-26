@@ -223,14 +223,14 @@ Implements the full patients domain — queries, mutations, schema validation, a
 
 ### 3.1 Zod Schemas
 
-- [ ] Create `features/patients/schema.ts`:
+- [x] Create `features/patients/schema.ts`:
   - `patientSchema` — create/edit form fields (name, dob, sex, phone, email, address); derived from Drizzle schema via `drizzle-zod`, extended for form shape.
   - `allergySchema` — substance, severity, reaction.
   - `problemSchema` — condition, status, onsetDate.
 
 ### 3.2 Queries
 
-- [ ] Create `features/patients/queries.ts`:
+- [x] Create `features/patients/queries.ts`:
   - `listPatients(clinicId, search?)` — returns paginated/filtered list.
   - `getPatient(clinicId, patientId)` — returns single patient or `null`.
   - `getPatientSummary(clinicId, patientId)` — returns patient + active allergies + active problems + recent prescriptions + upcoming appointments (used for profile page above-the-fold).
@@ -240,7 +240,7 @@ Implements the full patients domain — queries, mutations, schema validation, a
 
 ### 3.3 Mutations
 
-- [ ] Create `features/patients/mutations.ts`:
+- [x] Create `features/patients/mutations.ts`:
   - `createPatient(clinicId, input: NewPatientInput)`.
   - `updatePatient(clinicId, patientId, input)`.
   - `softDeletePatient(clinicId, patientId)` — sets `deletedAt = now()`.
@@ -252,26 +252,26 @@ Implements the full patients domain — queries, mutations, schema validation, a
 
 ### 3.4 Feature Tests
 
-- [ ] `features/patients/__tests__/schema.test.ts`:
+- [x] `features/patients/__tests__/schema.test.ts`:
   - Assert `patientSchema.safeParse` accepts valid input.
   - Assert `patientSchema.safeParse` rejects missing required fields.
   - Assert `allergySchema` validates `severity` enum.
-- [ ] `features/patients/__tests__/queries.test.ts` (mock the DB client):
+- [x] `features/patients/__tests__/queries.test.ts` (mock the DB client):
   - Assert `listPatients` always passes `clinicId` in the WHERE clause.
   - Assert `getPatientSummary` returns `null` for a non-existent patient.
   - Assert `listPatients` excludes soft-deleted patients.
-- [ ] `features/patients/__tests__/mutations.test.ts` (mock the DB client):
+- [x] `features/patients/__tests__/mutations.test.ts` (mock the DB client):
   - Assert `softDeletePatient` sets `deletedAt` and does not hard-delete.
   - Assert `createPatient` inserts `clinicId` from the parameter, not from any global.
-- [ ] **Test:** `pnpm test` — all patient tests pass. ✅
+- [x] **Test:** `pnpm test` — all patient tests pass. ✅
 
 ### 3.5 Patient UI Components
 
-- [ ] `features/patients/components/patient-form.tsx` — (JSX scaffolded) Wire intake and edit form to React Hook Form + `patientSchema` resolver and `createPatient`/`updatePatient` Server Actions.
-- [ ] `features/patients/components/patient-table.tsx` — (JSX scaffolded) Wire master directory table and status filter tabs to server query results / URL search params.
-- [ ] `features/patients/components/patient-search.tsx` — (JSX scaffolded) Wire debounced search input to `listPatients` Server Action / query.
-- [ ] `features/patients/components/allergy-list.tsx` — (JSX scaffolded) Wire allergy display and inline add/delete modal to `allergySchema` and allergy mutations.
-- [ ] `features/patients/components/problem-list.tsx` — (JSX scaffolded) Wire problem list display and inline add/edit modal to `problemSchema` and problem mutations.
+- [x] `features/patients/components/patient-form.tsx` — (JSX scaffolded) Wire intake and edit form to React Hook Form + `patientSchema` resolver and `createPatient`/`updatePatient` Server Actions.
+- [x] `features/patients/components/patient-table.tsx` — (JSX scaffolded) Wire master directory table and status filter tabs to server query results / URL search params.
+- [x] `features/patients/components/patient-search.tsx` — (JSX scaffolded) Wire debounced search input to `listPatients` Server Action / query.
+- [x] `features/patients/components/allergy-list.tsx` — (JSX scaffolded) Wire allergy display and inline add/delete modal to `allergySchema` and allergy mutations.
+- [x] `features/patients/components/problem-list.tsx` — (JSX scaffolded) Wire problem list display and inline add/edit modal to `problemSchema` and problem mutations.
 
 (No component tests for this phase — see testing scope note at the top of this document.)
 
@@ -281,42 +281,42 @@ Implements the full patients domain — queries, mutations, schema validation, a
 
 ### 4.1 Zod Schemas
 
-- [ ] Create `features/appointments/schema.ts`:
+- [x] Create `features/appointments/schema.ts`:
   - `appointmentSchema` — patientId, doctorId, scheduledAt, status, isWalkIn, reason.
 
 ### 4.2 Queries
 
-- [ ] Create `features/appointments/queries.ts`:
+- [x] Create `features/appointments/queries.ts`:
   - `listAppointmentsForDay(clinicId, date, doctorId?)`.
   - `listAppointmentsForPatient(clinicId, patientId)`.
   - `getAppointment(clinicId, appointmentId)`.
 
 ### 4.3 Mutations
 
-- [ ] Create `features/appointments/mutations.ts`:
+- [x] Create `features/appointments/mutations.ts`:
   - `createAppointment(clinicId, input)`.
   - `updateAppointment(clinicId, appointmentId, input)`.
   - `createWalkInAppointment(clinicId, patientId, doctorId)` — creates with `isWalkIn: true`, `status: checked-in`, `scheduledAt: now()`.
 
 ### 4.4 Feature Tests
 
-- [ ] `features/appointments/__tests__/schema.test.ts`:
+- [x] `features/appointments/__tests__/schema.test.ts`:
   - `appointmentSchema` rejects invalid status values.
   - `appointmentSchema` accepts all valid statuses.
-- [ ] `features/appointments/__tests__/queries.test.ts` (mock DB):
+- [x] `features/appointments/__tests__/queries.test.ts` (mock DB):
   - `listAppointmentsForDay` filters by date range and `clinicId`.
   - `listAppointmentsForDay` optionally filters by `doctorId`.
-- [ ] `features/appointments/__tests__/mutations.test.ts` (mock DB):
+- [x] `features/appointments/__tests__/mutations.test.ts` (mock DB):
   - `createWalkInAppointment` sets `isWalkIn: true` and `status: "checked-in"`.
-- [ ] **Test:** `pnpm test` — all appointment tests pass. ✅
+- [x] **Test:** `pnpm test` — all appointment tests pass. ✅
 
 ### 4.5 Appointment UI Components
 
-- [ ] `features/appointments/components/appointment-form.tsx` — (JSX scaffolded) Wire booking modal to React Hook Form + `appointmentSchema` resolver and `createAppointment` Server Action.
-- [ ] `features/appointments/components/appointment-status-badge.tsx` — (JSX scaffolded) Maps appointment status → label + color class variants.
-- [ ] `features/appointments/components/day-view.tsx` — (JSX scaffolded) Wire multi-practitioner calendar grid to `listAppointmentsForDay` query and slot click handler.
-- [ ] `features/appointments/components/appointment-queue.tsx` — (JSX scaffolded) Wire today's appointment queue and status changer to appointment queries & mutations.
-- [ ] `features/appointments/components/dashboard-quick-actions.tsx` — (JSX scaffolded) Wire walk-in action to `createWalkInAppointment` mutation.
+- [x] `features/appointments/components/appointment-form.tsx` — (JSX scaffolded) Wire booking modal to React Hook Form + `appointmentSchema` resolver and `createAppointment` Server Action.
+- [x] `features/appointments/components/appointment-status-badge.tsx` — (JSX scaffolded) Maps appointment status → label + color class variants.
+- [x] `features/appointments/components/day-view.tsx` — (JSX scaffolded) Wire multi-practitioner calendar grid to `listAppointmentsForDay` query and slot click handler.
+- [x] `features/appointments/components/appointment-queue.tsx` — (JSX scaffolded) Wire today's appointment queue and status changer to appointment queries & mutations.
+- [x] `features/appointments/components/dashboard-quick-actions.tsx` — (JSX scaffolded) Wire walk-in action to `createWalkInAppointment` mutation.
 
 ---
 
