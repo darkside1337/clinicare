@@ -6,6 +6,10 @@ import { auth } from "@/lib/auth/auth";
 import { DEMO_PERSONAS, type DemoRole } from "@/lib/auth/demo-personas";
 
 export async function loginAsDemoPersona(role: DemoRole) {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("Demo login disabled in production.");
+  }
+
   const persona = DEMO_PERSONAS[role];
   if (!persona) {
     throw new Error(`Invalid demo persona: ${role}`);
@@ -38,7 +42,7 @@ export async function loginAsDemoPersona(role: DemoRole) {
     cookieStore.set(c.name, c.value, {
       path: c.path ?? "/",
       httpOnly: c.httpOnly ?? true,
-      secure: process.env.NODE_ENV === "production",
+      secure: (process.env.NODE_ENV as string) === "production",
       sameSite: (c.sameSite?.toLowerCase() as "lax" | "strict" | "none") || "lax",
       expires: expiresDate,
       maxAge: 7 * 24 * 60 * 60, // 7 days in seconds

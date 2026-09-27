@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 const { mockCookieSet, mockCookieDelete, mockRedirect, mockTestLogin, mockSignOut } = vi.hoisted(() => ({
   mockCookieSet: vi.fn(),
@@ -130,5 +130,29 @@ describe("app/actions/sandbox-auth.ts", () => {
     expect(mockCookieDelete).toHaveBeenCalledWith("better-auth.session_token");
     expect(mockCookieDelete).toHaveBeenCalledWith("better-auth.session_data");
     expect(mockRedirect).toHaveBeenCalledWith("/");
+  });
+
+  describe("Production environment safeguards", () => {
+    beforeEach(() => {
+      vi.stubEnv("NODE_ENV", "production");
+    });
+
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    it("should reject loginAsDoctorAction with disabled error in production", async () => {
+      await expect(loginAsDoctorAction()).rejects.toThrow(
+        "Demo login disabled in production."
+      );
+      expect(mockTestLogin).not.toHaveBeenCalled();
+    });
+
+    it("should reject loginAsPersonaAction with disabled error in production", async () => {
+      await expect(loginAsDemoPersona("receptionist")).rejects.toThrow(
+        "Demo login disabled in production."
+      );
+      expect(mockTestLogin).not.toHaveBeenCalled();
+    });
   });
 });

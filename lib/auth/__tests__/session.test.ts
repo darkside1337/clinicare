@@ -125,4 +125,27 @@ describe("lib/auth/session.ts - getSession", () => {
       role: "receptionist",
     });
   });
+
+  describe("Fail-closed role enforcement", () => {
+    it.each([
+      ["null", null],
+      ["undefined", undefined],
+      ["empty string", ""],
+      ["unknown role 'admin'", "admin"],
+      ["unknown role 'superuser'", "superuser"],
+    ])("should redirect to /login/not-set-up when role is %s", async (_, roleValue) => {
+      mockGetSession.mockResolvedValueOnce({
+        user: {
+          id: "user-invalid-role",
+          name: "Invalid Role User",
+          email: "invalid@clinic.dev",
+          clinicId: "clinic-dev",
+          role: roleValue,
+        },
+      });
+
+      await expect(getSession()).rejects.toThrow("NEXT_REDIRECT:/login/not-set-up");
+      expect(mockRedirect).toHaveBeenCalledWith("/login/not-set-up");
+    });
+  });
 });

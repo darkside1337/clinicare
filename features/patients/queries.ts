@@ -18,8 +18,16 @@ import {
 } from "@/lib/db/schema";
 
 /**
+ * Escapes PostgreSQL LIKE/ILIKE wildcards (\, %, _) to prevent literal search injection.
+ */
+export function escapeLike(str: string): string {
+  return str.replace(/[\\%_]/g, "\\$&");
+}
+
+/**
  * List patients for a clinic, excluding soft-deleted patients.
  * Optionally filter by search query (name, phone, email).
+ * Capped to 100 records max for bounded reads.
  */
 export async function listPatients(
   clinicId: string,
@@ -31,7 +39,7 @@ export async function listPatients(
   ];
 
   if (search && search.trim()) {
-    const term = `%${search.trim()}%`;
+    const term = `%${escapeLike(search.trim())}%`;
     conditions.push(
       or(
         ilike(patients.name, term),
@@ -45,7 +53,8 @@ export async function listPatients(
     .select()
     .from(patients)
     .where(and(...conditions))
-    .orderBy(desc(patients.createdAt));
+    .orderBy(desc(patients.createdAt))
+    .limit(100);
 }
 
 export interface PatientDirectoryItem extends Patient {

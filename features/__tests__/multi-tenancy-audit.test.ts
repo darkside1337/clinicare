@@ -37,7 +37,8 @@ describe("Multi-Tenancy Audit (Two-Clinic Isolation Unit Tests)", () => {
       const chain: any = {
         from: vi.fn().mockReturnThis(),
         where: whereSpy.mockImplementation(() => chain),
-        orderBy: vi.fn().mockResolvedValue([
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue([
           { id: "pat-1", clinicId: "clinic-a", name: "Patient A", deletedAt: null },
         ]),
       };

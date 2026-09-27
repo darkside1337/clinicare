@@ -52,4 +52,10 @@ describe("lib/auth/require-doctor.ts - requireDoctor", () => {
 
     await expect(requireDoctor()).rejects.toThrow("NEXT_REDIRECT:/login");
   });
+
+  it("should reject when session resolution redirects to /login/not-set-up for invalid role", async () => {
+    mockGetSession.mockRejectedValueOnce(new Error("NEXT_REDIRECT:/login/not-set-up"));
+
+    await expect(requireDoctor()).rejects.toThrow("NEXT_REDIRECT:/login/not-set-up");
+  });
 });

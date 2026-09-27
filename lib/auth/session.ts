@@ -33,6 +33,10 @@ export async function getSession(): Promise<SessionContext> {
     redirect("/login/not-set-up");
   }
 
+  if (user.role !== "doctor" && user.role !== "receptionist") {
+    redirect("/login/not-set-up");
+  }
+
   return {
     user: {
       id: user.id,
@@ -40,6 +44,6 @@ export async function getSession(): Promise<SessionContext> {
       email: user.email,
     },
     clinicId: user.clinicId,
-    role: (user.role as UserRole) || "doctor",
+    role: user.role,
   };
 }

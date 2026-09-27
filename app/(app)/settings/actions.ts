@@ -27,12 +27,27 @@ export async function uploadClinicLogoAction(
     "image/jpeg",
     "image/jpg",
     "image/webp",
-    "image/svg+xml",
   ];
   if (!allowedTypes.includes(file.type)) {
     return {
       success: false,
-      error: "Invalid file type. Allowed formats: PNG, JPEG, WebP, SVG.",
+      error: "Invalid file type. Allowed formats: PNG, JPEG, WebP.",
+    };
+  }
+
+  // Validate extension-vs-MIME consistency
+  const MIME_EXTENSIONS: Record<string, string[]> = {
+    "image/png": ["png"],
+    "image/jpeg": ["jpg", "jpeg"],
+    "image/jpg": ["jpg", "jpeg"],
+    "image/webp": ["webp"],
+  };
+  const extension = file.name.split(".").pop()?.toLowerCase();
+  const validExtensions = MIME_EXTENSIONS[file.type];
+  if (!extension || !validExtensions || !validExtensions.includes(extension)) {
+    return {
+      success: false,
+      error: "File extension does not match allowed image format (PNG, JPEG, WebP).",
     };
   }
 

@@ -1,4 +1,4 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
   patients,
@@ -175,7 +175,23 @@ export async function updateAllergy(
   const [updated] = await db
     .update(allergies)
     .set(updateData)
-    .where(eq(allergies.id, allergyId))
+    .where(
+      and(
+        eq(allergies.id, allergyId),
+        inArray(
+          allergies.patientId,
+          db
+            .select({ id: patients.id })
+            .from(patients)
+            .where(
+              and(
+                eq(patients.clinicId, clinicId),
+                isNull(patients.deletedAt)
+              )
+            )
+        )
+      )
+    )
     .returning();
 
   return updated;
@@ -202,7 +218,25 @@ export async function deleteAllergy(
     throw new Error(`Allergy ${allergyId} not found in clinic.`);
   }
 
-  await db.delete(allergies).where(eq(allergies.id, allergyId));
+  await db
+    .delete(allergies)
+    .where(
+      and(
+        eq(allergies.id, allergyId),
+        inArray(
+          allergies.patientId,
+          db
+            .select({ id: patients.id })
+            .from(patients)
+            .where(
+              and(
+                eq(patients.clinicId, clinicId),
+                isNull(patients.deletedAt)
+              )
+            )
+        )
+      )
+    );
   return { id: allergyId };
 }
 
@@ -271,7 +305,23 @@ export async function updateProblem(
   const [updated] = await db
     .update(problems)
     .set(updateData)
-    .where(eq(problems.id, problemId))
+    .where(
+      and(
+        eq(problems.id, problemId),
+        inArray(
+          problems.patientId,
+          db
+            .select({ id: patients.id })
+            .from(patients)
+            .where(
+              and(
+                eq(patients.clinicId, clinicId),
+                isNull(patients.deletedAt)
+              )
+            )
+        )
+      )
+    )
     .returning();
 
   return updated;

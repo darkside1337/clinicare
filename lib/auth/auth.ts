@@ -31,7 +31,10 @@ export const auth = betterAuth({
       },
     },
   },
-  plugins: [nextCookies(), testUtils()],
+  plugins:
+    process.env.NODE_ENV === "production"
+      ? [nextCookies()]
+      : [nextCookies(), testUtils()],
 });
 
 export type Auth = typeof auth;

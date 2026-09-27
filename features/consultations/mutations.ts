@@ -1,4 +1,4 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
   consultations,
@@ -222,7 +222,23 @@ export async function updateConsultation(
   const [updated] = await db
     .update(consultations)
     .set(updateData)
-    .where(eq(consultations.id, consultationId))
+    .where(
+      and(
+        eq(consultations.id, consultationId),
+        inArray(
+          consultations.patientId,
+          db
+            .select({ id: patients.id })
+            .from(patients)
+            .where(
+              and(
+                eq(patients.clinicId, clinicId),
+                isNull(patients.deletedAt)
+              )
+            )
+        )
+      )
+    )
     .returning();
 
   return updated;

@@ -174,158 +174,160 @@ export default async function Home() {
           </Card>
         )}
 
-        {/* Section 1: Interactive Sandbox Workstations */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between border-b border-[var(--color-neutral-border)] pb-2">
-            <div>
-              <h2 className="text-sm font-mono font-bold uppercase tracking-widest text-[var(--color-primary)]">
-                Role-Gated Workstations
-              </h2>
-              <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
-                Simulate real clinical and administrative staff personas with
-                genuine Better Auth DB sessions.
-              </p>
+        {/* Section 1: Interactive Sandbox Workstations (dev-only; never rendered in production) */}
+        {process.env.NODE_ENV !== "production" && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between border-b border-[var(--color-neutral-border)] pb-2">
+              <div>
+                <h2 className="text-sm font-mono font-bold uppercase tracking-widest text-[var(--color-primary)]">
+                  Role-Gated Workstations
+                </h2>
+                <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
+                  Simulate real clinical and administrative staff personas with
+                  genuine Better Auth DB sessions.
+                </p>
+              </div>
+              <Badge variant="outline">Better Auth testUtils</Badge>
             </div>
-            <Badge variant="outline">Better Auth testUtils</Badge>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Workstation 1: Doctor Persona */}
-            <Card className="border border-[var(--color-primary)] bg-white rounded-sm shadow-[1px_1px_0px_var(--color-primary)] flex flex-col justify-between">
-              <CardHeader className="border-b border-[var(--color-neutral-border)] pb-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono uppercase tracking-widest text-[var(--color-text-muted)]">
-                    Clinical Persona
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Workstation 1: Doctor Persona */}
+              <Card className="border border-[var(--color-primary)] bg-white rounded-sm shadow-[1px_1px_0px_var(--color-primary)] flex flex-col justify-between">
+                <CardHeader className="border-b border-[var(--color-neutral-border)] pb-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono uppercase tracking-widest text-[var(--color-text-muted)]">
+                      Clinical Persona
+                    </span>
+                    <Badge variant="default">FULL CLINICAL ACCESS</Badge>
+                  </div>
+                  <CardTitle className="flex items-center gap-2 pt-2 text-lg font-bold text-[var(--color-primary)]">
+                    <Stethoscope className="size-5 text-[var(--color-primary)]" />
+                    Dr. Sarah Mitchell, MD
+                  </CardTitle>
+                  <CardDescription className="text-xs text-[var(--color-text-muted)]">
+                    Lead Family Physician • Complete access to consultations,
+                    diagnosis, medical history, and prescriptions.
+                  </CardDescription>
+                </CardHeader>
+
+                <CardContent className="pt-4 pb-2 space-y-3">
+                  <span className="text-xs font-mono font-semibold uppercase text-[var(--color-primary)] tracking-wider block">
+                    Permitted Clinical Scope:
                   </span>
-                  <Badge variant="default">FULL CLINICAL ACCESS</Badge>
-                </div>
-                <CardTitle className="flex items-center gap-2 pt-2 text-lg font-bold text-[var(--color-primary)]">
-                  <Stethoscope className="size-5 text-[var(--color-primary)]" />
-                  Dr. Sarah Mitchell, MD
-                </CardTitle>
-                <CardDescription className="text-xs text-[var(--color-text-muted)]">
-                  Lead Family Physician • Complete access to consultations,
-                  diagnosis, medical history, and prescriptions.
-                </CardDescription>
-              </CardHeader>
+                  <ul className="text-xs space-y-2 text-[var(--color-text-muted)]">
+                    <li className="flex items-start gap-2">
+                      <Check className="size-3.5 text-[var(--color-clinical-resolved)] shrink-0 mt-0.5" />
+                      <span>
+                        Dedicated full-page consultation recording (Vitals,
+                        narrative, diagnosis)
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="size-3.5 text-[var(--color-clinical-resolved)] shrink-0 mt-0.5" />
+                      <span>
+                        Vector prescription generation & signing with downloadable
+                        PDF
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="size-3.5 text-[var(--color-clinical-resolved)] shrink-0 mt-0.5" />
+                      <span>
+                        Permanent two-column patient record (Allergies & chronic
+                        problems)
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="size-3.5 text-[var(--color-clinical-resolved)] shrink-0 mt-0.5" />
+                      <span>
+                        Instant walk-in creation from global Cmd+K search
+                      </span>
+                    </li>
+                  </ul>
+                </CardContent>
 
-              <CardContent className="pt-4 pb-2 space-y-3">
-                <span className="text-xs font-mono font-semibold uppercase text-[var(--color-primary)] tracking-wider block">
-                  Permitted Clinical Scope:
-                </span>
-                <ul className="text-xs space-y-2 text-[var(--color-text-muted)]">
-                  <li className="flex items-start gap-2">
-                    <Check className="size-3.5 text-[var(--color-clinical-resolved)] shrink-0 mt-0.5" />
-                    <span>
-                      Dedicated full-page consultation recording (Vitals,
-                      narrative, diagnosis)
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="size-3.5 text-[var(--color-clinical-resolved)] shrink-0 mt-0.5" />
-                    <span>
-                      Vector prescription generation & signing with downloadable
-                      PDF
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="size-3.5 text-[var(--color-clinical-resolved)] shrink-0 mt-0.5" />
-                    <span>
-                      Permanent two-column patient record (Allergies & chronic
-                      problems)
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="size-3.5 text-[var(--color-clinical-resolved)] shrink-0 mt-0.5" />
-                    <span>
-                      Instant walk-in creation from global Cmd+K search
-                    </span>
-                  </li>
-                </ul>
-              </CardContent>
+                <CardFooter className="pt-3 border-t border-[var(--color-neutral-border)] bg-[var(--color-background)]">
+                  <form action={loginAsDoctorAction} className="w-full">
+                    <Button
+                      type="submit"
+                      className="w-full justify-between rounded-sm border border-[var(--color-primary)] bg-[var(--color-primary)] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-[var(--color-background)] hover:bg-black transition-colors"
+                    >
+                      <span>Launch as Doctor (Dr. Mitchell)</span>
+                      <ArrowRight className="size-4" />
+                    </Button>
+                  </form>
+                </CardFooter>
+              </Card>
 
-              <CardFooter className="pt-3 border-t border-[var(--color-neutral-border)] bg-[var(--color-background)]">
-                <form action={loginAsDoctorAction} className="w-full">
-                  <Button
-                    type="submit"
-                    className="w-full justify-between rounded-sm border border-[var(--color-primary)] bg-[var(--color-primary)] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-[var(--color-background)] hover:bg-black transition-colors"
-                  >
-                    <span>Launch as Doctor (Dr. Mitchell)</span>
-                    <ArrowRight className="size-4" />
-                  </Button>
-                </form>
-              </CardFooter>
-            </Card>
+              {/* Workstation 2: Receptionist Persona */}
+              <Card className="border border-[var(--color-primary)] bg-white rounded-sm shadow-[1px_1px_0px_var(--color-primary)] flex flex-col justify-between">
+                <CardHeader className="border-b border-[var(--color-neutral-border)] pb-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono uppercase tracking-widest text-[var(--color-text-muted)]">
+                      Front-Desk Persona
+                    </span>
+                    <Badge variant="amber">ADMINISTRATIVE ONLY</Badge>
+                  </div>
+                  <CardTitle className="flex items-center gap-2 pt-2 text-lg font-bold text-[var(--color-primary)]">
+                    <UserCheck className="size-5 text-[var(--color-primary)]" />
+                    Alex Rivera
+                  </CardTitle>
+                  <CardDescription className="text-xs text-[var(--color-text-muted)]">
+                    Clinic Receptionist • Front-desk scheduling and patient
+                    census. Medical records and consultations are strictly
+                    blocked.
+                  </CardDescription>
+                </CardHeader>
 
-            {/* Workstation 2: Receptionist Persona */}
-            <Card className="border border-[var(--color-primary)] bg-white rounded-sm shadow-[1px_1px_0px_var(--color-primary)] flex flex-col justify-between">
-              <CardHeader className="border-b border-[var(--color-neutral-border)] pb-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono uppercase tracking-widest text-[var(--color-text-muted)]">
-                    Front-Desk Persona
+                <CardContent className="pt-4 pb-2 space-y-3">
+                  <span className="text-xs font-mono font-semibold uppercase text-[var(--color-primary)] tracking-wider block">
+                    Enforced Boundary Scope:
                   </span>
-                  <Badge variant="amber">ADMINISTRATIVE ONLY</Badge>
-                </div>
-                <CardTitle className="flex items-center gap-2 pt-2 text-lg font-bold text-[var(--color-primary)]">
-                  <UserCheck className="size-5 text-[var(--color-primary)]" />
-                  Alex Rivera
-                </CardTitle>
-                <CardDescription className="text-xs text-[var(--color-text-muted)]">
-                  Clinic Receptionist • Front-desk scheduling and patient
-                  census. Medical records and consultations are strictly
-                  blocked.
-                </CardDescription>
-              </CardHeader>
+                  <ul className="text-xs space-y-2 text-[var(--color-text-muted)]">
+                    <li className="flex items-start gap-2">
+                      <Check className="size-3.5 text-[var(--color-clinical-resolved)] shrink-0 mt-0.5" />
+                      <span>
+                        Appointment calendar day-view & real-time queue management
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="size-3.5 text-[var(--color-clinical-resolved)] shrink-0 mt-0.5" />
+                      <span>
+                        Patient registration and demographic profile maintenance
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <X className="size-3.5 text-[var(--color-clinical-critical)] shrink-0 mt-0.5" />
+                      <span>
+                        Clinical consultation recording (403 Forbidden
+                        server-enforced)
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <X className="size-3.5 text-[var(--color-clinical-critical)] shrink-0 mt-0.5" />
+                      <span>
+                        Prescriptions & medical history (Server-blocked, invisible
+                        in UI)
+                      </span>
+                    </li>
+                  </ul>
+                </CardContent>
 
-              <CardContent className="pt-4 pb-2 space-y-3">
-                <span className="text-xs font-mono font-semibold uppercase text-[var(--color-primary)] tracking-wider block">
-                  Enforced Boundary Scope:
-                </span>
-                <ul className="text-xs space-y-2 text-[var(--color-text-muted)]">
-                  <li className="flex items-start gap-2">
-                    <Check className="size-3.5 text-[var(--color-clinical-resolved)] shrink-0 mt-0.5" />
-                    <span>
-                      Appointment calendar day-view & real-time queue management
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="size-3.5 text-[var(--color-clinical-resolved)] shrink-0 mt-0.5" />
-                    <span>
-                      Patient registration and demographic profile maintenance
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <X className="size-3.5 text-[var(--color-clinical-critical)] shrink-0 mt-0.5" />
-                    <span>
-                      Clinical consultation recording (403 Forbidden
-                      server-enforced)
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <X className="size-3.5 text-[var(--color-clinical-critical)] shrink-0 mt-0.5" />
-                    <span>
-                      Prescriptions & medical history (Server-blocked, invisible
-                      in UI)
-                    </span>
-                  </li>
-                </ul>
-              </CardContent>
-
-              <CardFooter className="pt-3 border-t border-[var(--color-neutral-border)] bg-[var(--color-background)]">
-                <form action={loginAsReceptionistAction} className="w-full">
-                  <Button
-                    type="submit"
-                    variant="outline"
-                    className="w-full justify-between rounded-sm border border-[var(--color-primary)] bg-white px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-background)] transition-colors"
-                  >
-                    <span>Launch as Receptionist (Alex Rivera)</span>
-                    <ArrowRight className="size-4" />
-                  </Button>
-                </form>
-              </CardFooter>
-            </Card>
+                <CardFooter className="pt-3 border-t border-[var(--color-neutral-border)] bg-[var(--color-background)]">
+                  <form action={loginAsReceptionistAction} className="w-full">
+                    <Button
+                      type="submit"
+                      variant="outline"
+                      className="w-full justify-between rounded-sm border border-[var(--color-primary)] bg-white px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-background)] transition-colors"
+                    >
+                      <span>Launch as Receptionist (Alex Rivera)</span>
+                      <ArrowRight className="size-4" />
+                    </Button>
+                  </form>
+                </CardFooter>
+              </Card>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Section 2: Direct Clinical Surface Shortcuts */}
         <div className="space-y-4">

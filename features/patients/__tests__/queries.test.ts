@@ -24,19 +24,21 @@ describe("features/patients/queries.ts", () => {
     vi.clearAllMocks();
   });
 
-  it("listPatients always passes clinicId and excludes soft-deleted patients in the WHERE clause", async () => {
+  it("listPatients always passes clinicId and excludes soft-deleted patients in the WHERE clause, bounded to 100", async () => {
     const whereSpy = vi.fn();
+    const limitSpy = vi.fn().mockResolvedValue([
+      {
+        id: "pat-1",
+        clinicId: "clinic-test",
+        name: "Alice Smith",
+        deletedAt: null,
+      },
+    ]);
     const chain: any = {
       from: vi.fn().mockReturnThis(),
       where: whereSpy.mockImplementation(() => chain),
-      orderBy: vi.fn().mockResolvedValue([
-        {
-          id: "pat-1",
-          clinicId: "clinic-test",
-          name: "Alice Smith",
-          deletedAt: null,
-        },
-      ]),
+      orderBy: vi.fn().mockReturnThis(),
+      limit: limitSpy,
     };
     mockSelect.mockReturnValue(chain);
 
@@ -45,6 +47,7 @@ describe("features/patients/queries.ts", () => {
     expect(mockSelect).toHaveBeenCalled();
     expect(chain.from).toHaveBeenCalled();
     expect(whereSpy).toHaveBeenCalled();
+    expect(limitSpy).toHaveBeenCalledWith(100);
     expect(result).toHaveLength(1);
     expect(result[0].name).toBe("Alice Smith");
 
@@ -56,16 +59,17 @@ describe("features/patients/queries.ts", () => {
     expect(params).toContain("clinic-test");
   });
 
-  it("listPatients with search parameter adds ILIKE search filter", async () => {
+  it("listPatients with search parameter adds ILIKE search filter with escaped wildcards", async () => {
     const whereSpy = vi.fn();
     const chain: any = {
       from: vi.fn().mockReturnThis(),
       where: whereSpy.mockImplementation(() => chain),
-      orderBy: vi.fn().mockResolvedValue([]),
+      orderBy: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue([]),
     };
     mockSelect.mockReturnValue(chain);
 
-    await listPatients("clinic-test", "Smith");
+    await listPatients("clinic-test", "Smith_10%\\tag");
 
     expect(whereSpy).toHaveBeenCalled();
     const whereArg = whereSpy.mock.calls[0][0];
@@ -74,7 +78,7 @@ describe("features/patients/queries.ts", () => {
     expect(sql).toContain('"patients"."deleted_at" is null');
     expect(sql).toContain('ilike');
     expect(params).toContain("clinic-test");
-    expect(params).toContain("%Smith%");
+    expect(params).toContain("%Smith\\_10\\%\\\\tag%");
   });
 
   it("getPatient returns null when patient is not found or is soft-deleted", async () => {
@@ -152,7 +156,8 @@ describe("features/patients/queries.ts", () => {
       const chain: any = {
         from: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
-        orderBy: vi.fn().mockResolvedValue([mockPatient]),
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue([mockPatient]),
       };
       mockSelect.mockReturnValue(chain);
 
@@ -183,6 +188,7 @@ describe("features/patients/queries.ts", () => {
           from: vi.fn().mockReturnThis(),
           where: vi.fn().mockReturnThis(),
           orderBy: vi.fn().mockReturnThis(),
+          limit: vi.fn().mockReturnThis(),
           then: (resolve: (val: any) => void) => {
             if (currentCall === 1) return resolve([mockPatient]);
             if (currentCall === 2)
