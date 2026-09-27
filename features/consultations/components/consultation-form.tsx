@@ -7,6 +7,7 @@ import { AlertCircle, Loader2, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { FormErrorAlert } from "@/components/ui/form-error-alert";
 import {
   consultationSchema,
   type ConsultationInput,
@@ -121,18 +122,7 @@ export function ConsultationForm({
       onSubmit={handleSubmit(handleFormSubmit)}
       className="space-y-6"
     >
-      {serverError && (
-        <div
-          role="alert"
-          aria-live="polite"
-          className="flex items-start gap-2 border border-clinical-critical bg-clinical-critical-bg p-3 text-xs text-clinical-critical font-mono"
-        >
-          <AlertCircle className="size-4 shrink-0 text-clinical-critical mt-0.5" />
-          <div>
-            <strong className="font-bold">Error:</strong> {serverError}
-          </div>
-        </div>
-      )}
+      <FormErrorAlert message={serverError} />
 
       <div className="border border-primary bg-card p-5 sm:p-6 space-y-6 shadow-[2px_2px_0px_var(--color-primary)]">
         {/* Encounter Metadata */}

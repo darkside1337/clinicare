@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Plus, Pill } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   PrescriptionSummary,
   type PrescriptionSummaryData,
@@ -142,7 +143,7 @@ export function PrescriptionList({
       )}
 
       {prescriptions.length === 0 && !showAddForm ? (
-        <div className="border border-dashed border-neutral-border bg-card p-8 text-center text-xs font-mono text-text-muted space-y-3">
+        <EmptyState className="p-8 space-y-3">
           <p>No prescriptions have been issued for this consultation encounter yet.</p>
           {patientId && consultationId && (
             <Button
@@ -156,7 +157,7 @@ export function PrescriptionList({
               <span>Issue First Prescription</span>
             </Button>
           )}
-        </div>
+        </EmptyState>
       ) : (
         currentRx && (
           <PrescriptionSummary

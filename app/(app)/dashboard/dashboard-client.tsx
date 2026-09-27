@@ -32,6 +32,8 @@ function calculateAge(dob: string): number {
   return calcAge(dob) ?? 0;
 }
 
+import { useOptimisticAppointments } from "@/features/appointments/hooks/use-optimistic-appointments";
+
 export function DashboardClient({
   initialAppointments,
   recentPatients = [],
@@ -40,19 +42,9 @@ export function DashboardClient({
   patients = [],
 }: DashboardClientProps) {
   const role = sessionRole || roleProp || "doctor";
-  const [appointments, setAppointments] = useState<AppointmentDetails[]>(initialAppointments);
-  const [prevInitial, setPrevInitial] = useState(initialAppointments);
-
-  if (initialAppointments !== prevInitial) {
-    setPrevInitial(initialAppointments);
-    setAppointments(initialAppointments);
-  }
-
-  const handleStatusChange = (id: string, newStatus: AppointmentStatus) => {
-    setAppointments((prev) =>
-      prev.map((apt) => (apt.id === id ? { ...apt, status: newStatus } : apt))
-    );
-  };
+  const { appointments, updateStatus } = useOptimisticAppointments({
+    initialAppointments,
+  });
 
   const totalBooked = appointments.length;
   const waitingCount = appointments.filter((a) => a.status === "checked-in").length;
@@ -80,7 +72,7 @@ export function DashboardClient({
         <section className="flex-1 border-b border-primary p-4 sm:p-6 lg:border-b-0 lg:border-r lg:p-8">
           <AppointmentQueue
             appointments={appointments}
-            onStatusChange={handleStatusChange}
+            onStatusChange={updateStatus}
             role={role}
           />
         </section>

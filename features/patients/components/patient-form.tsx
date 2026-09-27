@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { User, Home, Save, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { FormErrorAlert } from "@/components/ui/form-error-alert";
 import { patientSchema, type PatientInput } from "@/features/patients/schema";
 import { createPatientAction } from "@/app/(app)/patients/actions";
 import { updatePatientAction } from "@/app/(app)/patients/[id]/actions";
@@ -90,16 +91,7 @@ export function PatientForm({
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
-      {serverError && (
-        <div
-          role="alert"
-          aria-live="polite"
-          className="border border-clinical-critical bg-clinical-critical-bg p-3 text-xs font-mono text-clinical-critical flex items-center gap-2"
-        >
-          <AlertCircle className="size-4 shrink-0" />
-          <span>{serverError}</span>
-        </div>
-      )}
+      <FormErrorAlert message={serverError} />
 
       {/* SECTION 1: Patient Demographics */}
       <section className="border border-primary bg-card p-5 shadow-[1px_1px_0px_var(--color-primary)] space-y-4">

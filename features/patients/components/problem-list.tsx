@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { Activity, Plus, CheckCircle2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { FormErrorAlert } from "@/components/ui/form-error-alert";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Dialog,
   DialogPopup,
@@ -156,9 +158,9 @@ export function ProblemList({
       </div>
 
       {problems.length === 0 ? (
-        <div className="border border-dashed border-neutral-border p-3 text-center text-xs font-mono text-text-muted">
+        <EmptyState className="p-3">
           No active problems recorded
-        </div>
+        </EmptyState>
       ) : (
         <div className="border border-primary divide-y divide-neutral-border bg-card">
           {problems.map((problem) => {
@@ -238,15 +240,7 @@ export function ProblemList({
           </DialogHeader>
 
           <form onSubmit={handleAddProblem} className="p-4 space-y-4">
-            {formError && (
-              <div
-                role="alert"
-                aria-live="polite"
-                className="border border-clinical-critical bg-clinical-critical-bg p-2 text-xs font-mono text-clinical-critical"
-              >
-                {formError}
-              </div>
-            )}
+            <FormErrorAlert message={formError} className="p-2" />
 
             <div>
               <label

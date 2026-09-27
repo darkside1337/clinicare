@@ -7,6 +7,7 @@ import { Pill, Plus, Trash2, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { FormErrorAlert } from "@/components/ui/form-error-alert";
 import {
   Card,
   CardHeader,
@@ -179,15 +180,7 @@ export function PrescriptionForm({
           </div>
         )}
 
-        {serverError && (
-          <div
-            role="alert"
-            aria-live="polite"
-            className="border border-clinical-critical bg-clinical-critical-bg p-3 text-xs font-mono text-clinical-critical"
-          >
-            {serverError}
-          </div>
-        )}
+        <FormErrorAlert message={serverError} />
 
         {/* Dynamic Item Form */}
         {isOpen && (

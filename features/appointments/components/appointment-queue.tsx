@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { AppointmentDetails } from "@/features/appointments/queries";
 import type { AppointmentStatus } from "@/features/appointments/schema";
 import { updateAppointmentStatusAction } from "@/app/(app)/appointments/actions";
@@ -177,15 +178,12 @@ export function AppointmentQueue({
 
       {/* Appointment Queue Table / List */}
       {filteredAppointments.length === 0 ? (
-        <div className="border border-dashed border-neutral-border p-12 text-center bg-card">
-          <Calendar className="mx-auto size-8 text-text-muted mb-2" />
-          <p className="text-sm font-semibold text-foreground">
-            No appointments scheduled
-          </p>
-          <p className="text-xs text-text-muted mt-1">
-            There are no scheduled visits matching the selected practitioner today.
-          </p>
-        </div>
+        <EmptyState
+          icon={<Calendar className="size-8" />}
+          title="No appointments scheduled"
+          hint="There are no scheduled visits matching the selected practitioner today."
+          className="p-12"
+        />
       ) : (
         <div className="space-y-3">
           {filteredAppointments.map((apt) => {

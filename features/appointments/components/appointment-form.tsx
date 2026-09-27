@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { FormErrorAlert } from "@/components/ui/form-error-alert";
 import { CLINIC_HOURS } from "@/features/appointments/constants";
 import { createAppointmentSchema } from "@/features/appointments/schema";
 import { createAppointmentAction } from "@/app/(app)/appointments/actions";
@@ -233,16 +234,7 @@ function AppointmentFormInner({
         onSubmit={handleSubmit(handleFormSubmit)}
         className="p-4 space-y-4 bg-card"
       >
-        {serverError && (
-          <div
-            role="alert"
-            aria-live="polite"
-            className="flex items-start gap-2 border border-clinical-critical bg-clinical-critical-bg p-3 text-xs text-clinical-critical"
-          >
-            <AlertCircle className="size-4 shrink-0 mt-0.5" />
-            <span>{serverError}</span>
-          </div>
-        )}
+        <FormErrorAlert message={serverError} />
 
         {/* Patient Selection */}
         <div>

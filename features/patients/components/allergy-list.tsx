@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { AlertTriangle, Plus, Trash2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { FormErrorAlert } from "@/components/ui/form-error-alert";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Dialog,
   DialogPopup,
@@ -143,9 +145,9 @@ export function AllergyList({
       </div>
 
       {allergies.length === 0 ? (
-        <div className="border border-dashed border-neutral-border p-3 text-center text-xs font-mono text-text-muted">
+        <EmptyState className="p-3">
           No known allergies recorded
-        </div>
+        </EmptyState>
       ) : (
         <div className="space-y-2">
           {allergies.map((allergy) => {
@@ -236,15 +238,7 @@ export function AllergyList({
           </DialogHeader>
 
           <form onSubmit={handleAddAllergy} className="p-4 space-y-4">
-            {formError && (
-              <div
-                role="alert"
-                aria-live="polite"
-                className="border border-clinical-critical bg-clinical-critical-bg p-2 text-xs font-mono text-clinical-critical"
-              >
-                {formError}
-              </div>
-            )}
+            <FormErrorAlert message={formError} className="p-2" />
 
             <div>
               <label

@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { FileText, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   ConsultationCard,
   type ConsultationCardItem,
@@ -47,14 +48,11 @@ export function ConsultationTimeline({
       </div>
 
       {consultations.length === 0 ? (
-        <div className="border border-dashed border-neutral-border p-10 text-center bg-card">
-          <p className="text-sm font-medium text-foreground">
-            No consultations recorded for this patient.
-          </p>
-          <p className="text-xs text-text-muted mt-1">
-            Start a consultation to document clinical encounters.
-          </p>
-        </div>
+        <EmptyState
+          title="No consultations recorded for this patient."
+          hint="Start a consultation to document clinical encounters."
+          className="p-10"
+        />
       ) : (
         <div className="space-y-4">
           {consultations.map((c, index) => (

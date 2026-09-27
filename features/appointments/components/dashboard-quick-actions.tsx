@@ -7,6 +7,7 @@ import { Search, Plus, Stethoscope, X, Loader2, AlertCircle } from "lucide-react
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { FormErrorAlert } from "@/components/ui/form-error-alert";
 import {
   Dialog,
   DialogPopup,
@@ -195,16 +196,7 @@ export function DashboardQuickActions({
             </DialogHeader>
 
             <form onSubmit={handleConfirmWalkIn} className="p-4 space-y-4 bg-card">
-              {walkInError && (
-                <div
-                  role="alert"
-                  aria-live="polite"
-                  className="flex items-start gap-2 border border-clinical-critical bg-clinical-critical-bg p-3 text-xs text-clinical-critical"
-                >
-                  <AlertCircle className="size-4 shrink-0 mt-0.5" />
-                  <span>{walkInError}</span>
-                </div>
-              )}
+              <FormErrorAlert message={walkInError} />
 
               {/* Patient Selection */}
               <div>

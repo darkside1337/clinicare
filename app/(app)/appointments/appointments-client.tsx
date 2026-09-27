@@ -17,6 +17,7 @@ import {
 } from "@/features/appointments/components/appointment-form";
 import type { AppointmentDetails } from "@/features/appointments/queries";
 import type { AppointmentStatus } from "@/features/appointments/schema";
+import { useOptimisticAppointments } from "@/features/appointments/hooks/use-optimistic-appointments";
 
 interface AppointmentsClientProps {
   initialAppointments?: AppointmentDetails[];
@@ -54,16 +55,10 @@ export function AppointmentsClient({
     return new Date();
   }, [currentDateISO]);
 
-  const [appointments, setAppointments] =
-    useState<AppointmentDetails[]>(initialAppointments);
-  const [prevInitial, setPrevInitial] = useState(initialAppointments);
+  const { appointments, updateStatus } = useOptimisticAppointments({
+    initialAppointments,
+  });
   const [clinicianMenuOpen, setClinicianMenuOpen] = useState(false);
-
-  // Sync state if initialAppointments changes on router refresh without triggering cascading effect renders
-  if (initialAppointments !== prevInitial) {
-    setPrevInitial(initialAppointments);
-    setAppointments(initialAppointments);
-  }
 
   const activeDoctor = useMemo(() => {
     if (!currentDoctorId) return "All Clinicians";
@@ -100,12 +95,6 @@ export function AppointmentsClient({
 
   const handleToday = () => {
     navigateTo(new Date());
-  };
-
-  const handleStatusChange = (id: string, newStatus: AppointmentStatus) => {
-    setAppointments((prev) =>
-      prev.map((apt) => (apt.id === id ? { ...apt, status: newStatus } : apt))
-    );
   };
 
   const handleSlotClick = (doctorName: string, timeSlot: string) => {
@@ -296,7 +285,7 @@ export function AppointmentsClient({
         {/* Multi-Practitioner Day Calendar Grid */}
         <DayView
           appointments={appointments}
-          onStatusChange={handleStatusChange}
+          onStatusChange={updateStatus}
           onSlotClick={handleSlotClick}
           selectedClinician={activeDoctor}
         />
