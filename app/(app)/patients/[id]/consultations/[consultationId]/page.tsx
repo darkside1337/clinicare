@@ -18,13 +18,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-function calculateAge(dob: string): number {
-  if (!dob) return 0;
-  const parts = dob.includes("-") ? dob.split("-") : dob.split("/").reverse();
-  const birthYear = parseInt(parts[0], 10);
-  const currentYear = new Date().getFullYear();
-  return isNaN(birthYear) ? 0 : Math.max(0, currentYear - birthYear);
-}
+import { calculateAge } from "@/lib/dates/calculate-age";
+import { formatDate, formatTime } from "@/lib/dates/format";
+import { formatRxNumber } from "@/features/prescriptions/presenters";
 
 export default async function ConsultationDetailPage({ params }: PageProps) {
   const session = await requireDoctor();
@@ -38,11 +34,8 @@ export default async function ConsultationDetailPage({ params }: PageProps) {
   }
 
   const d = new Date(record.createdAt);
-  const day = String(d.getDate()).padStart(2, "0");
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const year = d.getFullYear();
-  const hours = String(d.getHours()).padStart(2, "0");
-  const minutes = String(d.getMinutes()).padStart(2, "0");
+  const consultationDate = formatDate(d);
+  const consultationTime = formatTime(d);
 
   const consultation: ClinicalConsultationDetail = {
     id: record.id,
@@ -50,7 +43,7 @@ export default async function ConsultationDetailPage({ params }: PageProps) {
     patientId: record.patientId,
     patientName: record.patient.name,
     patientDob: record.patient.dob,
-    patientAge: calculateAge(record.patient.dob),
+    patientAge: calculateAge(record.patient.dob) ?? 0,
     patientSex: (record.patient.sex as "Male" | "Female" | "Other") || "Other",
     patientContact: {
       phone: record.patient.phone || "—",
@@ -60,8 +53,8 @@ export default async function ConsultationDetailPage({ params }: PageProps) {
     doctorName: record.doctor.name,
     clinicName: "CliniCare Practice",
     clinicAddress: "Primary Care Centre, London",
-    consultationDate: `${day}/${month}/${year}`,
-    time: `${hours}:${minutes}`,
+    consultationDate,
+    time: consultationTime,
     encounterType: record.appointment.isWalkIn ? "Walk-In" : "Scheduled",
     chiefComplaint: record.chiefComplaint || "",
     symptoms: record.symptoms || "",
@@ -72,8 +65,8 @@ export default async function ConsultationDetailPage({ params }: PageProps) {
     prescriptions: record.prescriptions.map((rx) => ({
       id: rx.id,
       consultationId: record.id,
-      prescriptionNumber: `RX-${rx.id.slice(0, 8).toUpperCase()}`,
-      issuedAt: `${day}/${month}/${year}`,
+      prescriptionNumber: formatRxNumber(rx.id),
+      issuedAt: consultationDate,
       items: rx.items.map((item) => ({
         id: item.id,
         medication: item.medication,

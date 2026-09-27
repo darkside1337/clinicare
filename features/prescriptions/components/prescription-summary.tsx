@@ -5,6 +5,7 @@ import { Printer, Download, Pill } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { formatRxNumber } from "@/features/prescriptions/presenters";
 
 export interface PrescriptionSummaryItem {
   id?: string;
@@ -56,9 +57,7 @@ export function PrescriptionSummary({
   clinicAddress,
 }: PrescriptionSummaryProps) {
   const items = prescription?.items || [];
-  const rxNumber =
-    prescription.prescriptionNumber ||
-    `RX-${prescription.id.slice(0, 8).toUpperCase()}`;
+  const rxNumber = prescription.prescriptionNumber || formatRxNumber(prescription.id);
   const issueDate = formatDate(prescription.createdAt, prescription.issuedAt);
 
   const handleBrowserPrint = () => {

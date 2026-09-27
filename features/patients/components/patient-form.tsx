@@ -20,44 +20,7 @@ interface PatientFormProps {
   isSubmitting?: boolean;
 }
 
-function calculateAge(val: string): number | null {
-  if (!val) return null;
-  const parts = val.split("/");
-  if (parts.length === 3 && parts[2].length === 4) {
-    const day = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10) - 1;
-    const year = parseInt(parts[2], 10);
-    const birthDate = new Date(year, month, day);
-    if (!isNaN(birthDate.getTime())) {
-      const today = new Date();
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const m = today.getMonth() - birthDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-      }
-      if (age >= 0 && age < 125) return age;
-    }
-  }
-
-  const isoParts = val.split("-");
-  if (isoParts.length === 3 && isoParts[0].length === 4) {
-    const year = parseInt(isoParts[0], 10);
-    const month = parseInt(isoParts[1], 10) - 1;
-    const day = parseInt(isoParts[2], 10);
-    const birthDate = new Date(year, month, day);
-    if (!isNaN(birthDate.getTime())) {
-      const today = new Date();
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const m = today.getMonth() - birthDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-      }
-      if (age >= 0 && age < 125) return age;
-    }
-  }
-
-  return null;
-}
+import { calculateAge } from "@/lib/dates/calculate-age";
 
 export function PatientForm({
   initialData,

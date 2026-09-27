@@ -1,5 +1,6 @@
 import React from "react";
 import { Document, Page, Text, View, StyleSheet, Image } from "@react-pdf/renderer";
+import { formatRxNumber } from "@/features/prescriptions/presenters";
 
 const styles = StyleSheet.create({
   page: {
@@ -189,9 +190,7 @@ export function PrescriptionPdfDocument({
   clinicLogoUrl,
 }: PrescriptionPdfProps) {
   const items = prescription.items || [];
-  const rxNumber =
-    prescription.prescriptionNumber ||
-    `RX-${prescription.id.slice(0, 8).toUpperCase()}`;
+  const rxNumber = prescription.prescriptionNumber || formatRxNumber(prescription.id);
   const issueDate = formatDate(prescription.createdAt, prescription.issuedAt);
 
   return (

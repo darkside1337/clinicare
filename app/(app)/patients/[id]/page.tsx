@@ -12,32 +12,11 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+import { calculateAge as calcAge } from "@/lib/dates/calculate-age";
+import { formatDate, formatTime, formatDateTime } from "@/lib/dates/format";
+
 function calculateAge(dob: string): number {
-  if (!dob) return 0;
-  const parts = dob.includes("-") ? dob.split("-") : dob.split("/").reverse();
-  const birthYear = parseInt(parts[0], 10);
-  const currentYear = new Date().getFullYear();
-  return isNaN(birthYear) ? 0 : Math.max(0, currentYear - birthYear);
-}
-
-function formatDate(d: Date): string {
-  return d.toLocaleDateString("en-GB");
-}
-
-function formatTime(d: Date): string {
-  return d.toLocaleTimeString("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-function formatDateTime(d: Date): string {
-  const dateStr = d.toLocaleDateString("en-GB");
-  const timeStr = d.toLocaleTimeString("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  return `${dateStr} ${timeStr}`;
+  return calcAge(dob) ?? 0;
 }
 
 export default async function PatientPage({ params }: PageProps) {

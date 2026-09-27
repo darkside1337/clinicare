@@ -26,23 +26,10 @@ interface DashboardClientProps {
   patients?: FormPatient[];
 }
 
+import { calculateAge as calcAge } from "@/lib/dates/calculate-age";
+
 function calculateAge(dob: string): number {
-  if (!dob) return 0;
-  const parts = dob.split("-");
-  if (parts.length === 3) {
-    const year = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10) - 1;
-    const day = parseInt(parts[2], 10);
-    const birthDate = new Date(year, month, day);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
-  }
-  return 0;
+  return calcAge(dob) ?? 0;
 }
 
 export function DashboardClient({

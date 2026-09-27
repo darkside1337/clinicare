@@ -18,40 +18,8 @@ import { updateAppointmentStatusAction } from "@/app/(app)/appointments/actions"
 
 export type StatusType = AppointmentStatus;
 
-export const DASHBOARD_STATUS_CONFIG: Record<
-  AppointmentStatus,
-  {
-    label: string;
-    badgeVariant: "amber" | "outline" | "green" | "destructive" | "muted";
-    rowBg: string;
-  }
-> = {
-  "checked-in": {
-    label: "Waiting in Clinic",
-    badgeVariant: "amber",
-    rowBg: "bg-clinical-warning-bg/40",
-  },
-  scheduled: {
-    label: "Scheduled",
-    badgeVariant: "outline",
-    rowBg: "bg-card",
-  },
-  completed: {
-    label: "Completed",
-    badgeVariant: "green",
-    rowBg: "bg-clinical-resolved-bg/30",
-  },
-  "no-show": {
-    label: "No-Show",
-    badgeVariant: "destructive",
-    rowBg: "bg-clinical-critical-bg/30",
-  },
-  cancelled: {
-    label: "Cancelled",
-    badgeVariant: "muted",
-    rowBg: "bg-muted/40",
-  },
-};
+import { DASHBOARD_STATUS_CONFIG } from "@/features/appointments/status";
+export { DASHBOARD_STATUS_CONFIG };
 
 interface QueueDoctor {
   id: string;
@@ -79,24 +47,7 @@ interface NormalizedQueueAppointment {
   reason: string;
 }
 
-function calculateAge(dobStr?: string): number | null {
-  if (!dobStr) return null;
-  const parts = dobStr.includes("/") ? dobStr.split("/") : dobStr.split("-");
-  let birthDate: Date;
-  if (dobStr.includes("/")) {
-    birthDate = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
-  } else {
-    birthDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
-  }
-  if (isNaN(birthDate.getTime())) return null;
-  const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const m = today.getMonth() - birthDate.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-    age--;
-  }
-  return age >= 0 ? age : null;
-}
+import { calculateAge } from "@/lib/dates/calculate-age";
 
 function normalizeQueueItem(apt: AppointmentDetails): NormalizedQueueAppointment {
   const d = new Date(apt.scheduledAt);

@@ -1,4 +1,5 @@
 import { and, desc, eq, inArray, isNull } from "drizzle-orm";
+import { calculateAge as getAge } from "@/lib/dates/calculate-age";
 import { db } from "@/lib/db/client";
 import {
   prescriptions,
@@ -61,21 +62,7 @@ export interface PrescriptionDetail extends PrescriptionWithItems {
  * Supports ISO (YYYY-MM-DD) and UK (DD/MM/YYYY) formats.
  */
 export function calculateAge(dob: string): number {
-  if (!dob) return 0;
-  const parts = dob.includes("-") ? dob.split("-") : dob.split("/").reverse();
-  const birthDate = new Date(
-    parseInt(parts[0], 10),
-    parseInt(parts[1], 10) - 1,
-    parseInt(parts[2], 10)
-  );
-  if (isNaN(birthDate.getTime())) return 0;
-  const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const m = today.getMonth() - birthDate.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-    age--;
-  }
-  return Math.max(0, age);
+  return getAge(dob) ?? 0;
 }
 
 /**

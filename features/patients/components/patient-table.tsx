@@ -11,44 +11,7 @@ import { PatientSearch } from "./patient-search";
 
 type PatientRow = Patient | PatientDirectoryItem;
 
-function calculateAge(dob: string): number | null {
-  if (!dob) return null;
-  const slashParts = dob.split("/");
-  if (slashParts.length === 3) {
-    const day = parseInt(slashParts[0], 10);
-    const month = parseInt(slashParts[1], 10) - 1;
-    const year = parseInt(slashParts[2], 10);
-    const birthDate = new Date(year, month, day);
-    if (!isNaN(birthDate.getTime())) {
-      const today = new Date();
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const m = today.getMonth() - birthDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-      }
-      return age >= 0 ? age : null;
-    }
-  }
-
-  const dashParts = dob.split("-");
-  if (dashParts.length === 3) {
-    const year = parseInt(dashParts[0], 10);
-    const month = parseInt(dashParts[1], 10) - 1;
-    const day = parseInt(dashParts[2], 10);
-    const birthDate = new Date(year, month, day);
-    if (!isNaN(birthDate.getTime())) {
-      const today = new Date();
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const m = today.getMonth() - birthDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-      }
-      return age >= 0 ? age : null;
-    }
-  }
-
-  return null;
-}
+import { calculateAge } from "@/lib/dates/calculate-age";
 
 type FilterTab = "all" | "allergies" | "recent";
 

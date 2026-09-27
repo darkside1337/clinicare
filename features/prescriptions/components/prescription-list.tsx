@@ -10,6 +10,7 @@ import {
 } from "./prescription-summary";
 import { PrescriptionForm } from "./prescription-form";
 import type { PrescriptionWithItems } from "../queries";
+import { formatRxNumber } from "@/features/prescriptions/presenters";
 
 interface PrescriptionListProps {
   prescriptions: PrescriptionSummaryData[];
@@ -55,7 +56,7 @@ export function PrescriptionList({
   const handleCreated = (newRx: PrescriptionWithItems) => {
     const summaryData: PrescriptionSummaryData = {
       id: newRx.id,
-      prescriptionNumber: `RX-${newRx.id.slice(0, 8).toUpperCase()}`,
+      prescriptionNumber: formatRxNumber(newRx.id),
       createdAt: newRx.createdAt,
       items: newRx.items,
     };

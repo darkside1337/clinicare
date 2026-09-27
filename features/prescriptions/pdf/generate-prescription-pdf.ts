@@ -3,6 +3,7 @@ import { Readable } from "node:stream";
 import { renderToStream } from "@react-pdf/renderer";
 import type { PrescriptionDetail } from "@/features/prescriptions/queries";
 import PrescriptionPdfDocument from "@/features/prescriptions/pdf/prescription-document";
+import { formatRxNumber } from "@/features/prescriptions/presenters";
 
 /**
  * Sanitizes a patient name for use in filenames while preserving European accents
@@ -54,7 +55,7 @@ export function formatContentDisposition(
 export async function generatePrescriptionPdfResponse(
   prescription: PrescriptionDetail
 ): Promise<Response> {
-  const rxNumber = `RX-${prescription.id.slice(0, 8).toUpperCase()}`;
+  const rxNumber = formatRxNumber(prescription.id);
 
   const pdfElement = React.createElement(PrescriptionPdfDocument, {
     prescription: {
