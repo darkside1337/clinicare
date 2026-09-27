@@ -1,17 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { AlertTriangle, Plus, Trash2, Loader2 } from "lucide-react";
+import { AlertTriangle, Trash2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FormErrorAlert } from "@/components/ui/form-error-alert";
-import { EmptyState } from "@/components/ui/empty-state";
-import {
-  Dialog,
-  DialogPopup,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ClinicalListShell } from "./clinical-list-shell";
+import { ClinicalAddDialog } from "./clinical-add-dialog";
+import { formatDate } from "@/lib/dates/format";
 import type { Allergy } from "@/lib/db/schema";
 import { allergySchema } from "@/features/patients/schema";
 import {
@@ -49,6 +44,7 @@ export function AllergyList({
   const [newSeverity, setNewSeverity] = useState<"mild" | "moderate" | "severe">("moderate");
   const [newReaction, setNewReaction] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -101,10 +97,11 @@ export function AllergyList({
   const handleDeleteAllergy = async (allergyId: string) => {
     if (patientId) {
       setDeletingId(allergyId);
+      setActionError(null);
       const res = await deleteAllergyAction(allergyId, patientId);
       setDeletingId(null);
       if (!res.success) {
-        alert(res.error);
+        setActionError(res.error);
         return;
       }
     }
@@ -114,41 +111,23 @@ export function AllergyList({
   };
 
   return (
-    <section className={`space-y-2.5 ${className || ""}`}>
-      <div className="flex items-center justify-between border-b border-primary pb-1">
-        <div className="flex items-center gap-1.5">
-          <AlertTriangle className="size-3.5 text-clinical-critical" />
-          <h2 className="text-[11px] font-bold uppercase tracking-wider text-foreground">
-            Known Allergies &amp; Adverse Reactions
-          </h2>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] font-mono text-clinical-critical font-semibold">
-            {allergies.length} RECORDED
-          </span>
-          {!readOnly && (
-            <Button
-              type="button"
-              variant="outline"
-              size="xs"
-              onClick={() => {
-                setFormError(null);
-                setIsAddAllergyOpen(true);
-              }}
-              className="h-5 rounded-none border border-primary px-1.5 text-[11px] font-mono uppercase tracking-wider hover:bg-primary hover:text-primary-foreground"
-            >
-              <Plus className="size-2.5 mr-0.5" />
-              Log
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {allergies.length === 0 ? (
-        <EmptyState className="p-3">
-          No known allergies recorded
-        </EmptyState>
-      ) : (
+    <>
+      <ClinicalListShell
+        icon={<AlertTriangle className="size-3.5 text-clinical-critical" />}
+        title="Known Allergies & Adverse Reactions"
+        count={allergies.length}
+        countLabel="RECORDED"
+        countBadgeVariant="destructive"
+        canAdd={!readOnly}
+        onAddClick={() => {
+          setFormError(null);
+          setIsAddAllergyOpen(true);
+        }}
+        actionError={actionError}
+        emptyMessage="No known allergies recorded"
+        isEmpty={allergies.length === 0}
+        className={className}
+      >
         <div className="space-y-2">
           {allergies.map((allergy) => {
             const isSevere = allergy.severity === "severe";
@@ -217,119 +196,90 @@ export function AllergyList({
                   </p>
                 )}
                 <span className="mt-1 block text-[11px] font-mono text-text-muted">
-                  Recorded:{" "}
-                  {allergy.createdAt instanceof Date
-                    ? allergy.createdAt.toLocaleDateString("en-GB")
-                    : String(allergy.createdAt || "Clinical Record")}
+                  Recorded: {formatDate(allergy.createdAt, "Clinical Record")}
                 </span>
               </div>
             );
           })}
         </div>
-      )}
+      </ClinicalListShell>
 
-      {/* Modal: Log New Allergy */}
-      <Dialog open={isAddAllergyOpen} onOpenChange={setIsAddAllergyOpen}>
-        <DialogPopup className="max-w-md">
-          <DialogHeader className="border-b border-primary pb-3">
-            <DialogTitle className="text-sm font-bold uppercase tracking-wider text-foreground">
-              Record Adverse Reaction / Allergy
-            </DialogTitle>
-          </DialogHeader>
+      <ClinicalAddDialog
+        open={isAddAllergyOpen}
+        onOpenChange={setIsAddAllergyOpen}
+        title="Record Adverse Reaction / Allergy"
+        formError={formError}
+        isSubmitting={isSubmitting}
+        submitLabel="Save Allergy"
+        onSubmit={handleAddAllergy}
+      >
+        <div>
+          <label
+            htmlFor="allergy-substance-input"
+            className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1"
+          >
+            Substance / Medication *
+          </label>
+          <Input
+            id="allergy-substance-input"
+            type="text"
+            required
+            value={newSubstance}
+            onChange={(e) => setNewSubstance(e.target.value)}
+            placeholder="e.g. Amoxicillin, Latex, Peanuts"
+            className="rounded-none border border-primary bg-background text-xs font-mono"
+          />
+        </div>
 
-          <form onSubmit={handleAddAllergy} className="p-4 space-y-4">
-            <FormErrorAlert message={formError} className="p-2" />
+        <div>
+          <span className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
+            Clinical Severity
+          </span>
+          <div className="flex items-center border border-primary bg-card h-9">
+            {(["severe", "moderate", "mild"] as const).map((sev) => {
+              const isSelected = newSeverity === sev;
+              const activeClass =
+                sev === "severe"
+                  ? "bg-clinical-critical text-primary-foreground hover:bg-clinical-critical/90"
+                  : sev === "moderate"
+                  ? "bg-clinical-warning text-primary-foreground hover:bg-clinical-warning/90"
+                  : "bg-clinical-resolved text-primary-foreground hover:bg-clinical-resolved/90";
 
-            <div>
-              <label
-                htmlFor="allergy-substance-input"
-                className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1"
-              >
-                Substance / Medication *
-              </label>
-              <Input
-                id="allergy-substance-input"
-                type="text"
-                required
-                value={newSubstance}
-                onChange={(e) => setNewSubstance(e.target.value)}
-                placeholder="e.g. Amoxicillin, Latex, Peanuts"
-                className="rounded-none border border-primary bg-background text-xs font-mono"
-              />
-            </div>
+              return (
+                <Button
+                  key={sev}
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setNewSeverity(sev)}
+                  className={`flex-1 rounded-none text-xs font-mono uppercase font-bold h-full ${
+                    isSelected ? activeClass : "text-foreground hover:bg-background"
+                  }`}
+                >
+                  {sev}
+                </Button>
+              );
+            })}
+          </div>
+        </div>
 
-            <div>
-              <span className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
-                Clinical Severity
-              </span>
-              <div className="flex items-center border border-primary bg-card h-9">
-                {(["severe", "moderate", "mild"] as const).map((sev) => {
-                  const isSelected = newSeverity === sev;
-                  const activeClass =
-                    sev === "severe"
-                      ? "bg-clinical-critical text-primary-foreground hover:bg-clinical-critical/90"
-                      : sev === "moderate"
-                      ? "bg-clinical-warning text-primary-foreground hover:bg-clinical-warning/90"
-                      : "bg-clinical-resolved text-primary-foreground hover:bg-clinical-resolved/90";
-
-                  return (
-                    <Button
-                      key={sev}
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setNewSeverity(sev)}
-                      className={`flex-1 rounded-none text-xs font-mono uppercase font-bold h-full ${
-                        isSelected ? activeClass : "text-foreground hover:bg-background"
-                      }`}
-                    >
-                      {sev}
-                    </Button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="allergy-reaction-input"
-                className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1"
-              >
-                Reaction Description
-              </label>
-              <Input
-                id="allergy-reaction-input"
-                type="text"
-                value={newReaction}
-                onChange={(e) => setNewReaction(e.target.value)}
-                placeholder="e.g. Anaphylaxis, facial swelling, rash"
-                className="rounded-none border border-primary bg-background text-xs font-mono"
-              />
-            </div>
-
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-border">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={isSubmitting}
-                onClick={() => setIsAddAllergyOpen(false)}
-                className="rounded-none border border-primary text-xs font-mono uppercase"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                size="sm"
-                disabled={isSubmitting}
-                className="rounded-none border border-primary bg-primary text-xs font-mono uppercase font-bold text-primary-foreground hover:bg-black"
-              >
-                {isSubmitting ? "Saving..." : "Save Allergy"}
-              </Button>
-            </div>
-          </form>
-        </DialogPopup>
-      </Dialog>
-    </section>
+        <div>
+          <label
+            htmlFor="allergy-reaction-input"
+            className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1"
+          >
+            Reaction Description
+          </label>
+          <Input
+            id="allergy-reaction-input"
+            type="text"
+            value={newReaction}
+            onChange={(e) => setNewReaction(e.target.value)}
+            placeholder="e.g. Anaphylaxis, facial swelling, rash"
+            className="rounded-none border border-primary bg-background text-xs font-mono"
+          />
+        </div>
+      </ClinicalAddDialog>
+    </>
   );
 }

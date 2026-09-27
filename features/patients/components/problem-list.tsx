@@ -1,17 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { Activity, Plus, CheckCircle2, RefreshCw } from "lucide-react";
+import { Activity, CheckCircle2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FormErrorAlert } from "@/components/ui/form-error-alert";
-import { EmptyState } from "@/components/ui/empty-state";
-import {
-  Dialog,
-  DialogPopup,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ClinicalListShell } from "./clinical-list-shell";
+import { ClinicalAddDialog } from "./clinical-add-dialog";
 import type { Problem } from "@/lib/db/schema";
 import { problemSchema } from "@/features/patients/schema";
 import {
@@ -49,6 +43,7 @@ export function ProblemList({
   const [newStatus, setNewStatus] = useState<"active" | "resolved">("active");
   const [newOnsetDate, setNewOnsetDate] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
@@ -103,13 +98,14 @@ export function ProblemList({
 
     if (patientId) {
       setTogglingId(problem.id);
+      setActionError(null);
       const res = await updateProblemAction(problem.id, patientId, {
         status: nextStatus,
       });
       setTogglingId(null);
 
       if (!res.success) {
-        alert(res.error);
+        setActionError(res.error);
         return;
       }
 
@@ -127,41 +123,22 @@ export function ProblemList({
   };
 
   return (
-    <section className={`space-y-2.5 ${className || ""}`}>
-      <div className="flex items-center justify-between border-b border-primary pb-1">
-        <div className="flex items-center gap-1.5">
-          <Activity className="size-3.5 text-foreground" />
-          <h2 className="text-[11px] font-bold uppercase tracking-wider text-foreground">
-            Problem List &amp; Chronic Conditions
-          </h2>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] font-mono text-text-muted">
-            {problems.filter((p) => p.status === "active").length} ACTIVE
-          </span>
-          {!readOnly && (
-            <Button
-              type="button"
-              variant="outline"
-              size="xs"
-              onClick={() => {
-                setFormError(null);
-                setIsAddProblemOpen(true);
-              }}
-              className="h-5 rounded-none border border-primary px-1.5 text-[11px] font-mono uppercase tracking-wider hover:bg-primary hover:text-primary-foreground"
-            >
-              <Plus className="size-2.5 mr-0.5" />
-              Add
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {problems.length === 0 ? (
-        <EmptyState className="p-3">
-          No active problems recorded
-        </EmptyState>
-      ) : (
+    <>
+      <ClinicalListShell
+        icon={<Activity className="size-3.5 text-foreground" />}
+        title="Problem List & Chronic Conditions"
+        count={problems.filter((p) => p.status === "active").length}
+        countLabel="ACTIVE"
+        canAdd={!readOnly}
+        onAddClick={() => {
+          setFormError(null);
+          setIsAddProblemOpen(true);
+        }}
+        actionError={actionError}
+        emptyMessage="No active problems recorded"
+        isEmpty={problems.length === 0}
+        className={className}
+      >
         <div className="border border-primary divide-y divide-neutral-border bg-card">
           {problems.map((problem) => {
             const isActive = problem.status === "active";
@@ -228,104 +205,78 @@ export function ProblemList({
             );
           })}
         </div>
-      )}
+      </ClinicalListShell>
 
-      {/* Modal: Document Chronic Condition */}
-      <Dialog open={isAddProblemOpen} onOpenChange={setIsAddProblemOpen}>
-        <DialogPopup className="max-w-md">
-          <DialogHeader className="border-b border-primary pb-3">
-            <DialogTitle className="text-sm font-bold uppercase tracking-wider text-foreground">
-              Document Chronic Condition / Problem
-            </DialogTitle>
-          </DialogHeader>
+      <ClinicalAddDialog
+        open={isAddProblemOpen}
+        onOpenChange={setIsAddProblemOpen}
+        title="Document Chronic Condition / Problem"
+        formError={formError}
+        isSubmitting={isSubmitting}
+        submitLabel="Save Problem"
+        onSubmit={handleAddProblem}
+      >
+        <div>
+          <label
+            htmlFor="problem-condition-input"
+            className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1"
+          >
+            Medical Diagnosis / Problem *
+          </label>
+          <Input
+            id="problem-condition-input"
+            type="text"
+            required
+            value={newCondition}
+            onChange={(e) => setNewCondition(e.target.value)}
+            placeholder="e.g. Essential Hypertension, Asthma"
+            className="rounded-none border border-primary bg-background text-xs font-mono"
+          />
+        </div>
 
-          <form onSubmit={handleAddProblem} className="p-4 space-y-4">
-            <FormErrorAlert message={formError} className="p-2" />
-
-            <div>
-              <label
-                htmlFor="problem-condition-input"
-                className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1"
-              >
-                Medical Diagnosis / Problem *
-              </label>
-              <Input
-                id="problem-condition-input"
-                type="text"
-                required
-                value={newCondition}
-                onChange={(e) => setNewCondition(e.target.value)}
-                placeholder="e.g. Essential Hypertension, Asthma"
-                className="rounded-none border border-primary bg-background text-xs font-mono"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <span className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
-                  Status
-                </span>
-                <div className="flex border border-primary bg-card h-9">
-                  {(["active", "resolved"] as const).map((st) => (
-                    <Button
-                      key={st}
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setNewStatus(st)}
-                      className={`flex-1 rounded-none text-xs font-mono uppercase font-bold h-full ${
-                        newStatus === st
-                          ? "bg-primary text-primary-foreground"
-                          : "text-foreground hover:bg-background"
-                      }`}
-                    >
-                      {st}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="problem-onset-input"
-                  className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1"
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <span className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
+              Status
+            </span>
+            <div className="flex border border-primary bg-card h-9">
+              {(["active", "resolved"] as const).map((st) => (
+                <Button
+                  key={st}
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setNewStatus(st)}
+                  className={`flex-1 rounded-none text-xs font-mono uppercase font-bold h-full ${
+                    newStatus === st
+                      ? "bg-primary text-primary-foreground"
+                      : "text-foreground hover:bg-background"
+                  }`}
                 >
-                  Onset Year / Date
-                </label>
-                <Input
-                  id="problem-onset-input"
-                  type="text"
-                  value={newOnsetDate}
-                  onChange={(e) => setNewOnsetDate(e.target.value)}
-                  placeholder="e.g. 2021 or 05/2021"
-                  className="rounded-none border border-primary bg-background text-xs font-mono h-9"
-                />
-              </div>
+                  {st}
+                </Button>
+              ))}
             </div>
+          </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-border">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={isSubmitting}
-                onClick={() => setIsAddProblemOpen(false)}
-                className="rounded-none border border-primary text-xs font-mono uppercase"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                size="sm"
-                disabled={isSubmitting}
-                className="rounded-none border border-primary bg-primary text-xs font-mono uppercase font-bold text-primary-foreground hover:bg-black"
-              >
-                {isSubmitting ? "Saving..." : "Save Problem"}
-              </Button>
-            </div>
-          </form>
-        </DialogPopup>
-      </Dialog>
-    </section>
+          <div>
+            <label
+              htmlFor="problem-onset-input"
+              className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1"
+            >
+              Onset Year / Date
+            </label>
+            <Input
+              id="problem-onset-input"
+              type="text"
+              value={newOnsetDate}
+              onChange={(e) => setNewOnsetDate(e.target.value)}
+              placeholder="e.g. 2021 or 05/2021"
+              className="rounded-none border border-primary bg-background text-xs font-mono h-9"
+            />
+          </div>
+        </div>
+      </ClinicalAddDialog>
+    </>
   );
 }
