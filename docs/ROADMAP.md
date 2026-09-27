@@ -553,36 +553,36 @@ Builds every route as a thin orchestration layer over the feature modules.
 
 ### 10.1 Design System Compliance
 
-- [ ] Run `git diff` on all modified pages; replace any raw `<button>`, `<input>`, `<select>`, or `<textarea>` outside `components/ui/` with Shadcn primitives.
-- [ ] Verify allergy severity badges use the color tokens specified in `docs/DESIGN.md`.
-- [ ] Verify all timestamps rendered per the date format specified in `docs/DESIGN.md`.
-- [ ] Verify any numeric-display treatment (tabular numerals, etc.) specified in `docs/DESIGN.md` is applied to dates, dosages, and record IDs.
+- [x] Run `git diff` on all modified pages; replace any raw `<button>`, `<input>`, `<select>`, or `<textarea>` outside `components/ui/` with Shadcn primitives.
+- [x] Verify allergy severity badges use the color tokens specified in `docs/DESIGN.md`.
+- [x] Verify all timestamps rendered per the date format specified in `docs/DESIGN.md`.
+- [x] Verify any numeric-display treatment (tabular numerals, etc.) specified in `docs/DESIGN.md` is applied to dates, dosages, and record IDs.
 
 ### 10.2 Empty States
 
-- [ ] Patient profile — no allergies, no problems, no consultations, no appointments: each section renders a non-intrusive empty state message.
-- [ ] Dashboard — no appointments today: renders an empty state (not a blank panel).
-- [ ] Appointments page — no appointments for selected date: renders empty state.
-- [ ] Consultation page — zero prescriptions attached: renders a clear "no prescriptions" state rather than an empty list with no explanation.
+- [x] Patient profile — no allergies, no problems, no consultations, no appointments: each section renders a non-intrusive empty state message.
+- [x] Dashboard — no appointments today: renders an empty state (not a blank panel).
+- [x] Appointments page — no appointments for selected date: renders empty state.
+- [x] Consultation page — zero prescriptions attached: renders a clear "no prescriptions" state rather than an empty list with no explanation.
 
 ### 10.3 Responsive / Mobile
 
-- [ ] Patient profile collapses to single column on `< md` breakpoint (left column above timeline).
-- [ ] Command palette is usable on mobile (touch-friendly target sizes, no hover-only affordances).
-- [ ] Navigation collapses to a mobile-friendly layout at `< md`.
+- [x] Patient profile collapses to single column on `< md` breakpoint (left column above timeline).
+- [x] Command palette is usable on mobile (touch-friendly target sizes, no hover-only affordances).
+- [x] Navigation collapses to a mobile-friendly layout at `< md`.
 
 ### 10.4 Accessibility
 
-- [ ] All interactive elements are keyboard-navigable (Tab, Enter, Escape).
-- [ ] Severity badges have accessible labels (not color alone as the signal).
-- [ ] Form fields have explicit `<label>` elements (via Shadcn `FormLabel`).
-- [ ] `aria-live` regions on Server Action feedback (success/error inline messages).
+- [x] All interactive elements are keyboard-navigable (Tab, Enter, Escape).
+- [x] Severity badges have accessible labels (not color alone as the signal).
+- [x] Form fields have explicit `<label>` elements (via Shadcn `FormLabel`).
+- [x] `aria-live` regions on Server Action feedback (success/error inline messages).
 
 ### 10.5 Loading States
 
-- [ ] Add `loading.tsx` for `/patients`, `/patients/[id]`, `/appointments`, `/dashboard` showing skeleton placeholders.
-- [ ] Consultation form submit button shows a loading spinner while the Server Action is in-flight.
-- [ ] Each "Add prescription" action within the consultation page shows its own loading state independent of the overall form submit.
+- [x] Add `loading.tsx` for `/patients`, `/patients/[id]`, `/appointments`, `/dashboard` showing skeleton placeholders.
+- [x] Consultation form submit button shows a loading spinner while the Server Action is in-flight.
+- [x] Each "Add prescription" action within the consultation page shows its own loading state independent of the overall form submit.
 
 ---
 
@@ -590,24 +590,24 @@ Builds every route as a thin orchestration layer over the feature modules.
 
 ### 11.1 Storage Helpers
 
-- [ ] Create `lib/supabase/storage.ts`:
+- [x] Create `lib/supabase/storage.ts`:
   - `uploadClinicLogo(clinicId, file: File): Promise<string>` — uploads to `clinics/{clinicId}/logo` bucket; returns public URL.
   - `uploadDoctorSignature(doctorId, file: File): Promise<string>` — uploads to `doctors/{doctorId}/signature`; returns signed URL.
   - `getPublicUrl(path: string): string`.
 
 ### 11.2 Clinic Settings Page (Stretch)
 
-- [ ] Create `app/(app)/settings/page.tsx`:
+- [x] Create `app/(app)/settings/page.tsx`:
   - Doctor only.
   - Upload clinic logo (Shadcn `Input type="file"`).
   - On save: calls `uploadClinicLogo`, stores URL in `clinics.logoUrl`.
 
 ### 11.3 Storage Tests
 
-- [ ] `lib/supabase/__tests__/storage.test.ts`:
+- [x] `lib/supabase/__tests__/storage.test.ts`:
   - Mock Supabase client; assert `uploadClinicLogo` calls the correct bucket/path.
   - Assert URL returned matches expected format.
-- [ ] **Test:** `pnpm test` — storage tests pass. ✅
+- [x] **Test:** `pnpm test` — storage tests pass. ✅
 
 ---
 

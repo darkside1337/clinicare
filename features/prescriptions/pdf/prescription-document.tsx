@@ -1,5 +1,5 @@
 import React from "react";
-import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet, Image } from "@react-pdf/renderer";
 
 const styles = StyleSheet.create({
   page: {
@@ -16,6 +16,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
+  },
+  clinicHeaderLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    maxWidth: "70%",
+  },
+  clinicLogo: {
+    width: 36,
+    height: 36,
+    marginRight: 10,
+    objectFit: "contain",
   },
   clinicTitle: {
     fontSize: 13,
@@ -175,6 +186,7 @@ export function PrescriptionPdfDocument({
   doctorName,
   clinicName,
   clinicAddress,
+  clinicLogoUrl,
 }: PrescriptionPdfProps) {
   const items = prescription.items || [];
   const rxNumber =
@@ -187,12 +199,18 @@ export function PrescriptionPdfDocument({
       <Page size="A5" style={styles.page}>
         {/* Practice Header */}
         <View style={styles.headerBox}>
-          <View>
-            <Text style={styles.clinicTitle}>{clinicName}</Text>
-            {clinicAddress && (
-              <Text style={styles.clinicSubtitle}>{clinicAddress}</Text>
+          <View style={styles.clinicHeaderLeft}>
+            {clinicLogoUrl && (
+              /* eslint-disable-next-line jsx-a11y/alt-text */
+              <Image src={clinicLogoUrl} style={styles.clinicLogo} />
             )}
-            <Text style={styles.clinicSubtitle}>OUTPATIENT PRESCRIPTION ORDER</Text>
+            <View>
+              <Text style={styles.clinicTitle}>{clinicName}</Text>
+              {clinicAddress && (
+                <Text style={styles.clinicSubtitle}>{clinicAddress}</Text>
+              )}
+              <Text style={styles.clinicSubtitle}>OUTPATIENT PRESCRIPTION ORDER</Text>
+            </View>
           </View>
           <View style={styles.rxLabelBox}>
             <Text style={styles.rxText}>RX</Text>

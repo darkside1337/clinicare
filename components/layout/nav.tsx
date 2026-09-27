@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { LogOut, Search, Building2 } from "lucide-react";
+import { LogOut, Search, Building2, Menu, X, UserPlus } from "lucide-react";
 import { logoutSandboxAction } from "@/app/actions/sandbox-auth";
 
 export interface PracticeNavProps {
@@ -24,11 +24,21 @@ export function PracticeNav({
   onOpenSearch,
 }: PracticeNavProps) {
   const pathname = usePathname();
+  const [prevPathname, setPrevPathname] = React.useState(pathname);
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setMobileMenuOpen(false);
+  }
 
   const navLinks = [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/appointments", label: "Appointments" },
     { href: "/patients", label: "Patients" },
+    ...(sessionRole === "doctor"
+      ? [{ href: "/settings", label: "Settings" }]
+      : []),
   ];
 
   const handleOpenSearch = () => {
@@ -108,6 +118,23 @@ export function PracticeNav({
 
         {rightSlot}
 
+        {/* Mobile Hamburger Toggle Button */}
+        <Button
+          type="button"
+          variant="outline"
+          size="xs"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={mobileMenuOpen}
+          className="md:hidden rounded-none border border-primary bg-card px-2 py-1 text-xs font-mono h-7"
+        >
+          {mobileMenuOpen ? (
+            <X className="size-3.5 text-foreground" />
+          ) : (
+            <Menu className="size-3.5 text-foreground" />
+          )}
+        </Button>
+
         {/* Sign Out Form Action */}
         <form action={logoutSandboxAction}>
           <Button
@@ -122,6 +149,46 @@ export function PracticeNav({
           </Button>
         </form>
       </div>
+
+      {/* Mobile Navigation Drawer */}
+      {mobileMenuOpen && (
+        <div className="w-full md:hidden border-t border-neutral-border pt-3 pb-2 space-y-2">
+          <div className="text-[10px] font-mono uppercase tracking-wider text-text-muted px-1">
+            Clinical Modules
+          </div>
+          <nav className="flex flex-col space-y-1">
+            {navLinks.map((link) => {
+              const isActive =
+                pathname === link.href ||
+                (link.href !== "/dashboard" && pathname?.startsWith(link.href));
+              return (
+                <Button
+                  key={link.href}
+                  asChild
+                  variant={isActive ? "default" : "ghost"}
+                  className={`w-full justify-start rounded-none px-3 py-2 text-xs font-mono uppercase h-9 ${
+                    isActive
+                      ? "bg-primary text-primary-foreground font-bold"
+                      : "text-foreground hover:bg-muted"
+                  }`}
+                >
+                  <Link href={link.href}>{link.label}</Link>
+                </Button>
+              );
+            })}
+            <Button
+              asChild
+              variant="outline"
+              className="w-full justify-start gap-2 rounded-none border border-neutral-border bg-card px-3 py-2 text-xs font-mono text-foreground hover:bg-background h-9"
+            >
+              <Link href="/patients/new">
+                <UserPlus className="size-3.5 text-text-muted" />
+                <span>Register Patient</span>
+              </Link>
+            </Button>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

@@ -10,6 +10,7 @@ import {
   UserPlus,
   Stethoscope,
   Search,
+  Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +48,16 @@ export function AppSidebar({
       icon: Users,
       description: "Clinical directory",
     },
+    ...(role === "doctor"
+      ? [
+          {
+            href: "/settings",
+            label: "Settings",
+            icon: Settings,
+            description: "Practice branding & storage",
+          },
+        ]
+      : []),
   ];
 
   const handleOpenSearch = () => {
@@ -60,7 +71,7 @@ export function AppSidebar({
   return (
     <aside
       className={cn(
-        "flex flex-col border-r border-primary bg-background w-full md:w-64 shrink-0 selection:bg-primary selection:text-primary-foreground",
+        "hidden md:flex flex-col border-r border-primary bg-background md:w-64 shrink-0 selection:bg-primary selection:text-primary-foreground",
         className
       )}
     >
