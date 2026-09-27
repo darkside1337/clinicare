@@ -1,21 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { ArrowRight, Plus, User } from "lucide-react";
 import { AppointmentQueue } from "@/features/appointments/components/appointment-queue";
 import { DashboardQuickActions } from "@/features/appointments/components/dashboard-quick-actions";
+import { ClinicCensusStrip } from "@/features/appointments/components/clinic-census-strip";
+import {
+  RecentPatientsList,
+  type RecentPatientItem,
+} from "@/features/patients/components/recent-patients-list";
 import type { AppointmentDetails } from "@/features/appointments/queries";
-import type { AppointmentStatus } from "@/features/appointments/schema";
 import type { FormPatient } from "@/features/appointments/components/appointment-form";
-
-interface RecentPatientItem {
-  id: string;
-  name: string;
-  dob: string;
-  phone: string | null;
-  hasSevereAllergy?: boolean;
-}
+import { useOptimisticAppointments } from "@/features/appointments/hooks/use-optimistic-appointments";
 
 interface DashboardClientProps {
   initialAppointments: AppointmentDetails[];
@@ -25,14 +22,6 @@ interface DashboardClientProps {
   sessionUserName?: string;
   patients?: FormPatient[];
 }
-
-import { calculateAge as calcAge } from "@/lib/dates/calculate-age";
-
-function calculateAge(dob: string): number {
-  return calcAge(dob) ?? 0;
-}
-
-import { useOptimisticAppointments } from "@/features/appointments/hooks/use-optimistic-appointments";
 
 export function DashboardClient({
   initialAppointments,
@@ -80,66 +69,12 @@ export function DashboardClient({
         {/* RIGHT COLUMN: Census Metrics & Recent Patients Strip */}
         <aside className="w-full shrink-0 lg:w-[32%] p-4 sm:p-6 lg:p-7 space-y-7">
           {/* Quick Metrics Block */}
-          <div className="border border-primary bg-card p-5 shadow-[1px_1px_0px_var(--color-primary)] space-y-4">
-            <div className="flex items-center justify-between border-b border-primary pb-1.5">
-              <span className="text-[11px] font-mono uppercase tracking-widest text-text-muted">
-                CLINIC CENSUS
-              </span>
-              <span className="text-[11px] font-mono text-clinical-resolved font-bold">
-                LIVE
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="border border-neutral-border bg-background p-3">
-                <span className="text-[11px] font-mono uppercase tracking-wider text-text-muted block">
-                  Waiting Now
-                </span>
-                <span className="text-2xl font-bold font-mono text-clinical-warning mt-0.5 block tabular-nums">
-                  {waitingCount}
-                </span>
-                <span className="text-[11px] font-mono text-text-muted">
-                  Checked-in
-                </span>
-              </div>
-
-              <div className="border border-neutral-border bg-background p-3">
-                <span className="text-[11px] font-mono uppercase tracking-wider text-text-muted block">
-                  Total Booked
-                </span>
-                <span className="text-2xl font-bold font-mono text-foreground mt-0.5 block tabular-nums">
-                  {totalBooked}
-                </span>
-                <span className="text-[11px] font-mono text-text-muted">
-                  All practitioners
-                </span>
-              </div>
-
-              <div className="border border-neutral-border bg-background p-3">
-                <span className="text-[11px] font-mono uppercase tracking-wider text-text-muted block">
-                  Completed
-                </span>
-                <span className="text-2xl font-bold font-mono text-clinical-resolved mt-0.5 block tabular-nums">
-                  {completedCount}
-                </span>
-                <span className="text-[11px] font-mono text-text-muted">
-                  Encounters done
-                </span>
-              </div>
-
-              <div className="border border-neutral-border bg-background p-3">
-                <span className="text-[11px] font-mono uppercase tracking-wider text-text-muted block">
-                  No-Show
-                </span>
-                <span className="text-2xl font-bold font-mono text-clinical-critical mt-0.5 block tabular-nums">
-                  {noShowCount}
-                </span>
-                <span className="text-[11px] font-mono text-text-muted">
-                  Missed visits
-                </span>
-              </div>
-            </div>
-          </div>
+          <ClinicCensusStrip
+            waitingCount={waitingCount}
+            totalBooked={totalBooked}
+            completedCount={completedCount}
+            noShowCount={noShowCount}
+          />
 
           {/* Quick-Action Practice Shortcuts */}
           <div className="space-y-3">
@@ -192,54 +127,7 @@ export function DashboardClient({
           </div>
 
           {/* Recent Patients */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between border-b border-primary pb-1">
-              <h2 className="text-[11px] font-bold uppercase tracking-wider text-foreground">
-                Recent Patients
-              </h2>
-              <span className="text-[11px] font-mono text-text-muted">
-                DIRECTORY CENSUS
-              </span>
-            </div>
-
-            <div className="border border-primary divide-y divide-neutral-border bg-card">
-              {recentPatients.length === 0 ? (
-                <div className="p-4 text-center text-xs font-mono text-text-muted">
-                  No patients registered yet.
-                </div>
-              ) : (
-                recentPatients.map((rp) => (
-                  <Link
-                    key={rp.id}
-                    href={`/patients/${rp.id}`}
-                    className="p-3 block hover:bg-muted transition-colors group"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-foreground group-hover:underline">
-                        {rp.name}
-                      </span>
-                      <span className="text-[11px] font-mono text-text-muted tabular-nums">
-                        {rp.phone || "No phone"}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-[11px] font-mono text-text-muted mt-1">
-                      <span className="tabular-nums">
-                        DOB: {rp.dob} • {calculateAge(rp.dob)}y
-                      </span>
-                      {role === "doctor" && rp.hasSevereAllergy && (
-                        <span
-                          aria-label="Severe allergy recorded"
-                          className="text-clinical-critical font-bold uppercase text-[10px]"
-                        >
-                          Allergy Flag
-                        </span>
-                      )}
-                    </div>
-                  </Link>
-                ))
-              )}
-            </div>
-          </div>
+          <RecentPatientsList patients={recentPatients} role={role} />
         </aside>
       </div>
     </div>

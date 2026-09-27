@@ -21,6 +21,7 @@ export interface AllergyProfileItem {
   severity: "severe" | "moderate" | "mild";
   reaction: string;
   recordedDate: string;
+  createdAt?: string | Date;
 }
 
 export interface ProblemProfileItem {
@@ -30,6 +31,7 @@ export interface ProblemProfileItem {
   onsetDate: string;
   resolvedDate?: string;
   notes?: string;
+  createdAt?: string | Date;
 }
 
 export interface ConsultationProfileItem {
