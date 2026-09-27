@@ -19,45 +19,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { FormErrorAlert } from "@/components/ui/form-error-alert";
-import { CLINIC_HOURS } from "@/features/appointments/constants";
+import {
+  CLINIC_HOURS,
+  DOCTORS,
+  type FormDoctor,
+  type FormPatient,
+} from "@/features/appointments/constants";
+import { PatientPickerList } from "./patient-picker-list";
+import { DoctorGridPicker } from "./doctor-grid-picker";
 import { createAppointmentSchema } from "@/features/appointments/schema";
 import { createAppointmentAction } from "@/app/(app)/appointments/actions";
 import type { Appointment } from "@/lib/db/schema";
 
-export const DOCTORS = [
-  {
-    id: "doc-finch",
-    name: "Dr. Alistair Finch",
-    room: "Consulting Room 1",
-    specialty: "General Practice / Lead GP",
-  },
-  {
-    id: "doc-rostova",
-    name: "Dr. Helen Rostova",
-    room: "Consulting Room 2",
-    specialty: "General Practice / Minor Procedures",
-  },
-  {
-    id: "doc-brody",
-    name: "Dr. Marcus Brody",
-    room: "Consulting Room 3",
-    specialty: "GP / Chronic Disease",
-  },
-];
-
-export interface FormDoctor {
-  id: string;
-  name: string;
-  room?: string;
-  specialty?: string;
-}
-
-export interface FormPatient {
-  id: string;
-  name: string;
-  dob: string;
-  hasSevereAllergy?: boolean;
-}
+export { DOCTORS, type FormDoctor, type FormPatient };
 
 interface AppointmentFormProps {
   open: boolean;
@@ -241,50 +215,12 @@ function AppointmentFormInner({
           <span id="apt-patient-label" className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
             Select Patient *
           </span>
-          <div role="group" aria-labelledby="apt-patient-label" className="border border-primary bg-background p-1.5 max-h-36 overflow-y-auto divide-y divide-neutral-border">
-            {patients.length === 0 ? (
-              <div className="p-3 text-center text-xs font-mono text-text-muted">
-                No patients registered. Please register a patient before booking.
-              </div>
-            ) : (
-              patients.map((p) => {
-                const isSelected = watchedPatientId === p.id;
-                return (
-                  <Button
-                    key={p.id}
-                    type="button"
-                    variant="ghost"
-                    onClick={() =>
-                      setValue("patientId", p.id, { shouldValidate: true })
-                    }
-                    className={`w-full justify-between rounded-none p-2 h-auto text-xs font-mono transition-colors text-left ${
-                      isSelected
-                        ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
-                        : "hover:bg-card text-foreground"
-                    }`}
-                  >
-                    <div className="truncate">
-                      <span className="font-bold">{p.name}</span>
-                      <span className="text-[11px] opacity-75 ml-2">
-                        ({p.id} • {p.dob})
-                      </span>
-                    </div>
-                    {p.hasSevereAllergy && (
-                      <Badge
-                        variant="destructive"
-                        aria-label="Severe allergy recorded"
-                        className={`text-[10px] uppercase font-bold shrink-0 ml-2 ${
-                          isSelected ? "bg-card text-clinical-critical" : ""
-                        }`}
-                      >
-                        Allergy
-                      </Badge>
-                    )}
-                  </Button>
-                );
-              })
-            )}
-          </div>
+          <PatientPickerList
+            patients={patients}
+            selectedPatientId={watchedPatientId}
+            onSelectPatient={(id) => setValue("patientId", id, { shouldValidate: true })}
+            groupId="apt-patient-label"
+          />
           {errors.patientId && (
             <p role="alert" className="text-[11px] font-mono text-clinical-critical mt-1">
               {errors.patientId.message}
@@ -297,42 +233,12 @@ function AppointmentFormInner({
           <span id="apt-doctor-label" className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
             Practitioner *
           </span>
-          <div role="group" aria-labelledby="apt-doctor-label" className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-            {doctors.length === 0 ? (
-              <div className="col-span-1 sm:col-span-3 border border-primary bg-background p-3 text-center text-xs font-mono text-text-muted">
-                No practitioners registered in clinic.
-              </div>
-            ) : (
-              doctors.map((doc) => {
-                const isSelected = watchedDoctorId === doc.id;
-                return (
-                  <Button
-                    key={doc.id}
-                    type="button"
-                    variant={isSelected ? "default" : "outline"}
-                    size="xs"
-                    onClick={() =>
-                      setValue("doctorId", doc.id, { shouldValidate: true })
-                    }
-                    className={`rounded-none border text-xs font-mono text-left justify-start p-2 h-auto flex flex-col items-start ${
-                      isSelected
-                        ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
-                        : "border-primary bg-background text-foreground hover:bg-card"
-                    }`}
-                  >
-                    <span className="font-bold text-[11px]">{doc.name}</span>
-                    {doc.room && (
-                      <span
-                        className={`text-[10px] ${isSelected ? "text-primary-foreground/80" : "text-text-muted"}`}
-                      >
-                        {doc.room}
-                      </span>
-                    )}
-                  </Button>
-                );
-              })
-            )}
-          </div>
+          <DoctorGridPicker
+            doctors={doctors}
+            selectedDoctorId={watchedDoctorId}
+            onSelectDoctor={(id) => setValue("doctorId", id, { shouldValidate: true })}
+            groupId="apt-doctor-label"
+          />
           {errors.doctorId && (
             <p role="alert" className="text-[11px] font-mono text-clinical-critical mt-1">
               {errors.doctorId.message}

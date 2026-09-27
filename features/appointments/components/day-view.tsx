@@ -10,12 +10,12 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CLINIC_HOURS } from "@/features/appointments/constants";
+import { CLINIC_HOURS, DOCTORS, type FormDoctor } from "@/features/appointments/constants";
 import type { AppointmentDetails } from "@/features/appointments/queries";
 import type { AppointmentStatus } from "@/features/appointments/schema";
 import { updateAppointmentStatusAction } from "@/app/(app)/appointments/actions";
 import { STATUS_METADATA } from "./appointment-status-badge";
-import { DOCTORS, type FormDoctor } from "./appointment-form";
+import { AppointmentStatusMenu } from "./appointment-status-menu";
 
 interface DayViewProps {
   appointments: AppointmentDetails[];
@@ -264,61 +264,11 @@ export function DayView({
 
                       {/* Status changer dropdown */}
                       {activeStatusMenuId === apt.id && (
-                        <div className="absolute left-2 top-10 z-40 w-44 border border-primary bg-card p-1 shadow-[2px_2px_0px_var(--color-primary)] divide-y divide-muted">
-                          <div className="px-2 py-1 text-[11px] font-mono uppercase text-text-muted">
-                            Update Status:
-                          </div>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleStatusChange(apt.id, "checked-in")}
-                            className="w-full text-left justify-between rounded-none px-2 py-1 text-xs font-mono uppercase hover:bg-background h-auto"
-                          >
-                            <span>Waiting</span>
-                            <span className="size-2 rounded-full bg-clinical-warning"></span>
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleStatusChange(apt.id, "scheduled")}
-                            className="w-full text-left justify-between rounded-none px-2 py-1 text-xs font-mono uppercase hover:bg-background h-auto"
-                          >
-                            <span>Scheduled</span>
-                            <span className="size-2 rounded-full bg-neutral-border"></span>
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleStatusChange(apt.id, "completed")}
-                            className="w-full text-left justify-between rounded-none px-2 py-1 text-xs font-mono uppercase hover:bg-background h-auto"
-                          >
-                            <span>Completed</span>
-                            <span className="size-2 rounded-full bg-clinical-resolved"></span>
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleStatusChange(apt.id, "no-show")}
-                            className="w-full text-left justify-between rounded-none px-2 py-1 text-xs font-mono uppercase hover:bg-background h-auto"
-                          >
-                            <span>No-Show</span>
-                            <span className="size-2 rounded-full bg-clinical-critical"></span>
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleStatusChange(apt.id, "cancelled")}
-                            className="w-full text-left justify-between rounded-none px-2 py-1 text-xs font-mono uppercase hover:bg-background h-auto"
-                          >
-                            <span>Cancelled</span>
-                            <span className="size-2 rounded-full bg-text-muted"></span>
-                          </Button>
-                        </div>
+                        <AppointmentStatusMenu
+                          className="absolute left-2 top-10"
+                          onSelect={(newStatus) => handleStatusChange(apt.id, newStatus)}
+                          onClose={() => setActiveStatusMenuId(null)}
+                        />
                       )}
                     </div>
                   ) : (

@@ -20,3 +20,38 @@ export const CLINIC_HOURS = [
 ] as const;
 
 export const DEFAULT_SLOT_DURATION_MINUTES = 30;
+
+export interface FormDoctor {
+  id: string;
+  name: string;
+  room?: string;
+  specialty?: string;
+}
+
+export interface FormPatient {
+  id: string;
+  name: string;
+  dob: string;
+  hasSevereAllergy?: boolean;
+}
+
+export const DOCTORS: FormDoctor[] = [
+  {
+    id: "doc-finch",
+    name: "Dr. Alistair Finch",
+    room: "Consulting Room 1",
+    specialty: "General Practice / Lead GP",
+  },
+  {
+    id: "doc-rostova",
+    name: "Dr. Helen Rostova",
+    room: "Consulting Room 2",
+    specialty: "General Practice / Minor Procedures",
+  },
+  {
+    id: "doc-brody",
+    name: "Dr. Marcus Brody",
+    room: "Consulting Room 3",
+    specialty: "GP / Chronic Disease",
+  },
+];

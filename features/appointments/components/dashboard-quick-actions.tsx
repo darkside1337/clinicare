@@ -15,6 +15,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { AppointmentForm, DOCTORS, type FormDoctor, type FormPatient } from "./appointment-form";
+import { PatientPickerList } from "./patient-picker-list";
+import { DoctorGridPicker } from "./doctor-grid-picker";
 import { createWalkInAppointmentAction } from "@/app/(app)/appointments/actions";
 
 interface DashboardQuickActionsProps {
@@ -203,40 +205,12 @@ export function DashboardQuickActions({
                 <span id="quick-patient-label" className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
                   Select Arrived Patient *
                 </span>
-                <div role="group" aria-labelledby="quick-patient-label" className="border border-primary bg-background p-1.5 max-h-36 overflow-y-auto divide-y divide-neutral-border">
-                  {patients.map((p) => {
-                    const isSelected = selectedPatientId === p.id;
-                    return (
-                      <Button
-                        key={p.id}
-                        type="button"
-                        variant="ghost"
-                        onClick={() => setSelectedPatientId(p.id)}
-                        className={`w-full justify-between rounded-none p-2 h-auto text-xs font-mono transition-colors text-left ${
-                          isSelected
-                            ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
-                            : "hover:bg-card text-foreground"
-                        }`}
-                      >
-                        <div className="truncate">
-                          <span className="font-bold">{p.name}</span>
-                          <span className="text-[11px] opacity-75 ml-2">({p.id} • {p.dob})</span>
-                        </div>
-                        {p.hasSevereAllergy && (
-                          <Badge
-                            variant="destructive"
-                            aria-label="Severe allergy recorded"
-                            className={`text-[10px] uppercase font-bold shrink-0 ml-2 ${
-                              isSelected ? "bg-card text-clinical-critical" : ""
-                            }`}
-                          >
-                            Allergy
-                          </Badge>
-                        )}
-                      </Button>
-                    );
-                  })}
-                </div>
+                <PatientPickerList
+                  patients={patients}
+                  selectedPatientId={selectedPatientId}
+                  onSelectPatient={setSelectedPatientId}
+                  groupId="quick-patient-label"
+                />
               </div>
 
               {/* Practitioner Selection */}
@@ -244,32 +218,12 @@ export function DashboardQuickActions({
                 <span id="quick-doctor-label" className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
                   Assign Clinician *
                 </span>
-                <div role="group" aria-labelledby="quick-doctor-label" className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  {doctors.map((doc) => {
-                    const isSelected = selectedDoctorId === doc.id;
-                    return (
-                      <Button
-                        key={doc.id}
-                        type="button"
-                        variant={isSelected ? "default" : "outline"}
-                        size="xs"
-                        onClick={() => setSelectedDoctorId(doc.id)}
-                        className={`rounded-none border text-xs font-mono text-left justify-start p-2 h-auto flex flex-col items-start ${
-                          isSelected
-                            ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
-                            : "border-primary bg-background text-foreground hover:bg-card"
-                        }`}
-                      >
-                        <span className="font-bold text-[11px]">{doc.name}</span>
-                        {doc.room && (
-                          <span className={`text-[10px] ${isSelected ? "text-primary-foreground/80" : "text-text-muted"}`}>
-                            {doc.room}
-                          </span>
-                        )}
-                      </Button>
-                    );
-                  })}
-                </div>
+                <DoctorGridPicker
+                  doctors={doctors}
+                  selectedDoctorId={selectedDoctorId}
+                  onSelectDoctor={setSelectedDoctorId}
+                  groupId="quick-doctor-label"
+                />
               </div>
 
               {/* Reason / Presenting Complaint */}
