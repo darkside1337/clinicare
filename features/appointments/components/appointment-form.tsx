@@ -7,7 +7,6 @@ import {
   Calendar as CalendarIcon,
   X,
   Loader2,
-  AlertCircle,
 } from "lucide-react";
 import {
   Dialog,
@@ -17,7 +16,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { FormErrorAlert } from "@/components/ui/form-error-alert";
 import {
   CLINIC_HOURS,

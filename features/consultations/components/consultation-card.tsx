@@ -6,6 +6,8 @@ import { ChevronRight, Pill, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
+import { formatDate, formatTime } from "@/lib/dates/format";
+
 export interface ConsultationCardItem {
   id: string;
   chiefComplaint: string | null;
@@ -35,7 +37,7 @@ export interface ConsultationCardProps {
   defaultExpanded?: boolean;
 }
 
-function formatDate(consultation: {
+function formatConsultationDateTime(consultation: {
   createdAt?: Date | string;
   date?: string;
   time?: string;
@@ -46,22 +48,9 @@ function formatDate(consultation: {
   if (!consultation.createdAt) {
     return { date: "—", time: "—" };
   }
-  const d =
-    typeof consultation.createdAt === "string"
-      ? new Date(consultation.createdAt)
-      : consultation.createdAt;
-  if (isNaN(d.getTime())) {
-    return { date: "—", time: "—" };
-  }
-  const day = String(d.getDate()).padStart(2, "0");
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const year = d.getFullYear();
-  const hours = String(d.getHours()).padStart(2, "0");
-  const minutes = String(d.getMinutes()).padStart(2, "0");
-
   return {
-    date: `${day}/${month}/${year}`,
-    time: `${hours}:${minutes}`,
+    date: formatDate(consultation.createdAt),
+    time: formatTime(consultation.createdAt),
   };
 }
 
@@ -71,7 +60,7 @@ export function ConsultationCard({
   defaultExpanded = false,
 }: ConsultationCardProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
-  const { date, time } = formatDate(consultation);
+  const { date, time } = formatConsultationDateTime(consultation);
   const encounterType =
     consultation.type ||
     (consultation.appointment?.isWalkIn ? "Walk-In" : "Scheduled");
@@ -81,9 +70,11 @@ export function ConsultationCard({
   return (
     <article className="border border-primary bg-card shadow-[1px_1px_0px_var(--color-primary)] transition-shadow">
       {/* Header Banner */}
-      <div
+      <button
+        type="button"
+        aria-expanded={isExpanded}
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex cursor-pointer items-center justify-between border-b border-primary bg-muted/40 px-4 py-2.5 hover:bg-muted/70 transition-colors"
+        className="flex w-full text-left items-center justify-between border-b border-primary bg-muted/40 px-4 py-2.5 hover:bg-muted/70 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
       >
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <span className="font-mono text-xs font-bold text-foreground">
@@ -113,7 +104,7 @@ export function ConsultationCard({
             }`}
           />
         </div>
-      </div>
+      </button>
 
       {/* Summary View */}
       <div className="p-4 space-y-3">

@@ -12,7 +12,6 @@ import {
 } from "@/features/appointments/components/appointment-form";
 import { CalendarControlBar } from "@/features/appointments/components/calendar-control-bar";
 import type { AppointmentDetails } from "@/features/appointments/queries";
-import type { AppointmentStatus } from "@/features/appointments/schema";
 import { useOptimisticAppointments } from "@/features/appointments/hooks/use-optimistic-appointments";
 import { toISODate } from "@/lib/dates/format";
 

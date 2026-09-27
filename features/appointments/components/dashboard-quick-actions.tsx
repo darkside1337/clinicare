@@ -3,10 +3,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, Plus, Stethoscope, X, Loader2, AlertCircle } from "lucide-react";
+import { Search, Plus, Stethoscope, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { FormErrorAlert } from "@/components/ui/form-error-alert";
 import {
   Dialog,
