@@ -29,7 +29,7 @@ export default function ConsultationForbiddenError({
 
   return (
     <div className="flex flex-1 items-center justify-center p-6 min-h-[60vh]">
-      <Card className="w-full max-w-lg rounded-none border border-destructive bg-card shadow-[2px_2px_0px_#B91C1C]">
+      <Card className="w-full max-w-lg rounded-none border border-destructive bg-card shadow-[2px_2px_0px_var(--color-destructive)]">
         <CardHeader className="border-b border-destructive/20 bg-destructive/5 pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

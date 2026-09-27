@@ -91,16 +91,27 @@ export function DayView({
     }
   };
 
+  if (visibleDoctors.length === 0) {
+    return (
+      <div className={`border border-primary bg-card p-12 text-center ${className || ""}`}>
+        <p className="text-sm font-semibold text-foreground">No clinicians selected</p>
+        <p className="text-xs text-text-muted mt-1">
+          No doctor schedules match the current filter selection.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className={`border border-[#141618] bg-white shadow-[1px_1px_0px_#141618] overflow-hidden ${className || ""}`}>
+    <div className={`border border-primary bg-card shadow-[1px_1px_0px_var(--color-primary)] overflow-hidden ${className || ""}`}>
       {/* Header Row: Doctor Columns */}
       <div
-        className="grid border-b border-[#141618] bg-[#FAFAF7]"
+        className="grid border-b border-primary bg-background"
         style={{
           gridTemplateColumns: `80px repeat(${visibleDoctors.length}, minmax(300px, 1fr))`,
         }}
       >
-        <div className="p-3 border-r border-[#141618] text-[11px] font-mono font-bold uppercase text-[#5A5D61] flex items-center justify-center">
+        <div className="p-3 border-r border-primary text-[11px] font-mono font-bold uppercase text-text-muted flex items-center justify-center">
           Time
         </div>
 
@@ -109,17 +120,17 @@ export function DayView({
           return (
             <div
               key={doc.id || doc.name}
-              className="p-3 border-r border-[#141618] last:border-r-0 space-y-0.5"
+              className="p-3 border-r border-primary last:border-r-0 space-y-0.5"
             >
               <div className="flex items-center justify-between">
-                <span className="font-bold text-xs uppercase tracking-wider text-[#141618]">
+                <span className="font-bold text-xs uppercase tracking-wider text-foreground">
                   {doc.name}
                 </span>
                 <Badge variant="outline" className="font-mono text-[11px]">
                   {docAppointments.length} Booked
                 </Badge>
               </div>
-              <div className="flex items-center justify-between text-[11px] font-mono text-[#5A5D61]">
+              <div className="flex items-center justify-between text-[11px] font-mono text-text-muted">
                 <span>{doc.room || "Consulting Room"}</span>
                 <span>{doc.specialty || "General Practice"}</span>
               </div>
@@ -129,7 +140,7 @@ export function DayView({
       </div>
 
       {/* Time Slot Rows */}
-      <div className="divide-y divide-[#D8D4CC] overflow-x-auto">
+      <div className="divide-y divide-neutral-border overflow-x-auto">
         {CLINIC_HOURS.map((hour) => (
           <div
             key={hour}
@@ -139,7 +150,7 @@ export function DayView({
             }}
           >
             {/* Time Axis Cell */}
-            <div className="p-3 border-r border-[#141618] bg-[#FAFAF7] font-mono text-xs font-bold text-[#141618] flex items-start justify-center pt-3 select-none">
+            <div className="p-3 border-r border-primary bg-background font-mono text-xs font-bold text-foreground flex items-start justify-center pt-3 select-none">
               {hour}
             </div>
 
@@ -152,12 +163,12 @@ export function DayView({
               return (
                 <div
                   key={doc.id || doc.name}
-                  className="p-2 border-r border-[#D8D4CC] last:border-r-0 relative group"
+                  className="p-2 border-r border-neutral-border last:border-r-0 relative group"
                 >
                   {apt ? (
                     <div
-                      className={`border p-2.5 h-full flex flex-col justify-between shadow-[1px_1px_0px_#141618] ${
-                        STATUS_METADATA[apt.status]?.bgClass || "bg-white"
+                      className={`border p-2.5 h-full flex flex-col justify-between shadow-[1px_1px_0px_var(--color-primary)] ${
+                        STATUS_METADATA[apt.status]?.bgClass || "bg-card border-primary"
                       }`}
                     >
                       <div className="space-y-1">
@@ -168,6 +179,8 @@ export function DayView({
                               type="button"
                               variant="outline"
                               size="xs"
+                              aria-haspopup="menu"
+                              aria-expanded={activeStatusMenuId === apt.id}
                               onClick={() =>
                                 setActiveStatusMenuId(
                                   activeStatusMenuId === apt.id ? null : apt.id
@@ -185,7 +198,7 @@ export function DayView({
                             </Button>
 
                             {apt.isWalkIn && (
-                              <Badge className="border-[#141618] bg-[#141618] text-[#FAFAF7] text-[11px] px-1 py-0 font-bold uppercase">
+                              <Badge className="border-primary bg-primary text-primary-foreground text-[11px] px-1 py-0 font-bold uppercase">
                                 Walk-In
                               </Badge>
                             )}
@@ -206,28 +219,28 @@ export function DayView({
                         <div>
                           <Link
                             href={`/patients/${apt.patientId}`}
-                            className="font-bold text-xs text-[#141618] hover:underline block truncate"
+                            className="font-bold text-xs text-foreground hover:underline block truncate"
                           >
                             {apt.patientName}
                           </Link>
-                          <span className="text-[11px] font-mono text-[#5A5D61] block truncate">
+                          <span className="text-[11px] font-mono text-text-muted block truncate">
                             DOB: {apt.patientDob}
                           </span>
                         </div>
 
                         {/* Reason for encounter */}
-                        <p className="text-[11px] text-[#5A5D61] line-clamp-1 italic">
+                        <p className="text-[11px] text-text-muted line-clamp-1 italic">
                           {apt.reason}
                         </p>
                       </div>
 
                       {/* Action Links */}
-                      <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-[#D8D4CC]/60 mt-1">
+                      <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-neutral-border/60 mt-1">
                         <Button
                           asChild
                           variant="outline"
                           size="xs"
-                          className="rounded-none border border-[#141618] bg-white px-2 py-0.5 text-[11px] font-mono uppercase font-bold text-[#141618] hover:bg-[#FAFAF7] h-auto"
+                          className="rounded-none border border-primary bg-card px-2 py-0.5 text-[11px] font-mono uppercase font-bold text-foreground hover:bg-background h-auto"
                         >
                           <Link href={`/patients/${apt.patientId}`}>Profile</Link>
                         </Button>
@@ -238,8 +251,8 @@ export function DayView({
                           size="xs"
                           className={`rounded-none border px-2 py-0.5 text-[11px] font-mono uppercase font-bold h-auto ${
                             apt.status === "checked-in"
-                              ? "border-[#141618] bg-[#141618] text-[#FAFAF7] hover:bg-black"
-                              : "border-[#141618] bg-white text-[#141618] hover:bg-[#FAFAF7]"
+                              ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
+                              : "border-primary bg-card text-foreground hover:bg-background"
                           }`}
                         >
                           <Link href={`/patients/${apt.patientId}/consultations/new?appointmentId=${apt.id}`}>
@@ -251,8 +264,8 @@ export function DayView({
 
                       {/* Status changer dropdown */}
                       {activeStatusMenuId === apt.id && (
-                        <div className="absolute left-2 top-10 z-40 w-44 border border-[#141618] bg-white p-1 shadow-[2px_2px_0px_#141618] divide-y divide-[#EFECE6]">
-                          <div className="px-2 py-1 text-[11px] font-mono uppercase text-[#5A5D61]">
+                        <div className="absolute left-2 top-10 z-40 w-44 border border-primary bg-card p-1 shadow-[2px_2px_0px_var(--color-primary)] divide-y divide-muted">
+                          <div className="px-2 py-1 text-[11px] font-mono uppercase text-text-muted">
                             Update Status:
                           </div>
                           <Button
@@ -260,50 +273,50 @@ export function DayView({
                             variant="ghost"
                             size="sm"
                             onClick={() => handleStatusChange(apt.id, "checked-in")}
-                            className="w-full text-left justify-between rounded-none px-2 py-1 text-xs font-mono uppercase hover:bg-[#FAFAF7] h-auto"
+                            className="w-full text-left justify-between rounded-none px-2 py-1 text-xs font-mono uppercase hover:bg-background h-auto"
                           >
                             <span>Waiting</span>
-                            <span className="size-2 rounded-full bg-[#D97706]"></span>
+                            <span className="size-2 rounded-full bg-clinical-warning"></span>
                           </Button>
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
                             onClick={() => handleStatusChange(apt.id, "scheduled")}
-                            className="w-full text-left justify-between rounded-none px-2 py-1 text-xs font-mono uppercase hover:bg-[#FAFAF7] h-auto"
+                            className="w-full text-left justify-between rounded-none px-2 py-1 text-xs font-mono uppercase hover:bg-background h-auto"
                           >
                             <span>Scheduled</span>
-                            <span className="size-2 rounded-full bg-[#D8D4CC]"></span>
+                            <span className="size-2 rounded-full bg-neutral-border"></span>
                           </Button>
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
                             onClick={() => handleStatusChange(apt.id, "completed")}
-                            className="w-full text-left justify-between rounded-none px-2 py-1 text-xs font-mono uppercase hover:bg-[#FAFAF7] h-auto"
+                            className="w-full text-left justify-between rounded-none px-2 py-1 text-xs font-mono uppercase hover:bg-background h-auto"
                           >
                             <span>Completed</span>
-                            <span className="size-2 rounded-full bg-[#166534]"></span>
+                            <span className="size-2 rounded-full bg-clinical-resolved"></span>
                           </Button>
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
                             onClick={() => handleStatusChange(apt.id, "no-show")}
-                            className="w-full text-left justify-between rounded-none px-2 py-1 text-xs font-mono uppercase hover:bg-[#FAFAF7] h-auto"
+                            className="w-full text-left justify-between rounded-none px-2 py-1 text-xs font-mono uppercase hover:bg-background h-auto"
                           >
                             <span>No-Show</span>
-                            <span className="size-2 rounded-full bg-[#B91C1C]"></span>
+                            <span className="size-2 rounded-full bg-clinical-critical"></span>
                           </Button>
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
                             onClick={() => handleStatusChange(apt.id, "cancelled")}
-                            className="w-full text-left justify-between rounded-none px-2 py-1 text-xs font-mono uppercase hover:bg-[#FAFAF7] h-auto"
+                            className="w-full text-left justify-between rounded-none px-2 py-1 text-xs font-mono uppercase hover:bg-background h-auto"
                           >
                             <span>Cancelled</span>
-                            <span className="size-2 rounded-full bg-[#5A5D61]"></span>
+                            <span className="size-2 rounded-full bg-text-muted"></span>
                           </Button>
                         </div>
                       )}
@@ -314,9 +327,9 @@ export function DayView({
                       type="button"
                       variant="ghost"
                       onClick={() => onSlotClick?.(doc.name, hour)}
-                      className="w-full h-full rounded-none border border-dashed border-[#D8D4CC] bg-[#FAFAF7]/30 hover:bg-[#FFFDF5] hover:border-[#141618] transition-colors p-2 flex items-center justify-center cursor-pointer opacity-70 hover:opacity-100"
+                      className="w-full h-full rounded-none border border-dashed border-neutral-border bg-card hover:bg-muted/40 hover:border-primary transition-colors p-2 flex items-center justify-center cursor-pointer"
                     >
-                      <span className="text-[11px] font-mono text-[#5A5D61] group-hover:text-[#141618] flex items-center gap-1">
+                      <span className="text-[11px] font-mono text-text-muted hover:text-foreground flex items-center gap-1">
                         <Plus className="size-3" />
                         <span>Available Slot</span>
                       </span>

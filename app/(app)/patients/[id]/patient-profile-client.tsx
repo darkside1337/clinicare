@@ -21,7 +21,7 @@ const ConsultationTimeline = dynamic(
     ),
   {
     loading: () => (
-      <div className="border border-[#141618] bg-white p-6 font-mono text-xs text-[#5A5D61]">
+      <div className="border border-primary bg-card p-6 font-mono text-xs text-muted-foreground">
         Loading consultations...
       </div>
     ),
@@ -86,18 +86,18 @@ export function PatientProfileClient({
   }, [prescriptions]);
 
   return (
-    <div className="min-h-full bg-[#FAFAF7] text-[#141618] selection:bg-[#141618] selection:text-[#FAFAF7]">
+    <div className="min-h-full bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
       {/* Patient Profile Action Bar */}
-      <div className="border-b border-[#141618] bg-white px-4 py-3 sm:px-6 flex flex-wrap items-center justify-between gap-3">
+      <div className="border-b border-primary bg-card px-4 py-3 sm:px-6 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="flex size-7 shrink-0 items-center justify-center border border-[#141618] bg-[#FAFAF7] font-mono text-xs font-bold uppercase text-[#141618]">
+          <div className="flex size-7 shrink-0 items-center justify-center border border-primary bg-background font-mono text-xs font-bold uppercase text-foreground">
             {patient.sex?.charAt(0) || "P"}
           </div>
           <div>
-            <h1 className="text-base font-bold uppercase tracking-tight text-[#141618]">
+            <h1 className="text-base font-bold uppercase tracking-tight text-foreground">
               {patient.name}
             </h1>
-            <p className="text-[11px] font-mono text-[#5A5D61]">
+            <p className="text-[11px] font-mono text-text-muted">
               DOB: {patient.dob} • RECORD REF: {patient.id.slice(0, 8).toUpperCase()}
             </p>
           </div>
@@ -106,7 +106,7 @@ export function PatientProfileClient({
         {canStartConsultation && (
           <Button
             asChild
-            className="min-h-[32px] rounded-none border border-[#141618] bg-[#141618] px-3.5 text-xs font-semibold uppercase tracking-wider text-[#FAFAF7] transition-colors hover:bg-black"
+            className="min-h-[32px] rounded-none border border-primary bg-primary px-3.5 text-xs font-semibold uppercase tracking-wider text-primary-foreground transition-colors hover:bg-black"
           >
             <Link href={`/patients/${patient.id}/consultations/new`}>
               <Plus className="size-3.5 stroke-[2.5] mr-1.5" />
@@ -117,26 +117,26 @@ export function PatientProfileClient({
       </div>
 
       {/* Main Two-Column Document Canvas */}
-      <main className="mx-auto flex w-full max-w-[1536px] flex-col lg:flex-row">
-        {/* LEFT COLUMN: Persistent Summary (30% width on desktop, sticky) */}
-        <aside className="w-full shrink-0 border-b border-[#141618] lg:w-[32%] lg:border-b-0 lg:border-r lg:min-h-[calc(100vh-3rem)]">
-          <div className="p-6 lg:p-7 sticky top-12 space-y-7">
+      <div className="mx-auto flex w-full max-w-[1536px] flex-col lg:flex-row">
+        {/* LEFT COLUMN: Persistent Summary (30% width on desktop, sticky on lg) */}
+        <aside className="w-full shrink-0 border-b border-primary lg:w-[32%] lg:border-b-0 lg:border-r lg:min-h-[calc(100vh-3rem)]">
+          <div className="p-6 lg:p-7 lg:sticky lg:top-12 space-y-7">
             {/* Patient Identity Document Block */}
             <section className="space-y-3">
-              <div className="flex items-baseline justify-between border-b border-[#141618] pb-1.5">
-                <span className="text-[11px] font-mono uppercase tracking-widest text-[#5A5D61]">
+              <div className="flex items-baseline justify-between border-b border-primary pb-1.5">
+                <span className="text-[11px] font-mono uppercase tracking-widest text-text-muted">
                   RECORD #{patient.id.toUpperCase()}
                 </span>
-                <span className="text-[11px] font-mono text-[#5A5D61]">
+                <span className="text-[11px] font-mono text-text-muted">
                   REG: {patient.registeredDate}
                 </span>
               </div>
 
               <div>
-                <h1 className="text-2xl font-bold tracking-tight text-[#141618]">
+                <h1 className="text-2xl font-bold tracking-tight text-foreground">
                   {patient.name}
                 </h1>
-                <div className="mt-1 flex flex-wrap items-center gap-x-3 text-xs font-mono text-[#5A5D61]">
+                <div className="mt-1 flex flex-wrap items-center gap-x-3 text-xs font-mono text-text-muted">
                   <span>
                     DOB: {patient.dob} ({patient.age}y)
                   </span>
@@ -145,24 +145,24 @@ export function PatientProfileClient({
                 </div>
               </div>
 
-              <div className="space-y-1.5 pt-1 text-xs text-[#5A5D61]">
+              <div className="space-y-1.5 pt-1 text-xs text-text-muted">
                 <div className="flex justify-between">
                   <span className="font-mono text-[11px] uppercase">Telephone</span>
-                  <span className="font-mono text-[#141618]">{patient.phone}</span>
+                  <span className="font-mono text-foreground">{patient.phone}</span>
                 </div>
                 {patient.email && (
                   <div className="flex justify-between">
                     <span className="font-mono text-[11px] uppercase">Email</span>
-                    <span className="font-mono text-[#141618]">{patient.email}</span>
+                    <span className="font-mono text-foreground">{patient.email}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
                   <span className="font-mono text-[11px] uppercase">Address</span>
-                  <span className="text-right text-[#141618]">{patient.address}</span>
+                  <span className="text-right text-foreground">{patient.address}</span>
                 </div>
-                <div className="flex justify-between pt-1 border-t border-[#D8D4CC]">
+                <div className="flex justify-between pt-1 border-t border-neutral-border">
                   <span className="font-mono text-[11px] uppercase">Emergency</span>
-                  <span className="text-[#141618]">
+                  <span className="text-foreground">
                     {patient.emergencyContact.name} ({patient.emergencyContact.relationship})
                   </span>
                 </div>
@@ -172,20 +172,20 @@ export function PatientProfileClient({
             {/* ALLERGIES & PROBLEMS: Doctor only per PRD §6 */}
             {role === "doctor" ? (
               <>
-                <AllergyList initialAllergies={allergies} />
-                <ProblemList initialProblems={problems} />
+                <AllergyList initialAllergies={allergies} patientId={patient.id} />
+                <ProblemList initialProblems={problems} patientId={patient.id} />
               </>
             ) : (
-              <div className="border border-[#141618] bg-white p-4 shadow-[1px_1px_0px_#141618] space-y-2">
-                <div className="flex items-center justify-between border-b border-[#141618] pb-1">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-[#5A5D61]">
+              <div className="border border-primary bg-card p-4 shadow-[1px_1px_0px_var(--color-primary)] space-y-2">
+                <div className="flex items-center justify-between border-b border-primary pb-1">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-text-muted">
                     Clinical Medical History
                   </span>
                   <Badge variant="outline" className="font-mono text-[9px] uppercase">
                     Restricted
                   </Badge>
                 </div>
-                <p className="text-[11px] font-mono text-[#5A5D61]">
+                <p className="text-[11px] font-mono text-text-muted">
                   Allergies, chronic conditions, and diagnostic records are restricted to attending clinicians.
                 </p>
               </div>
@@ -200,11 +200,11 @@ export function PatientProfileClient({
               {/* SECTION A: Above-the-fold Quick Clinical Status Strip (PRD §8.4 / §12) */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* 1. Upcoming Appointments */}
-                <div className="border border-[#141618] bg-white p-5 shadow-[1px_1px_0px_#141618] space-y-3">
-                  <div className="flex items-center justify-between border-b border-[#141618] pb-1.5">
+                <div className="border border-primary bg-card p-5 shadow-[1px_1px_0px_var(--color-primary)] space-y-3">
+                  <div className="flex items-center justify-between border-b border-primary pb-1.5">
                     <div className="flex items-center gap-2">
-                      <Calendar className="size-4 text-[#141618]" />
-                      <h3 className="text-xs font-bold uppercase tracking-wider text-[#141618]">
+                      <Calendar className="size-4 text-foreground" />
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">
                         Appointments
                       </h3>
                     </div>
@@ -214,7 +214,7 @@ export function PatientProfileClient({
                   </div>
 
                   {upcomingAppointments.length === 0 ? (
-                    <div className="border border-dashed border-[#D8D4CC] p-4 text-center text-xs font-mono text-[#5A5D61]">
+                    <div className="border border-dashed border-neutral-border p-4 text-center text-xs font-mono text-text-muted">
                       No upcoming appointments scheduled
                     </div>
                   ) : (
@@ -222,10 +222,10 @@ export function PatientProfileClient({
                       {upcomingAppointments.map((apt) => (
                         <div
                           key={apt.id}
-                          className="border border-[#D8D4CC] bg-[#FAFAF7] p-2.5 space-y-1"
+                          className="border border-neutral-border bg-background p-2.5 space-y-1"
                         >
                           <div className="flex items-center justify-between text-xs">
-                            <span className="font-mono font-bold text-[#141618]">
+                            <span className="font-mono font-bold text-foreground">
                               {apt.scheduledAt}
                             </span>
                             <Badge
@@ -235,11 +235,11 @@ export function PatientProfileClient({
                               {apt.status}
                             </Badge>
                           </div>
-                          <div className="text-xs text-[#5A5D61]">
-                            Clinician: <strong className="text-[#141618]">{apt.doctorName}</strong>
+                          <div className="text-xs text-text-muted">
+                            Clinician: <strong className="text-foreground">{apt.doctorName}</strong>
                           </div>
                           {apt.reason && (
-                            <div className="text-[11px] text-[#141618] font-medium">
+                            <div className="text-[11px] text-foreground font-medium">
                               {apt.reason}
                             </div>
                           )}
@@ -250,11 +250,11 @@ export function PatientProfileClient({
                 </div>
 
                 {/* 2. Active Medications (Derived from Prescriptions) */}
-                <div className="border border-[#141618] bg-white p-5 shadow-[1px_1px_0px_#141618] space-y-3">
-                  <div className="flex items-center justify-between border-b border-[#141618] pb-1.5">
+                <div className="border border-primary bg-card p-5 shadow-[1px_1px_0px_var(--color-primary)] space-y-3">
+                  <div className="flex items-center justify-between border-b border-primary pb-1.5">
                     <div className="flex items-center gap-2">
-                      <Pill className="size-4 text-[#141618]" />
-                      <h3 className="text-xs font-bold uppercase tracking-wider text-[#141618]">
+                      <Pill className="size-4 text-foreground" />
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">
                         Active Medications
                       </h3>
                     </div>
@@ -264,7 +264,7 @@ export function PatientProfileClient({
                   </div>
 
                   {activeMedications.length === 0 ? (
-                    <div className="border border-dashed border-[#D8D4CC] p-4 text-center text-xs font-mono text-[#5A5D61]">
+                    <div className="border border-dashed border-neutral-border p-4 text-center text-xs font-mono text-text-muted">
                       No active prescribed medications recorded
                     </div>
                   ) : (
@@ -272,13 +272,13 @@ export function PatientProfileClient({
                       {activeMedications.map((item, idx) => (
                         <div
                           key={idx}
-                          className="border border-[#D8D4CC] bg-[#FAFAF7] p-2.5 text-xs space-y-0.5"
+                          className="border border-neutral-border bg-background p-2.5 text-xs space-y-0.5"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-bold text-[#141618]">{item.medication}</span>
-                            <span className="font-mono text-[11px] text-[#5A5D61]">{item.dosage}</span>
+                            <span className="font-bold text-foreground">{item.medication}</span>
+                            <span className="font-mono text-[11px] text-text-muted">{item.dosage}</span>
                           </div>
-                          <div className="text-[11px] text-[#5A5D61] font-mono">
+                          <div className="text-[11px] text-text-muted font-mono">
                             {item.frequency} • {item.duration}
                           </div>
                         </div>
@@ -297,11 +297,11 @@ export function PatientProfileClient({
           ) : (
             /* RECEPTIONIST VIEW: Front-Desk Patient Administration */
             <div className="space-y-6">
-              <div className="border border-[#141618] bg-white p-6 shadow-[1px_1px_0px_#141618] space-y-4">
-                <div className="flex items-center justify-between border-b border-[#141618] pb-2">
+              <div className="border border-primary bg-card p-6 shadow-[1px_1px_0px_var(--color-primary)] space-y-4">
+                <div className="flex items-center justify-between border-b border-primary pb-2">
                   <div className="flex items-center gap-2">
-                    <Calendar className="size-4 text-[#141618]" />
-                    <h2 className="text-xs font-bold uppercase tracking-wider text-[#141618]">
+                    <Calendar className="size-4 text-foreground" />
+                    <h2 className="text-xs font-bold uppercase tracking-wider text-foreground">
                       Patient Appointments &amp; Bookings
                     </h2>
                   </div>
@@ -311,16 +311,16 @@ export function PatientProfileClient({
                 </div>
 
                 {upcomingAppointments.length === 0 ? (
-                  <div className="border border-dashed border-[#D8D4CC] p-6 text-center text-xs font-mono text-[#5A5D61]">
+                  <div className="border border-dashed border-neutral-border p-6 text-center text-xs font-mono text-text-muted">
                     No upcoming appointments scheduled for this patient.
                   </div>
                 ) : (
-                  <div className="divide-y divide-[#D8D4CC] border border-[#D8D4CC]">
+                  <div className="divide-y divide-neutral-border border border-neutral-border">
                     {upcomingAppointments.map((apt) => (
-                      <div key={apt.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FAFAF7]">
+                      <div key={apt.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-background">
                         <div className="space-y-1 text-xs">
                           <div className="flex items-center gap-2">
-                            <span className="font-mono font-bold text-[#141618] text-sm">
+                            <span className="font-mono font-bold text-foreground text-sm">
                               {apt.scheduledAt}
                             </span>
                             <Badge
@@ -330,11 +330,11 @@ export function PatientProfileClient({
                               {apt.status}
                             </Badge>
                           </div>
-                          <div className="text-xs text-[#5A5D61]">
-                            Practitioner: <strong className="text-[#141618]">{apt.doctorName}</strong>
+                          <div className="text-xs text-text-muted">
+                            Practitioner: <strong className="text-foreground">{apt.doctorName}</strong>
                           </div>
                           {apt.reason && (
-                            <div className="text-xs text-[#141618]">
+                            <div className="text-xs text-foreground">
                               Reason: {apt.reason}
                             </div>
                           )}
@@ -345,18 +345,18 @@ export function PatientProfileClient({
                 )}
               </div>
 
-              <div className="border border-dashed border-[#D8D4CC] bg-[#FAFAF7] p-5 text-center space-y-1">
-                <p className="text-xs font-bold uppercase tracking-wider text-[#141618]">
+              <div className="border border-dashed border-neutral-border bg-background p-5 text-center space-y-1">
+                <p className="text-xs font-bold uppercase tracking-wider text-foreground">
                   Front-Desk Administration View
                 </p>
-                <p className="text-[11px] font-mono text-[#5A5D61]">
+                <p className="text-[11px] font-mono text-text-muted">
                   Clinical encounter notes, consultations, and prescriptions are restricted to medical practitioners.
                 </p>
               </div>
             </div>
           )}
         </section>
-      </main>
+      </div>
     </div>
   );
 }

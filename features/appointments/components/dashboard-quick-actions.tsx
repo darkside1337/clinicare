@@ -121,9 +121,9 @@ export function DashboardQuickActions({
           variant="outline"
           size="sm"
           onClick={handleOpenSearch}
-          className="hidden sm:flex items-center gap-1.5 rounded-none border border-[#141618] bg-white px-2.5 py-1 text-xs font-mono text-[#5A5D61] hover:bg-[#FAFAF7] hover:text-[#141618] h-auto"
+          className="hidden sm:flex items-center gap-1.5 rounded-none border border-primary bg-card px-2.5 py-1 text-xs font-mono text-text-muted hover:bg-muted hover:text-foreground h-auto"
         >
-          <Search className="size-3.5 text-[#141618]" />
+          <Search className="size-3.5 text-foreground" />
           <span>Search (Cmd+K)</span>
         </Button>
 
@@ -133,7 +133,7 @@ export function DashboardQuickActions({
           variant="outline"
           size="sm"
           onClick={handleTriggerBook}
-          className="rounded-none border border-[#141618] bg-white px-2.5 py-1 text-xs font-mono text-[#141618] hover:bg-[#FAFAF7] h-auto"
+          className="rounded-none border border-primary bg-card px-2.5 py-1 text-xs font-mono text-foreground hover:bg-muted h-auto"
         >
           <Plus className="size-3.5" />
           <span>Book</span>
@@ -144,7 +144,7 @@ export function DashboardQuickActions({
           <Button
             type="button"
             onClick={handleTriggerWalkIn}
-            className="min-h-[38px] rounded-none border border-[#141618] bg-[#141618] px-3.5 text-xs font-semibold uppercase tracking-wider text-[#FAFAF7] transition-colors hover:bg-black"
+            className="min-h-[38px] rounded-none border border-primary bg-primary px-3.5 text-xs font-semibold uppercase tracking-wider text-primary-foreground transition-colors hover:bg-primary/90"
           >
             <Plus className="size-3.5 stroke-[2.5]" />
             <span>Start Walk-In Consultation</span>
@@ -152,7 +152,7 @@ export function DashboardQuickActions({
         ) : (
           <Button
             asChild
-            className="min-h-[38px] rounded-none border border-[#141618] bg-[#141618] px-3.5 text-xs font-semibold uppercase tracking-wider text-[#FAFAF7] transition-colors hover:bg-black"
+            className="min-h-[38px] rounded-none border border-primary bg-primary px-3.5 text-xs font-semibold uppercase tracking-wider text-primary-foreground transition-colors hover:bg-primary/90"
           >
             <Link href="/patients/new">
               <Plus className="size-3.5 stroke-[2.5]" />
@@ -177,9 +177,9 @@ export function DashboardQuickActions({
       {!onStartWalkIn && (
         <Dialog open={isWalkInModalOpen} onOpenChange={setIsWalkInModalOpen}>
           <DialogPopup className="overflow-hidden">
-            <DialogHeader className="flex-row items-center justify-between border-b border-[#141618] bg-[#FAFAF7] px-4 py-2.5">
+            <DialogHeader className="flex-row items-center justify-between border-b border-primary bg-background px-4 py-2.5">
               <div className="flex items-center gap-2">
-                <Stethoscope className="size-4 text-[#141618]" />
+                <Stethoscope className="size-4 text-foreground" />
                 <DialogTitle>WALK-IN CONSULTATION INTAKE</DialogTitle>
               </div>
               <Button
@@ -187,16 +187,20 @@ export function DashboardQuickActions({
                 variant="ghost"
                 size="xs"
                 onClick={() => setIsWalkInModalOpen(false)}
-                className="size-6 p-0 hover:bg-[#EFECE6] text-[#141618]"
+                className="size-6 p-0 hover:bg-muted text-foreground"
               >
                 <X className="size-3.5" />
                 <span className="sr-only">Close</span>
               </Button>
             </DialogHeader>
 
-            <form onSubmit={handleConfirmWalkIn} className="p-4 space-y-4 bg-white">
+            <form onSubmit={handleConfirmWalkIn} className="p-4 space-y-4 bg-card">
               {walkInError && (
-                <div className="flex items-start gap-2 border border-[#B91C1C] bg-[#FFF5F5] p-3 text-xs text-[#B91C1C]">
+                <div
+                  role="alert"
+                  aria-live="polite"
+                  className="flex items-start gap-2 border border-clinical-critical bg-clinical-critical-bg p-3 text-xs text-clinical-critical"
+                >
                   <AlertCircle className="size-4 shrink-0 mt-0.5" />
                   <span>{walkInError}</span>
                 </div>
@@ -204,10 +208,10 @@ export function DashboardQuickActions({
 
               {/* Patient Selection */}
               <div>
-                <label className="text-[11px] font-mono uppercase font-bold text-[#5A5D61] block mb-1">
+                <span id="quick-patient-label" className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
                   Select Arrived Patient *
-                </label>
-                <div className="border border-[#141618] bg-[#FAFAF7] p-1.5 max-h-36 overflow-y-auto divide-y divide-[#D8D4CC]">
+                </span>
+                <div role="group" aria-labelledby="quick-patient-label" className="border border-primary bg-background p-1.5 max-h-36 overflow-y-auto divide-y divide-neutral-border">
                   {patients.map((p) => {
                     const isSelected = selectedPatientId === p.id;
                     return (
@@ -218,8 +222,8 @@ export function DashboardQuickActions({
                         onClick={() => setSelectedPatientId(p.id)}
                         className={`w-full justify-between rounded-none p-2 h-auto text-xs font-mono transition-colors text-left ${
                           isSelected
-                            ? "bg-[#141618] text-[#FAFAF7] hover:bg-black hover:text-[#FAFAF7]"
-                            : "hover:bg-white text-[#141618]"
+                            ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                            : "hover:bg-card text-foreground"
                         }`}
                       >
                         <div className="truncate">
@@ -229,8 +233,9 @@ export function DashboardQuickActions({
                         {p.hasSevereAllergy && (
                           <Badge
                             variant="destructive"
+                            aria-label="Severe allergy recorded"
                             className={`text-[10px] uppercase font-bold shrink-0 ml-2 ${
-                              isSelected ? "bg-white text-[#B91C1C]" : ""
+                              isSelected ? "bg-card text-clinical-critical" : ""
                             }`}
                           >
                             Allergy
@@ -244,10 +249,10 @@ export function DashboardQuickActions({
 
               {/* Practitioner Selection */}
               <div>
-                <label className="text-[11px] font-mono uppercase font-bold text-[#5A5D61] block mb-1">
+                <span id="quick-doctor-label" className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
                   Assign Clinician *
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                </span>
+                <div role="group" aria-labelledby="quick-doctor-label" className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   {doctors.map((doc) => {
                     const isSelected = selectedDoctorId === doc.id;
                     return (
@@ -259,13 +264,13 @@ export function DashboardQuickActions({
                         onClick={() => setSelectedDoctorId(doc.id)}
                         className={`rounded-none border text-xs font-mono text-left justify-start p-2 h-auto flex flex-col items-start ${
                           isSelected
-                            ? "border-[#141618] bg-[#141618] text-[#FAFAF7] hover:bg-black"
-                            : "border-[#141618] bg-[#FAFAF7] text-[#141618] hover:bg-white"
+                            ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
+                            : "border-primary bg-background text-foreground hover:bg-card"
                         }`}
                       >
                         <span className="font-bold text-[11px]">{doc.name}</span>
                         {doc.room && (
-                          <span className={`text-[10px] ${isSelected ? "text-[#D8D4CC]" : "text-[#5A5D61]"}`}>
+                          <span className={`text-[10px] ${isSelected ? "text-primary-foreground/80" : "text-text-muted"}`}>
                             {doc.room}
                           </span>
                         )}
@@ -277,34 +282,35 @@ export function DashboardQuickActions({
 
               {/* Reason / Presenting Complaint */}
               <div>
-                <label className="text-[11px] font-mono uppercase font-bold text-[#5A5D61] block mb-1">
+                <label htmlFor="quick-walkin-reason" className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
                   Presenting Complaint / Reason
                 </label>
                 <Input
+                  id="quick-walkin-reason"
                   type="text"
                   value={walkInReason}
                   onChange={(e) => setWalkInReason(e.target.value)}
                   placeholder="e.g. Acute wrist sprain, allergic flare, shortness of breath..."
-                  className="rounded-none border border-[#141618] bg-[#FAFAF7] text-xs font-mono"
+                  className="rounded-none border border-primary bg-background text-xs font-mono"
                 />
               </div>
 
               {/* Actions */}
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#D8D4CC]">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-neutral-border">
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => setIsWalkInModalOpen(false)}
                   disabled={isWalkInSubmitting}
-                  className="rounded-none border border-[#141618] bg-white text-xs font-mono uppercase font-bold text-[#141618] hover:bg-[#FAFAF7]"
+                  className="rounded-none border border-primary bg-card text-xs font-mono uppercase font-bold text-foreground hover:bg-muted"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={isWalkInSubmitting}
-                  className="rounded-none border border-[#141618] bg-[#141618] text-xs font-mono uppercase font-bold text-[#FAFAF7] hover:bg-black"
+                  className="rounded-none border border-primary bg-primary text-xs font-mono uppercase font-bold text-primary-foreground hover:bg-primary/90"
                 >
                   {isWalkInSubmitting ? (
                     <>

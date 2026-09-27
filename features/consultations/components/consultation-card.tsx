@@ -79,36 +79,36 @@ export function ConsultationCard({
     consultation.hasPrescription || Boolean(consultation.prescriptionId);
 
   return (
-    <article className="border border-[#141618] bg-white shadow-[1px_1px_0px_#141618] transition-shadow">
+    <article className="border border-primary bg-card shadow-[1px_1px_0px_var(--color-primary)] transition-shadow">
       {/* Header Banner */}
       <div
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex cursor-pointer items-center justify-between border-b border-[#141618] bg-[#F7F6F2] px-4 py-2.5 hover:bg-[#EFECE6] transition-colors"
+        className="flex cursor-pointer items-center justify-between border-b border-primary bg-muted/40 px-4 py-2.5 hover:bg-muted/70 transition-colors"
       >
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          <span className="font-mono text-xs font-bold text-[#141618]">
+          <span className="font-mono text-xs font-bold text-foreground">
             {date} • {time}
           </span>
           <Badge
             variant="outline"
-            className="rounded-none border-[#141618] bg-white px-2 py-0.5 text-[11px] font-mono uppercase tracking-wider text-[#141618]"
+            className="rounded-none border-primary bg-card px-2 py-0.5 text-[11px] font-mono uppercase tracking-wider text-foreground"
           >
             {encounterType}
           </Badge>
-          <span className="text-xs text-[#5A5D61]">
+          <span className="text-xs text-text-muted">
             Clinician:{" "}
-            <strong className="text-[#141618] font-medium">
+            <strong className="text-foreground font-medium">
               {consultation.doctorName || "Attending Doctor"}
             </strong>
           </span>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-[11px] font-mono text-[#5A5D61] hidden sm:inline">
+          <span className="text-[11px] font-mono text-text-muted hidden sm:inline">
             REF: {consultation.id.slice(0, 8)}
           </span>
           <ChevronRight
-            className={`size-4 text-[#141618] transition-transform ${
+            className={`size-4 text-foreground transition-transform ${
               isExpanded ? "rotate-90" : ""
             }`}
           />
@@ -119,18 +119,18 @@ export function ConsultationCard({
       <div className="p-4 space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <span className="text-[11px] font-mono uppercase tracking-wider text-[#5A5D61] block">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-text-muted block">
               Chief Complaint
             </span>
-            <p className="text-xs font-semibold text-[#141618] mt-0.5">
+            <p className="text-xs font-semibold text-foreground mt-0.5">
               {consultation.chiefComplaint || "—"}
             </p>
           </div>
           <div>
-            <span className="text-[11px] font-mono uppercase tracking-wider text-[#5A5D61] block">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-text-muted block">
               Primary Diagnosis
             </span>
-            <p className="text-xs font-semibold text-[#141618] mt-0.5">
+            <p className="text-xs font-semibold text-foreground mt-0.5">
               {consultation.diagnosis || "Under clinical evaluation"}
             </p>
           </div>
@@ -138,13 +138,13 @@ export function ConsultationCard({
 
         {/* Expanded Clinical Narrative */}
         {isExpanded && (
-          <div className="mt-4 pt-4 border-t border-[#D8D4CC] space-y-4">
+          <div className="mt-4 pt-4 border-t border-neutral-border space-y-4">
             {consultation.symptoms && (
               <div>
-                <span className="text-[11px] font-mono uppercase tracking-wider text-[#5A5D61] block">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-text-muted block">
                   Symptoms &amp; History
                 </span>
-                <p className="text-xs text-[#141618] leading-relaxed mt-0.5">
+                <p className="text-xs text-foreground leading-relaxed mt-0.5">
                   {consultation.symptoms}
                 </p>
               </div>
@@ -152,10 +152,10 @@ export function ConsultationCard({
 
             {consultation.observations && (
               <div>
-                <span className="text-[11px] font-mono uppercase tracking-wider text-[#5A5D61] block">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-text-muted block">
                   Clinical Observations
                 </span>
-                <div className="mt-0.5 border border-[#141618] bg-[#FAFAF7] p-2.5 font-mono text-xs text-[#141618]">
+                <div className="mt-0.5 border border-primary bg-background p-2.5 font-mono text-xs text-foreground">
                   {consultation.observations}
                 </div>
               </div>
@@ -163,10 +163,10 @@ export function ConsultationCard({
 
             {consultation.treatment && (
               <div>
-                <span className="text-[11px] font-mono uppercase tracking-wider text-[#5A5D61] block">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-text-muted block">
                   Treatment &amp; Management Plan
                 </span>
-                <p className="text-xs text-[#141618] leading-relaxed mt-0.5">
+                <p className="text-xs text-foreground leading-relaxed mt-0.5">
                   {consultation.treatment}
                 </p>
               </div>
@@ -174,19 +174,19 @@ export function ConsultationCard({
 
             {consultation.notes && (
               <div>
-                <span className="text-[11px] font-mono uppercase tracking-wider text-[#5A5D61] block">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-text-muted block">
                   Clinical Notes
                 </span>
-                <p className="text-xs text-[#141618] leading-relaxed mt-0.5 italic">
+                <p className="text-xs text-foreground leading-relaxed mt-0.5 italic">
                   {consultation.notes}
                 </p>
               </div>
             )}
 
-            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#EFECE6]">
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-neutral-border/60">
               {hasPrescription ? (
-                <div className="flex items-center gap-2 text-xs font-medium text-[#141618]">
-                  <Pill className="size-3.5 text-[#141618]" />
+                <div className="flex items-center gap-2 text-xs font-medium text-foreground">
+                  <Pill className="size-3.5 text-foreground" />
                   <span>
                     Prescription attached ({consultation.prescriptionCount || 1})
                   </span>
@@ -199,7 +199,7 @@ export function ConsultationCard({
                 asChild
                 variant="outline"
                 size="xs"
-                className="rounded-none border border-[#141618] bg-white text-xs font-mono uppercase font-bold text-[#141618] hover:bg-[#141618] hover:text-[#FAFAF7]"
+                className="rounded-none border border-primary bg-card text-xs font-mono uppercase font-bold text-foreground hover:bg-primary hover:text-primary-foreground"
               >
                 <Link
                   href={`/patients/${patientId}/consultations/${consultation.id}`}

@@ -73,10 +73,10 @@ export function PrescriptionList({
   return (
     <div className="space-y-4">
       {/* Action / Switcher Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border border-[#141618] bg-white p-3 shadow-[1px_1px_0px_#141618]">
+      <div className="flex flex-wrap items-center justify-between gap-3 border border-primary bg-card p-3 shadow-[1px_1px_0px_var(--color-primary)]">
         <div className="flex items-center gap-2">
-          <Pill className="size-4 text-[#141618]" />
-          <span className="font-mono text-xs uppercase font-bold text-[#141618]">
+          <Pill className="size-4 text-foreground" />
+          <span className="font-mono text-xs uppercase font-bold text-foreground">
             Encounter Prescriptions
           </span>
           <Badge variant="outline" className="font-mono text-[11px] rounded-none">
@@ -92,8 +92,8 @@ export function PrescriptionList({
             onClick={() => setShowAddForm(!showAddForm)}
             className={`rounded-none text-xs font-mono uppercase font-bold flex items-center gap-1.5 ${
               showAddForm
-                ? "border border-[#141618] text-[#141618] hover:bg-[#FAFAF7]"
-                : "bg-[#141618] text-[#FAFAF7] hover:bg-black"
+                ? "border border-primary text-foreground hover:bg-background"
+                : "bg-primary text-primary-foreground hover:bg-black"
             }`}
           >
             <Plus className="size-3" />
@@ -114,8 +114,8 @@ export function PrescriptionList({
 
       {/* Multi-Prescription Tab Switcher */}
       {prescriptions.length > 1 && (
-        <div className="flex flex-wrap items-center gap-2 border border-[#141618] bg-white p-2 text-xs font-mono">
-          <span className="font-bold text-[#5A5D61] uppercase text-[11px] mr-2">
+        <div className="flex flex-wrap items-center gap-2 border border-primary bg-card p-2 text-xs font-mono">
+          <span className="font-bold text-text-muted uppercase text-[11px] mr-2">
             Select Order:
           </span>
           {prescriptions.map((rx, idx) => (
@@ -130,8 +130,8 @@ export function PrescriptionList({
               }}
               className={`rounded-none font-mono text-xs uppercase ${
                 selectedIndex === idx
-                  ? "bg-[#141618] text-[#FAFAF7] hover:bg-black"
-                  : "border-[#141618] text-[#141618] hover:bg-[#FAFAF7]"
+                  ? "bg-primary text-primary-foreground hover:bg-black"
+                  : "border-primary text-foreground hover:bg-background"
               }`}
             >
               Order #{idx + 1} ({rx.prescriptionNumber || rx.id.slice(0, 8)})
@@ -141,7 +141,7 @@ export function PrescriptionList({
       )}
 
       {prescriptions.length === 0 && !showAddForm ? (
-        <div className="border border-dashed border-[#D8D4CC] bg-white p-8 text-center text-xs font-mono text-[#5A5D61] space-y-3">
+        <div className="border border-dashed border-neutral-border bg-card p-8 text-center text-xs font-mono text-text-muted space-y-3">
           <p>No prescriptions have been issued for this consultation encounter yet.</p>
           {patientId && consultationId && (
             <Button
@@ -149,7 +149,7 @@ export function PrescriptionList({
               variant="default"
               size="sm"
               onClick={() => setShowAddForm(true)}
-              className="rounded-none border border-[#141618] bg-[#141618] text-xs font-mono uppercase font-bold text-[#FAFAF7] hover:bg-black inline-flex items-center gap-1.5"
+              className="rounded-none border border-primary bg-primary text-xs font-mono uppercase font-bold text-primary-foreground hover:bg-black inline-flex items-center gap-1.5"
             >
               <Plus className="size-3.5" />
               <span>Issue First Prescription</span>

@@ -14,6 +14,7 @@ import {
 import { createConsultationAction } from "@/app/(app)/patients/[id]/consultations/new/actions";
 import { updateConsultationAction } from "@/app/(app)/patients/[id]/consultations/[consultationId]/actions";
 import type { Consultation } from "@/lib/db/schema";
+import type { PrescriptionItemDraft } from "@/features/prescriptions/components/prescription-form";
 
 export interface ConsultationFormProps {
   patientId?: string;
@@ -22,6 +23,7 @@ export interface ConsultationFormProps {
   initialData?: Partial<ConsultationInput>;
   doctorName?: string;
   encounterType?: "Scheduled" | "Walk-In";
+  prescriptionItems?: PrescriptionItemDraft[];
   onSuccess?: (consultation: Consultation) => void;
   onSubmit?: (data: ConsultationInput) => void;
   isSubmitting?: boolean;
@@ -34,13 +36,12 @@ export function ConsultationForm({
   initialData,
   doctorName,
   encounterType: initialEncounterType = "Scheduled",
+  prescriptionItems,
   onSuccess,
   onSubmit: externalOnSubmit,
   isSubmitting: externalSubmitting,
 }: ConsultationFormProps) {
-  const [encounterType, setEncounterType] = useState<"Scheduled" | "Walk-In">(
-    initialEncounterType
-  );
+  const encounterType = appointmentId ? "Scheduled" : (initialEncounterType || "Walk-In");
   const [serverError, setServerError] = useState<string | null>(null);
 
   const {
@@ -93,6 +94,16 @@ export function ConsultationForm({
       const result = await createConsultationAction(patientId, {
         ...data,
         appointmentId,
+        prescriptionItems:
+          prescriptionItems && prescriptionItems.length > 0
+            ? prescriptionItems.map((item) => ({
+                medication: item.medication,
+                dosage: item.dosage,
+                frequency: item.frequency,
+                duration: item.duration,
+                instructions: item.instructions || undefined,
+              }))
+            : undefined,
       });
       if (!result.success) {
         setServerError(result.error);
@@ -111,55 +122,44 @@ export function ConsultationForm({
       className="space-y-6"
     >
       {serverError && (
-        <div className="flex items-start gap-2 border border-red-600 bg-red-50 p-3 text-xs text-red-900 font-mono">
-          <AlertCircle className="size-4 shrink-0 text-red-600 mt-0.5" />
+        <div
+          role="alert"
+          aria-live="polite"
+          className="flex items-start gap-2 border border-clinical-critical bg-clinical-critical-bg p-3 text-xs text-clinical-critical font-mono"
+        >
+          <AlertCircle className="size-4 shrink-0 text-clinical-critical mt-0.5" />
           <div>
             <strong className="font-bold">Error:</strong> {serverError}
           </div>
         </div>
       )}
 
-      <div className="border border-[#141618] bg-white p-5 sm:p-6 space-y-6 shadow-[2px_2px_0px_#141618]">
+      <div className="border border-primary bg-card p-5 sm:p-6 space-y-6 shadow-[2px_2px_0px_var(--color-primary)]">
         {/* Encounter Metadata */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-b border-[#D8D4CC] pb-4 text-xs font-mono">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-b border-neutral-border pb-4 text-xs font-mono">
           <div>
-            <span className="block text-[10px] uppercase text-[#5A5D61] font-bold mb-1">
+            <span className="block text-[10px] uppercase text-text-muted font-bold mb-1">
               Encounter Type
             </span>
-            <div className="flex items-center border border-[#141618] bg-white h-8">
-              {(["Scheduled", "Walk-In"] as const).map((type) => (
-                <Button
-                  key={type}
-                  type="button"
-                  variant="ghost"
-                  size="xs"
-                  onClick={() => setEncounterType(type)}
-                  className={`flex-1 rounded-none text-xs font-mono uppercase font-bold h-full ${
-                    encounterType === type
-                      ? "bg-[#141618] text-[#FAFAF7] hover:bg-black hover:text-[#FAFAF7]"
-                      : "text-[#5A5D61] hover:bg-[#FAFAF7]"
-                  }`}
-                >
-                  {type}
-                </Button>
-              ))}
+            <div className="h-8 flex items-center px-2 bg-background border border-neutral-border text-xs text-foreground font-mono uppercase font-bold">
+              {encounterType}
             </div>
           </div>
 
           <div>
-            <span className="block text-[10px] uppercase text-[#5A5D61] font-bold mb-1">
+            <span className="block text-[10px] uppercase text-text-muted font-bold mb-1">
               Linked Appointment
             </span>
-            <div className="h-8 flex items-center px-2 bg-[#FAFAF7] border border-[#D8D4CC] text-xs text-[#141618]">
+            <div className="h-8 flex items-center px-2 bg-background border border-neutral-border text-xs text-foreground font-mono">
               {appointmentId ? `ID: ${appointmentId.slice(0, 8)}…` : "Auto-linked (Walk-In)"}
             </div>
           </div>
 
           <div>
-            <span className="block text-[10px] uppercase text-[#5A5D61] font-bold mb-1">
+            <span className="block text-[10px] uppercase text-text-muted font-bold mb-1">
               Clinician
             </span>
-            <div className="h-8 flex items-center px-2 bg-[#FAFAF7] border border-[#D8D4CC] text-xs font-bold text-[#141618]">
+            <div className="h-8 flex items-center px-2 bg-background border border-neutral-border text-xs font-bold text-foreground">
               {doctorName || "Lead Practitioner"}
             </div>
           </div>
@@ -169,18 +169,18 @@ export function ConsultationForm({
         <div className="space-y-1.5">
           <label
             htmlFor="chiefComplaint"
-            className="block text-xs font-bold uppercase tracking-wider text-[#141618]"
+            className="block text-xs font-bold uppercase tracking-wider text-foreground"
           >
-            1. Chief Complaint <span className="text-red-600">*</span>
+            1. Chief Complaint <span className="text-clinical-critical">*</span>
           </label>
           <Input
             id="chiefComplaint"
             {...register("chiefComplaint")}
             placeholder="e.g. 3-day history of right flank pain and dysuria..."
-            className="w-full rounded-none border border-[#141618] bg-[#FAFAF7] p-2 text-xs text-[#141618] focus-visible:ring-1 focus-visible:ring-[#141618]"
+            className="w-full rounded-none border border-primary bg-background p-2 text-xs text-foreground focus-visible:ring-1 focus-visible:ring-primary"
           />
           {errors.chiefComplaint && (
-            <p className="text-[11px] font-mono text-red-600 mt-1">
+            <p className="text-[11px] font-mono text-clinical-critical mt-1">
               {errors.chiefComplaint.message}
             </p>
           )}
@@ -190,7 +190,7 @@ export function ConsultationForm({
         <div className="space-y-1.5">
           <label
             htmlFor="symptoms"
-            className="block text-xs font-bold uppercase tracking-wider text-[#141618]"
+            className="block text-xs font-bold uppercase tracking-wider text-foreground"
           >
             2. Symptoms &amp; History
           </label>
@@ -199,7 +199,7 @@ export function ConsultationForm({
             rows={3}
             {...register("symptoms")}
             placeholder="Onset, character, severity, radiation, timing, exacerbating/relieving factors..."
-            className="w-full rounded-none border border-[#141618] bg-[#FAFAF7] p-2 text-xs text-[#141618] focus-visible:ring-1 focus-visible:ring-[#141618]"
+            className="w-full rounded-none border border-primary bg-background p-2 text-xs text-foreground focus-visible:ring-1 focus-visible:ring-primary"
           />
         </div>
 
@@ -207,7 +207,7 @@ export function ConsultationForm({
         <div className="space-y-1.5">
           <label
             htmlFor="observations"
-            className="block text-xs font-bold uppercase tracking-wider text-[#141618]"
+            className="block text-xs font-bold uppercase tracking-wider text-foreground"
           >
             3. Clinical Observations &amp; Physical Examination
           </label>
@@ -216,7 +216,7 @@ export function ConsultationForm({
             rows={3}
             {...register("observations")}
             placeholder="Vital signs, physical exam observations, general appearance..."
-            className="w-full rounded-none border border-[#141618] bg-[#FAFAF7] p-2 text-xs font-mono text-[#141618] focus-visible:ring-1 focus-visible:ring-[#141618]"
+            className="w-full rounded-none border border-primary bg-background p-2 text-xs font-mono text-foreground focus-visible:ring-1 focus-visible:ring-primary"
           />
         </div>
 
@@ -224,7 +224,7 @@ export function ConsultationForm({
         <div className="space-y-1.5">
           <label
             htmlFor="diagnosis"
-            className="block text-xs font-bold uppercase tracking-wider text-[#141618]"
+            className="block text-xs font-bold uppercase tracking-wider text-foreground"
           >
             4. Primary Clinical Diagnosis / Working Impression
           </label>
@@ -233,7 +233,7 @@ export function ConsultationForm({
             type="text"
             {...register("diagnosis")}
             placeholder="Free text working clinical diagnosis..."
-            className="w-full rounded-none border border-[#141618] bg-[#FAFAF7] p-2 text-xs font-semibold text-[#141618] focus-visible:ring-1 focus-visible:ring-[#141618]"
+            className="w-full rounded-none border border-primary bg-background p-2 text-xs font-semibold text-foreground focus-visible:ring-1 focus-visible:ring-primary"
           />
         </div>
 
@@ -241,7 +241,7 @@ export function ConsultationForm({
         <div className="space-y-1.5">
           <label
             htmlFor="treatment"
-            className="block text-xs font-bold uppercase tracking-wider text-[#141618]"
+            className="block text-xs font-bold uppercase tracking-wider text-foreground"
           >
             5. Treatment Plan &amp; Patient Management
           </label>
@@ -250,7 +250,7 @@ export function ConsultationForm({
             rows={3}
             {...register("treatment")}
             placeholder="Therapies, patient counseling, safety netting, red flag warnings..."
-            className="w-full rounded-none border border-[#141618] bg-[#FAFAF7] p-2 text-xs text-[#141618] focus-visible:ring-1 focus-visible:ring-[#141618]"
+            className="w-full rounded-none border border-primary bg-background p-2 text-xs text-foreground focus-visible:ring-1 focus-visible:ring-primary"
           />
         </div>
 
@@ -258,7 +258,7 @@ export function ConsultationForm({
         <div className="space-y-1.5">
           <label
             htmlFor="notes"
-            className="block text-xs font-bold uppercase tracking-wider text-[#141618]"
+            className="block text-xs font-bold uppercase tracking-wider text-foreground"
           >
             6. Clinical Notes &amp; Follow-up Advice
           </label>
@@ -267,16 +267,16 @@ export function ConsultationForm({
             rows={2}
             {...register("notes")}
             placeholder="Private practice notes, colleague handovers, follow-up timelines..."
-            className="w-full rounded-none border border-[#141618] bg-[#FAFAF7] p-2 text-xs text-[#141618] focus-visible:ring-1 focus-visible:ring-[#141618]"
+            className="w-full rounded-none border border-primary bg-background p-2 text-xs text-foreground focus-visible:ring-1 focus-visible:ring-primary"
           />
         </div>
 
-        <div className="flex justify-end pt-2 border-t border-[#D8D4CC]">
+        <div className="flex justify-end pt-2 border-t border-neutral-border">
           <Button
             type="submit"
             disabled={isSubmitting}
             size="sm"
-            className="rounded-none border border-[#141618] bg-[#141618] px-5 py-2 text-xs font-mono uppercase font-bold text-[#FAFAF7] hover:bg-black flex items-center gap-1.5"
+            className="rounded-none border border-primary bg-primary px-5 py-2 text-xs font-mono uppercase font-bold text-primary-foreground hover:bg-black flex items-center gap-1.5"
           >
             {isSubmitting ? (
               <>

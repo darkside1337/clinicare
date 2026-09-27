@@ -30,23 +30,25 @@ export function ConsultationDetailClient({
   const currentRx: ConsultationPrescription | undefined = prescriptions[0];
 
   return (
-    <div className="min-h-screen bg-[#FAFAF7] text-[#141618] selection:bg-[#141618] selection:text-[#FAFAF7]">
-      {/* Top Clinical Navigation Bar */}
-      <header className="sticky top-0 z-30 flex h-auto min-h-12 w-full flex-wrap items-center justify-between gap-3 border-b border-[#141618] bg-[#FAFAF7] px-4 py-2 sm:px-6 print:hidden">
+    <div className="min-h-full bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
+      {/* Sub-Header Navigation */}
+      <div className="border-b border-primary bg-card px-4 py-3 sm:px-6 flex flex-wrap items-center justify-between gap-3 print:hidden">
         <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-mono tracking-tight">
-          <Link
-            href={`/patients/${consultation.patientId}`}
-            className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[#141618] hover:opacity-75"
-          >
-            <ArrowLeft className="size-3.5" />
-            <span>PATIENT PROFILE</span>
-          </Link>
-          <span className="text-[#D8D4CC]">|</span>
+          <Button asChild variant="ghost" size="xs" className="rounded-none text-xs font-mono uppercase">
+            <Link
+              href={`/patients/${consultation.patientId}`}
+              className="flex items-center gap-1.5"
+            >
+              <ArrowLeft className="size-3.5" />
+              <span>Back to Profile</span>
+            </Link>
+          </Button>
+          <span className="text-neutral-border">|</span>
           <div className="flex items-center gap-2">
-            <span className="text-[#5A5D61] uppercase tracking-wider text-[11px]">
+            <span className="text-text-muted uppercase tracking-wider text-[11px]">
               CONSULTATION:
             </span>
-            <span className="font-semibold text-[#141618]">{consultation.reference}</span>
+            <span className="font-semibold text-foreground">{consultation.reference}</span>
           </div>
         </div>
 
@@ -57,7 +59,7 @@ export function ConsultationDetailClient({
                 asChild
                 variant="outline"
                 size="xs"
-                className="rounded-none border border-[#141618] bg-white px-2.5 py-1 text-xs font-mono uppercase font-bold text-[#141618] hover:bg-[#FAFAF7] flex items-center gap-1.5 h-auto"
+                className="rounded-none border border-primary bg-card px-2.5 py-1 text-xs font-mono uppercase font-bold text-foreground hover:bg-muted flex items-center gap-1.5 h-auto"
               >
                 <a
                   href={`/prescriptions/${currentRx.id}/pdf`}
@@ -78,7 +80,7 @@ export function ConsultationDetailClient({
                   setActiveTab("prescriptions");
                   setTimeout(() => window.print(), 100);
                 }}
-                className="rounded-none border border-[#141618] bg-[#141618] px-3.5 py-1 text-xs font-mono uppercase font-bold text-[#FAFAF7] hover:bg-black flex items-center gap-1.5 h-auto"
+                className="rounded-none border border-primary bg-primary px-3.5 py-1 text-xs font-mono uppercase font-bold text-primary-foreground hover:bg-primary/90 flex items-center gap-1.5 h-auto"
               >
                 <Printer className="size-3.5" />
                 <span>Print Prescription</span>
@@ -86,21 +88,21 @@ export function ConsultationDetailClient({
             </>
           )}
         </div>
-      </header>
+      </div>
 
       {/* Main Review Workspace */}
-      <main className="mx-auto max-w-5xl p-4 sm:p-6 lg:p-8 space-y-6">
+      <div className="mx-auto max-w-5xl p-4 sm:p-6 lg:p-8 space-y-6">
         {/* Document Header & Patient Banner */}
-        <div className="border border-[#141618] bg-white p-5 shadow-[1px_1px_0px_#141618] space-y-4 print:hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#141618] pb-3">
+        <div className="border border-primary bg-card p-5 shadow-[1px_1px_0px_var(--color-primary)] space-y-4 print:hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-primary pb-3">
             <div>
               <div className="flex items-center gap-2">
-                <FileText className="size-4 text-[#141618]" />
-                <h1 className="text-base sm:text-lg font-bold uppercase tracking-wider text-[#141618]">
+                <FileText className="size-4 text-foreground" />
+                <h1 className="text-base sm:text-lg font-bold uppercase tracking-wider text-foreground">
                   Clinical Consultation Record
                 </h1>
               </div>
-              <p className="text-xs font-mono text-[#5A5D61] mt-0.5">
+              <p className="text-xs font-mono text-text-muted mt-0.5">
                 REF: {consultation.reference} • DATE: {consultation.consultationDate} at {consultation.time}
               </p>
             </div>
@@ -112,30 +114,30 @@ export function ConsultationDetailClient({
           </div>
 
           {/* Patient Quick Strip */}
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-[#FAFAF7] border border-[#D8D4CC] p-3 text-xs font-mono">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-background border border-neutral-border p-3 text-xs font-mono">
             <div>
-              <span className="text-[11px] text-[#5A5D61] uppercase block">Patient</span>
+              <span className="text-[11px] text-text-muted uppercase block">Patient</span>
               <Link
                 href={`/patients/${consultation.patientId}`}
-                className="font-bold text-[#141618] hover:underline"
+                className="font-bold text-foreground hover:underline"
               >
                 {consultation.patientName} ({consultation.patientAge}y • DOB: {consultation.patientDob})
               </Link>
             </div>
 
             <div>
-              <span className="text-[11px] text-[#5A5D61] uppercase block">Sex</span>
-              <strong className="text-[#141618]">{consultation.patientSex}</strong>
+              <span className="text-[11px] text-text-muted uppercase block">Sex</span>
+              <strong className="text-foreground">{consultation.patientSex}</strong>
             </div>
 
             <div>
-              <span className="text-[11px] text-[#5A5D61] uppercase block">Attending Clinician</span>
-              <strong className="text-[#141618]">{consultation.doctorName}</strong>
+              <span className="text-[11px] text-text-muted uppercase block">Attending Clinician</span>
+              <strong className="text-foreground">{consultation.doctorName}</strong>
             </div>
           </div>
 
           {/* View Tab Switcher */}
-          <div className="flex items-center border border-[#141618] bg-white p-0.5 text-xs font-mono">
+          <div className="flex items-center border border-primary bg-card p-0.5 text-xs font-mono">
             <Button
               type="button"
               variant={activeTab === "notes" ? "default" : "ghost"}
@@ -143,8 +145,8 @@ export function ConsultationDetailClient({
               onClick={() => setActiveTab("notes")}
               className={`flex-1 rounded-none uppercase font-bold text-xs ${
                 activeTab === "notes"
-                  ? "bg-[#141618] text-[#FAFAF7] hover:bg-black"
-                  : "text-[#5A5D61] hover:text-[#141618] hover:bg-[#FAFAF7]"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "text-text-muted hover:text-foreground hover:bg-muted"
               }`}
             >
               1. Consultation Notes (PRD Core Fields)
@@ -157,8 +159,8 @@ export function ConsultationDetailClient({
               onClick={() => setActiveTab("prescriptions")}
               className={`flex-1 rounded-none uppercase font-bold text-xs flex items-center justify-center gap-1.5 ${
                 activeTab === "prescriptions"
-                  ? "bg-[#141618] text-[#FAFAF7] hover:bg-black"
-                  : "text-[#5A5D61] hover:text-[#141618] hover:bg-[#FAFAF7]"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "text-text-muted hover:text-foreground hover:bg-muted"
               }`}
             >
               <Pill className="size-3.5" />
@@ -171,82 +173,82 @@ export function ConsultationDetailClient({
         {activeTab === "notes" && (
           <div className="space-y-6">
             {/* 1. Chief Complaint */}
-            <section className="border border-[#141618] bg-white p-5 shadow-[1px_1px_0px_#141618] space-y-2">
-              <div className="flex items-center justify-between border-b border-[#D8D4CC] pb-1.5">
-                <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-[#141618]">
+            <section className="border border-primary bg-card p-5 shadow-[1px_1px_0px_var(--color-primary)] space-y-2">
+              <div className="flex items-center justify-between border-b border-neutral-border pb-1.5">
+                <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-foreground">
                   1. Chief Complaint
                 </h2>
-                <span className="text-[11px] font-mono text-[#5A5D61]">PRESENTING ISSUE</span>
+                <span className="text-[11px] font-mono text-text-muted">PRESENTING ISSUE</span>
               </div>
-              <p className="text-sm font-bold text-[#141618] pt-1">
+              <p className="text-sm font-bold text-foreground pt-1">
                 {consultation.chiefComplaint}
               </p>
             </section>
 
             {/* 2. Symptoms */}
-            <section className="border border-[#141618] bg-white p-5 shadow-[1px_1px_0px_#141618] space-y-2">
-              <div className="flex items-center justify-between border-b border-[#D8D4CC] pb-1.5">
-                <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-[#141618]">
+            <section className="border border-primary bg-card p-5 shadow-[1px_1px_0px_var(--color-primary)] space-y-2">
+              <div className="flex items-center justify-between border-b border-neutral-border pb-1.5">
+                <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-foreground">
                   2. Symptoms &amp; History
                 </h2>
-                <span className="text-[11px] font-mono text-[#5A5D61]">PATIENT REPORTED</span>
+                <span className="text-[11px] font-mono text-text-muted">PATIENT REPORTED</span>
               </div>
-              <p className="text-xs text-[#141618] leading-relaxed bg-[#FAFAF7] p-3 border border-[#EFECE6]">
+              <p className="text-xs text-foreground leading-relaxed bg-background p-3 border border-neutral-border">
                 {consultation.symptoms}
               </p>
             </section>
 
             {/* 3. Observations */}
-            <section className="border border-[#141618] bg-white p-5 shadow-[1px_1px_0px_#141618] space-y-2">
-              <div className="flex items-center justify-between border-b border-[#D8D4CC] pb-1.5">
-                <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-[#141618]">
+            <section className="border border-primary bg-card p-5 shadow-[1px_1px_0px_var(--color-primary)] space-y-2">
+              <div className="flex items-center justify-between border-b border-neutral-border pb-1.5">
+                <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-foreground">
                   3. Clinical Observations &amp; Examination
                 </h2>
-                <span className="text-[11px] font-mono text-[#5A5D61]">FREE-TEXT CLINICAL FINDINGS</span>
+                <span className="text-[11px] font-mono text-text-muted">FREE-TEXT CLINICAL FINDINGS</span>
               </div>
-              <div className="text-xs text-[#141618] bg-[#FAFAF7] p-3 border border-[#EFECE6] leading-relaxed font-mono">
+              <div className="text-xs text-foreground bg-background p-3 border border-neutral-border leading-relaxed font-mono">
                 {consultation.observations}
               </div>
             </section>
 
             {/* 4. Diagnosis */}
-            <section className="border border-[#141618] bg-white p-5 shadow-[1px_1px_0px_#141618] space-y-2">
-              <div className="flex items-center justify-between border-b border-[#D8D4CC] pb-1.5">
-                <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-[#141618]">
+            <section className="border border-primary bg-card p-5 shadow-[1px_1px_0px_var(--color-primary)] space-y-2">
+              <div className="flex items-center justify-between border-b border-neutral-border pb-1.5">
+                <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-foreground">
                   4. Diagnosis / Working Assessment
                 </h2>
-                <span className="text-[11px] font-mono text-[#166534] font-bold">VERIFIED</span>
+                <span className="text-[11px] font-mono text-clinical-resolved font-bold">VERIFIED</span>
               </div>
-              <div className="border border-[#166534] bg-[#F0FDF4] p-3">
-                <p className="text-sm font-bold text-[#141618]">
+              <div className="border border-clinical-resolved bg-clinical-resolved-bg p-3">
+                <p className="text-sm font-bold text-foreground">
                   {consultation.diagnosis}
                 </p>
               </div>
             </section>
 
             {/* 5. Treatment */}
-            <section className="border border-[#141618] bg-white p-5 shadow-[1px_1px_0px_#141618] space-y-2">
-              <div className="flex items-center justify-between border-b border-[#D8D4CC] pb-1.5">
-                <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-[#141618]">
+            <section className="border border-primary bg-card p-5 shadow-[1px_1px_0px_var(--color-primary)] space-y-2">
+              <div className="flex items-center justify-between border-b border-neutral-border pb-1.5">
+                <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-foreground">
                   5. Treatment Plan
                 </h2>
-                <span className="text-[11px] font-mono text-[#5A5D61]">THERAPY &amp; MANAGEMENT</span>
+                <span className="text-[11px] font-mono text-text-muted">THERAPY &amp; MANAGEMENT</span>
               </div>
-              <p className="text-xs text-[#141618] leading-relaxed bg-[#FAFAF7] p-3 border border-[#EFECE6]">
+              <p className="text-xs text-foreground leading-relaxed bg-background p-3 border border-neutral-border">
                 {consultation.treatment}
               </p>
             </section>
 
             {/* 6. Notes */}
             {consultation.notes && (
-              <section className="border border-[#141618] bg-white p-5 shadow-[1px_1px_0px_#141618] space-y-2">
-                <div className="flex items-center justify-between border-b border-[#D8D4CC] pb-1.5">
-                  <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-[#141618]">
+              <section className="border border-primary bg-card p-5 shadow-[1px_1px_0px_var(--color-primary)] space-y-2">
+                <div className="flex items-center justify-between border-b border-neutral-border pb-1.5">
+                  <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-foreground">
                     6. Clinical Notes &amp; Follow-up Advice
                   </h2>
-                  <span className="text-[11px] font-mono text-[#5A5D61]">INTERNAL RECORD</span>
+                  <span className="text-[11px] font-mono text-text-muted">INTERNAL RECORD</span>
                 </div>
-                <p className="text-xs text-[#141618] leading-relaxed bg-[#FAFAF7] p-3 border border-[#EFECE6] italic">
+                <p className="text-xs text-foreground leading-relaxed bg-background p-3 border border-neutral-border italic">
                   {consultation.notes}
                 </p>
               </section>
@@ -254,14 +256,14 @@ export function ConsultationDetailClient({
 
             {/* Attached Prescriptions Quick Access */}
             {prescriptions.length > 0 && (
-              <div className="border border-[#141618] bg-[#F0EFEA] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="border border-primary bg-muted p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
-                  <Pill className="size-4 text-[#141618]" />
+                  <Pill className="size-4 text-foreground" />
                   <div>
-                    <span className="text-xs font-bold text-[#141618] block">
+                    <span className="text-xs font-bold text-foreground block">
                       {prescriptions.length} Prescription{prescriptions.length > 1 ? "s" : ""} Attached
                     </span>
-                    <span className="text-[11px] font-mono text-[#5A5D61]">
+                    <span className="text-[11px] font-mono text-text-muted">
                       Click to review prescription pads and export print PDFs
                     </span>
                   </div>
@@ -272,7 +274,7 @@ export function ConsultationDetailClient({
                   variant="outline"
                   size="xs"
                   onClick={() => setActiveTab("prescriptions")}
-                  className="rounded-none border border-[#141618] bg-white text-xs font-mono uppercase font-bold text-[#141618] hover:bg-[#141618] hover:text-[#FAFAF7]"
+                  className="rounded-none border border-primary bg-card text-xs font-mono uppercase font-bold text-foreground hover:bg-primary hover:text-primary-foreground"
                 >
                   View Prescriptions ({prescriptions.length})
                 </Button>
@@ -296,7 +298,7 @@ export function ConsultationDetailClient({
             consultationId={consultation.id}
           />
         )}
-      </main>
+      </div>
     </div>
   );
 }

@@ -191,6 +191,69 @@ describe("features/consultations/mutations.ts", () => {
       expect(result.appointmentId).toBe("apt-walkin-1");
     });
 
+    it("atomically persists attached prescription items when provided", async () => {
+      let selectCount = 0;
+      mockSelect.mockImplementation(() => {
+        selectCount++;
+        const current = selectCount;
+        const chain: any = {
+          from: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          limit: vi.fn().mockImplementation(() => {
+            if (current === 1) return Promise.resolve([{ id: "pat-1" }]);
+            if (current === 2) return Promise.resolve([{ id: "doc-1" }]);
+            if (current === 3) return Promise.resolve([{ id: "apt-1", status: "checked-in" }]);
+            if (current === 4) return Promise.resolve([]);
+            return Promise.resolve([]);
+          }),
+        };
+        return chain;
+      });
+
+      const txInsertSpies: any[] = [];
+      mockTxInsert.mockImplementation(() => {
+        const valuesSpy = vi.fn();
+        txInsertSpies.push(valuesSpy);
+        const chain: any = {
+          values: valuesSpy.mockImplementation(() => chain),
+          returning: vi.fn().mockImplementation(() => {
+            if (txInsertSpies.length === 1) {
+              return Promise.resolve([{ id: "cns-1", patientId: "pat-1" }]);
+            }
+            if (txInsertSpies.length === 2) {
+              return Promise.resolve([{ id: "rx-1", consultationId: "cns-1" }]);
+            }
+            return Promise.resolve([]);
+          }),
+        };
+        return chain;
+      });
+
+      const txUpdateChain: any = {
+        set: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue([]),
+      };
+      mockTxUpdate.mockReturnValue(txUpdateChain);
+
+      const result = await createConsultation("clinic-test", "doc-1", {
+        patientId: "pat-1",
+        appointmentId: "apt-1",
+        chiefComplaint: "Severe migraine",
+        prescriptionItems: [
+          {
+            medication: "Sumatriptan",
+            dosage: "50mg",
+            frequency: "Once daily PRN",
+            duration: "5 days",
+            instructions: "Take with water",
+          },
+        ],
+      });
+
+      expect(result.id).toBe("cns-1");
+      expect(mockTxInsert).toHaveBeenCalledTimes(3);
+    });
+
     it("throws if patient is not found in clinicId", async () => {
       const chain: any = {
         from: vi.fn().mockReturnThis(),

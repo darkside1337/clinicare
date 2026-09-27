@@ -26,26 +26,26 @@ export default async function PatientsPage({
     : await listPatients(session.clinicId, search?.trim() || undefined);
 
   return (
-    <div className="min-h-full bg-[#FAFAF7] text-[#141618] selection:bg-[#141618] selection:text-[#FAFAF7]">
+    <div className="min-h-full bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
       {/* Main Container */}
-      <main className="mx-auto max-w-[1536px] p-4 sm:p-6 lg:p-8 space-y-6">
+      <div className="mx-auto max-w-[1536px] p-4 sm:p-6 lg:p-8 space-y-6">
         {/* Page Heading Strip */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#141618] pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-primary pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <Users className="size-5 text-[#141618]" />
-              <h1 className="text-xl font-bold uppercase tracking-wider text-[#141618]">
+              <Users className="size-5 text-foreground" />
+              <h1 className="text-xl font-bold uppercase tracking-wider text-foreground">
                 Practice Patient Directory
               </h1>
             </div>
-            <p className="text-xs text-[#5A5D61] mt-0.5">
+            <p className="text-xs text-text-muted mt-0.5">
               Clinic register for patient search, medical history review, and
               consultation access.
             </p>
           </div>
 
           <div className="flex items-center gap-2 self-start sm:self-auto">
-            <span className="border border-[#141618] bg-white px-2.5 py-1 text-[11px] font-mono text-[#141618]">
+            <span className="border border-primary bg-card px-2.5 py-1 text-[11px] font-mono text-foreground tabular-nums">
               TOTAL REGISTERED: <strong>{patientsData.length}</strong>
             </span>
           </div>
@@ -53,7 +53,7 @@ export default async function PatientsPage({
 
         {/* Master Clinical Table (client boundary lives in PatientTable) */}
         <PatientTable initialPatients={patientsData} role={session.role} />
-      </main>
+      </div>
     </div>
   );
 }

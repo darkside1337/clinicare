@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { UserPlus, ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { PatientForm } from "@/features/patients/components/patient-form";
 import { getSession } from "@/lib/auth/session";
 
@@ -12,53 +13,36 @@ export const metadata: Metadata = {
 };
 
 export default async function NewPatientPage() {
-  // Authoritative session check, consistent with every other (app) page.
-  // Broad route protection lives in the (app) layout + proxy; this keeps
-  // the page compliant with the Phase 9 multi-tenancy audit.
   await getSession();
 
-  const todayDate = new Date().toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-
   return (
-    <div className="min-h-screen bg-[#FAFAF7] text-[#141618] selection:bg-[#141618] selection:text-[#FAFAF7]">
-      {/* Top Clinical Navigation Bar */}
-      <header className="sticky top-0 z-30 flex h-auto min-h-12 w-full flex-wrap items-center justify-between gap-3 border-b border-[#141618] bg-[#FAFAF7] px-4 py-2 sm:px-6">
-        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-mono tracking-tight">
-          <Link
-            href="/patients"
-            className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[#141618] hover:opacity-75 transition-opacity"
-          >
+    <div className="min-h-full bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
+      {/* Sub-header navigation row */}
+      <div className="border-b border-primary bg-card px-4 py-3 sm:px-6 flex items-center justify-between gap-3">
+        <Button asChild variant="ghost" size="xs" className="rounded-none text-xs font-mono uppercase">
+          <Link href="/patients" className="flex items-center gap-1.5">
             <ArrowLeft className="size-3.5" />
-            <span>PATIENT DIRECTORY</span>
+            <span>Back to Patient Directory</span>
           </Link>
-          <span className="text-[#D8D4CC] hidden sm:inline">|</span>
-          <span className="text-[#5A5D61] uppercase tracking-wider text-[11px]">
-            NEW PATIENT REGISTRATION
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-mono text-[#5A5D61]">DATE: {todayDate}</span>
-        </div>
-      </header>
+        </Button>
+        <Badge variant="outline" className="font-mono text-xs">
+          INTAKE WORKSTATION
+        </Badge>
+      </div>
 
       {/* Main Intake Form Container */}
-      <main className="mx-auto max-w-4xl p-4 sm:p-6 lg:p-8 space-y-6">
+      <div className="mx-auto max-w-4xl p-4 sm:p-6 lg:p-8 space-y-6">
         {/* Form Title */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#141618] pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-primary pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <UserPlus className="size-5 text-[#141618]" />
-              <h1 className="text-xl font-bold uppercase tracking-wider text-[#141618]">
+              <UserPlus className="size-5 text-foreground" />
+              <h1 className="text-xl font-bold uppercase tracking-wider text-foreground">
                 New Patient Registration Form
               </h1>
             </div>
-            <p className="text-xs text-[#5A5D61] mt-0.5">
-              Enter core demographics, contact information, known allergies, and problem list.
+            <p className="text-xs text-text-muted mt-0.5">
+              Enter core demographics and contact information. Allergies and problem lists are managed on the patient record.
             </p>
           </div>
           <Badge variant="outline" className="font-mono text-xs">
@@ -68,7 +52,7 @@ export default async function NewPatientPage() {
 
         {/* Patient Registration Form */}
         <PatientForm />
-      </main>
+      </div>
     </div>
   );
 }

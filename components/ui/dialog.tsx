@@ -15,7 +15,7 @@ function DialogBackdrop({
     <DialogPrimitive.Backdrop
       data-slot="dialog-backdrop"
       className={cn(
-        "fixed inset-0 z-50 bg-[#141618]/50 transition-opacity",
+        "fixed inset-0 z-50 bg-primary/50 transition-opacity",
         className
       )}
       {...props}
@@ -35,7 +35,7 @@ function DialogPopup({
         <DialogPrimitive.Popup
           data-slot="dialog-popup"
           className={cn(
-            "relative max-h-[90vh] w-[94vw] max-w-2xl overflow-y-auto border border-[#141618] bg-[#FAFAF7] p-0 shadow-[2px_2px_0px_#141618] outline-none",
+            "relative max-h-[90vh] w-[94vw] max-w-2xl overflow-y-auto border border-primary bg-background p-0 shadow-[2px_2px_0px_var(--color-primary)] outline-none",
             className
           )}
           {...props}
@@ -54,7 +54,7 @@ function DialogHeader({
   return (
     <div
       className={cn(
-        "flex flex-col space-y-1 text-left border-b border-[#D8D4CC] px-4 py-3 bg-white",
+        "flex flex-col space-y-1 text-left border-b border-neutral-border px-4 py-3 bg-card",
         className
       )}
       {...props}
@@ -69,7 +69,7 @@ function DialogTitle({
   return (
     <DialogPrimitive.Title
       className={cn(
-        "text-xs font-mono font-bold uppercase tracking-wider text-[#141618]",
+        "text-xs font-mono font-bold uppercase tracking-wider text-foreground",
         className
       )}
       {...props}
@@ -83,7 +83,7 @@ function DialogDescription({
 }: React.ComponentProps<typeof DialogPrimitive.Description>) {
   return (
     <DialogPrimitive.Description
-      className={cn("text-[11px] font-mono text-[#5A5D61]", className)}
+      className={cn("text-[11px] font-mono text-text-muted", className)}
       {...props}
     />
   )

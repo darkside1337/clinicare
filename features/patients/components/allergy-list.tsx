@@ -35,6 +35,13 @@ export function AllergyList({
   className,
 }: AllergyListProps) {
   const [allergies, setAllergies] = useState<Allergy[]>(initialAllergies);
+  const [prevInitial, setPrevInitial] = useState<Allergy[]>(initialAllergies);
+
+  // Sync if prop updates (render-time adjustment, avoids setState-in-effect)
+  if (initialAllergies !== prevInitial) {
+    setPrevInitial(initialAllergies);
+    setAllergies(initialAllergies);
+  }
   const [isAddAllergyOpen, setIsAddAllergyOpen] = useState(false);
   const [newSubstance, setNewSubstance] = useState("");
   const [newSeverity, setNewSeverity] = useState<"mild" | "moderate" | "severe">("moderate");
@@ -106,15 +113,15 @@ export function AllergyList({
 
   return (
     <section className={`space-y-2.5 ${className || ""}`}>
-      <div className="flex items-center justify-between border-b border-[#141618] pb-1">
+      <div className="flex items-center justify-between border-b border-primary pb-1">
         <div className="flex items-center gap-1.5">
-          <AlertTriangle className="size-3.5 text-[#B91C1C]" />
-          <h2 className="text-[11px] font-bold uppercase tracking-wider text-[#141618]">
+          <AlertTriangle className="size-3.5 text-clinical-critical" />
+          <h2 className="text-[11px] font-bold uppercase tracking-wider text-foreground">
             Known Allergies &amp; Adverse Reactions
           </h2>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-mono text-[#B91C1C] font-semibold">
+          <span className="text-[11px] font-mono text-clinical-critical font-semibold">
             {allergies.length} RECORDED
           </span>
           {!readOnly && (
@@ -126,7 +133,7 @@ export function AllergyList({
                 setFormError(null);
                 setIsAddAllergyOpen(true);
               }}
-              className="h-5 rounded-none border-[#141618] px-1.5 text-[11px] font-mono uppercase tracking-wider hover:bg-[#141618] hover:text-[#FAFAF7]"
+              className="h-5 rounded-none border border-primary px-1.5 text-[11px] font-mono uppercase tracking-wider hover:bg-primary hover:text-primary-foreground"
             >
               <Plus className="size-2.5 mr-0.5" />
               Log
@@ -136,7 +143,7 @@ export function AllergyList({
       </div>
 
       {allergies.length === 0 ? (
-        <div className="border border-dashed border-[#D8D4CC] p-3 text-center text-xs font-mono text-[#5A5D61]">
+        <div className="border border-dashed border-neutral-border p-3 text-center text-xs font-mono text-text-muted">
           No known allergies recorded
         </div>
       ) : (
@@ -151,32 +158,34 @@ export function AllergyList({
                 key={allergy.id}
                 className={`group relative border p-2.5 transition-colors ${
                   isSevere
-                    ? "border-[#B91C1C] bg-[#FFF5F5]"
+                    ? "border-clinical-critical bg-clinical-critical-bg"
                     : isModerate
-                    ? "border-[#D97706] bg-[#FFFDF5]"
-                    : "border-[#166534] bg-[#F0FDF4]"
+                    ? "border-clinical-warning bg-clinical-warning-bg"
+                    : "border-clinical-resolved bg-clinical-resolved-bg"
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <span
                     className={`font-semibold text-xs tracking-tight ${
                       isSevere
-                        ? "text-[#B91C1C]"
+                        ? "text-clinical-critical"
                         : isModerate
-                        ? "text-[#92400E]"
-                        : "text-[#166534]"
+                        ? "text-clinical-warning"
+                        : "text-clinical-resolved"
                     }`}
                   >
                     {allergy.substance}
                   </span>
                   <div className="flex items-center gap-1.5">
                     <span
+                      role="status"
+                      aria-label={`Allergy severity: ${allergy.severity}`}
                       className={`text-[11px] font-mono uppercase px-2 py-0.5 font-bold tracking-wider ${
                         isSevere
-                          ? "bg-[#B91C1C] text-[#FAFAF7]"
+                          ? "bg-clinical-critical text-primary-foreground"
                           : isModerate
-                          ? "bg-[#D97706] text-[#FAFAF7]"
-                          : "bg-[#166534] text-[#FAFAF7]"
+                          ? "bg-clinical-warning text-primary-foreground"
+                          : "bg-clinical-resolved text-primary-foreground"
                       }`}
                     >
                       {allergy.severity}
@@ -188,24 +197,24 @@ export function AllergyList({
                         size="xs"
                         disabled={isDeleting}
                         onClick={() => handleDeleteAllergy(allergy.id)}
-                        className="size-6 p-0 text-[#5A5D61] hover:text-[#B91C1C] hover:bg-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="size-6 p-0 text-text-muted hover:text-clinical-critical hover:bg-transparent opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         {isDeleting ? (
                           <Loader2 className="size-3 animate-spin" />
                         ) : (
                           <Trash2 className="size-3" />
                         )}
-                        <span className="sr-only">Delete allergy</span>
+                        <span className="sr-only">Delete allergy {allergy.substance}</span>
                       </Button>
                     )}
                   </div>
                 </div>
                 {allergy.reaction && (
-                  <p className="mt-1 text-[11px] leading-tight text-[#141618]">
+                  <p className="mt-1 text-[11px] leading-tight text-foreground">
                     {allergy.reaction}
                   </p>
                 )}
-                <span className="mt-1 block text-[11px] font-mono text-[#5A5D61]">
+                <span className="mt-1 block text-[11px] font-mono text-text-muted">
                   Recorded:{" "}
                   {allergy.createdAt instanceof Date
                     ? allergy.createdAt.toLocaleDateString("en-GB")
@@ -220,46 +229,54 @@ export function AllergyList({
       {/* Modal: Log New Allergy */}
       <Dialog open={isAddAllergyOpen} onOpenChange={setIsAddAllergyOpen}>
         <DialogPopup className="max-w-md">
-          <DialogHeader className="border-b border-[#141618] pb-3">
-            <DialogTitle className="text-sm font-bold uppercase tracking-wider text-[#141618]">
+          <DialogHeader className="border-b border-primary pb-3">
+            <DialogTitle className="text-sm font-bold uppercase tracking-wider text-foreground">
               Record Adverse Reaction / Allergy
             </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleAddAllergy} className="p-4 space-y-4">
             {formError && (
-              <div className="border border-[#B91C1C] bg-[#FFF5F5] p-2 text-xs font-mono text-[#B91C1C]">
+              <div
+                role="alert"
+                aria-live="polite"
+                className="border border-clinical-critical bg-clinical-critical-bg p-2 text-xs font-mono text-clinical-critical"
+              >
                 {formError}
               </div>
             )}
 
             <div>
-              <label className="text-[11px] font-mono uppercase font-bold text-[#5A5D61] block mb-1">
+              <label
+                htmlFor="allergy-substance-input"
+                className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1"
+              >
                 Substance / Medication *
               </label>
               <Input
+                id="allergy-substance-input"
                 type="text"
                 required
                 value={newSubstance}
                 onChange={(e) => setNewSubstance(e.target.value)}
                 placeholder="e.g. Amoxicillin, Latex, Peanuts"
-                className="rounded-none border border-[#141618] bg-[#FAFAF7] text-xs font-mono"
+                className="rounded-none border border-primary bg-background text-xs font-mono"
               />
             </div>
 
             <div>
-              <label className="text-[11px] font-mono uppercase font-bold text-[#5A5D61] block mb-1">
+              <span className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
                 Clinical Severity
-              </label>
-              <div className="flex items-center border border-[#141618] bg-white h-9">
+              </span>
+              <div className="flex items-center border border-primary bg-card h-9">
                 {(["severe", "moderate", "mild"] as const).map((sev) => {
                   const isSelected = newSeverity === sev;
                   const activeClass =
                     sev === "severe"
-                      ? "bg-[#B91C1C] text-[#FFF5F5] hover:bg-[#991B1B]"
+                      ? "bg-clinical-critical text-primary-foreground hover:bg-clinical-critical/90"
                       : sev === "moderate"
-                      ? "bg-[#D97706] text-[#FFFDF5] hover:bg-[#B45309]"
-                      : "bg-[#166534] text-[#F0FDF4] hover:bg-[#15803D]";
+                      ? "bg-clinical-warning text-primary-foreground hover:bg-clinical-warning/90"
+                      : "bg-clinical-resolved text-primary-foreground hover:bg-clinical-resolved/90";
 
                   return (
                     <Button
@@ -269,7 +286,7 @@ export function AllergyList({
                       size="sm"
                       onClick={() => setNewSeverity(sev)}
                       className={`flex-1 rounded-none text-xs font-mono uppercase font-bold h-full ${
-                        isSelected ? activeClass : "text-[#141618] hover:bg-[#FAFAF7]"
+                        isSelected ? activeClass : "text-foreground hover:bg-background"
                       }`}
                     >
                       {sev}
@@ -280,26 +297,30 @@ export function AllergyList({
             </div>
 
             <div>
-              <label className="text-[11px] font-mono uppercase font-bold text-[#5A5D61] block mb-1">
+              <label
+                htmlFor="allergy-reaction-input"
+                className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1"
+              >
                 Reaction Description
               </label>
               <Input
+                id="allergy-reaction-input"
                 type="text"
                 value={newReaction}
                 onChange={(e) => setNewReaction(e.target.value)}
                 placeholder="e.g. Anaphylaxis, facial swelling, rash"
-                className="rounded-none border border-[#141618] bg-[#FAFAF7] text-xs font-mono"
+                className="rounded-none border border-primary bg-background text-xs font-mono"
               />
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#D8D4CC]">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-border">
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 disabled={isSubmitting}
                 onClick={() => setIsAddAllergyOpen(false)}
-                className="rounded-none border border-[#141618] text-xs font-mono uppercase"
+                className="rounded-none border border-primary text-xs font-mono uppercase"
               >
                 Cancel
               </Button>
@@ -307,7 +328,7 @@ export function AllergyList({
                 type="submit"
                 size="sm"
                 disabled={isSubmitting}
-                className="rounded-none border border-[#141618] bg-[#141618] text-xs font-mono uppercase font-bold text-[#FAFAF7] hover:bg-black"
+                className="rounded-none border border-primary bg-primary text-xs font-mono uppercase font-bold text-primary-foreground hover:bg-black"
               >
                 {isSubmitting ? "Saving..." : "Save Allergy"}
               </Button>

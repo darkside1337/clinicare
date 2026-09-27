@@ -21,15 +21,15 @@ export function ConsultationTimeline({
   return (
     <div className="space-y-4">
       {/* Timeline Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#141618] pb-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-primary pb-2">
         <div>
           <div className="flex items-center gap-2">
-            <FileText className="size-4 text-[#141618]" />
-            <h2 className="text-sm font-bold uppercase tracking-wider text-[#141618]">
+            <FileText className="size-4 text-foreground" />
+            <h2 className="text-sm font-bold uppercase tracking-wider text-foreground">
               Consultation History &amp; Clinical Notes ({consultations.length})
             </h2>
           </div>
-          <p className="text-xs text-[#5A5D61] mt-0.5">
+          <p className="text-xs text-text-muted mt-0.5">
             Reverse-chronological consultation encounters. Click any record to expand details.
           </p>
         </div>
@@ -37,7 +37,7 @@ export function ConsultationTimeline({
           asChild
           variant="outline"
           size="sm"
-          className="rounded-none border border-[#141618] bg-white text-xs font-mono uppercase font-bold text-[#141618] hover:bg-[#141618] hover:text-[#FAFAF7]"
+          className="rounded-none border border-primary bg-card text-xs font-mono uppercase font-bold text-foreground hover:bg-primary hover:text-primary-foreground"
         >
           <Link href={`/patients/${patientId}/consultations/new`}>
             <Plus className="size-3 mr-1" />
@@ -47,11 +47,11 @@ export function ConsultationTimeline({
       </div>
 
       {consultations.length === 0 ? (
-        <div className="border border-dashed border-[#D8D4CC] p-10 text-center">
-          <p className="text-sm font-medium text-[#141618]">
+        <div className="border border-dashed border-neutral-border p-10 text-center bg-card">
+          <p className="text-sm font-medium text-foreground">
             No consultations recorded for this patient.
           </p>
-          <p className="text-xs text-[#5A5D61] mt-1">
+          <p className="text-xs text-text-muted mt-1">
             Start a consultation to document clinical encounters.
           </p>
         </div>

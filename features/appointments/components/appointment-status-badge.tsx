@@ -9,27 +9,27 @@ export const STATUS_METADATA: Record<
   "checked-in": {
     label: "Waiting",
     badgeVariant: "amber",
-    bgClass: "bg-[#FFFDF5] border-[#D97706]",
+    bgClass: "bg-clinical-warning-bg border-clinical-warning",
   },
   scheduled: {
     label: "Scheduled",
     badgeVariant: "outline",
-    bgClass: "bg-white border-[#141618]",
+    bgClass: "bg-card border-primary",
   },
   completed: {
     label: "Completed",
     badgeVariant: "green",
-    bgClass: "bg-[#F0FDF4]/50 border-[#166534]",
+    bgClass: "bg-clinical-resolved-bg border-clinical-resolved",
   },
   "no-show": {
     label: "No-Show",
     badgeVariant: "destructive",
-    bgClass: "bg-[#FFF5F5] border-[#B91C1C]",
+    bgClass: "bg-clinical-critical-bg border-clinical-critical",
   },
   cancelled: {
     label: "Cancelled",
     badgeVariant: "muted",
-    bgClass: "bg-[#FAFAF7] border-[#5A5D61]",
+    bgClass: "bg-muted border-neutral-border",
   },
 };
 

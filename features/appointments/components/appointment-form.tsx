@@ -94,7 +94,7 @@ function resolveInitialDoctor(
   doctors: FormDoctor[],
   initialDoctorId?: string,
   initialDoctor?: string,
-): FormDoctor {
+): FormDoctor | undefined {
   if (initialDoctorId) {
     const found = doctors.find((d) => d.id === initialDoctorId);
     if (found) return found;
@@ -105,7 +105,7 @@ function resolveInitialDoctor(
     );
     if (found) return found;
   }
-  return doctors[0] || { id: "doc-default", name: "Default Doctor" };
+  return doctors[0];
 }
 
 function computeScheduledAt(
@@ -140,11 +140,7 @@ function AppointmentFormInner({
     initialDoctorId,
     initialDoctor,
   );
-  const defaultPatient = patients[0] || {
-    id: "pat-default",
-    name: "Default Patient",
-    dob: "01/01/1990",
-  };
+  const defaultPatient = patients[0];
 
   const [selectedTimeSlot, setSelectedTimeSlot] =
     useState<string>(initialTimeSlot);
@@ -160,8 +156,8 @@ function AppointmentFormInner({
       AppointmentFormData
     >,
     defaultValues: {
-      patientId: defaultPatient.id,
-      doctorId: defaultDoctor.id,
+      patientId: defaultPatient?.id ?? "",
+      doctorId: defaultDoctor?.id ?? "",
       scheduledAt: computeScheduledAt(initialTimeSlot, initialDate),
       status: "scheduled",
       isWalkIn: false,
@@ -188,6 +184,14 @@ function AppointmentFormInner({
 
   const handleFormSubmit = async (data: AppointmentFormData) => {
     setServerError(null);
+    if (!data.patientId) {
+      setServerError("Please select a patient before booking.");
+      return;
+    }
+    if (!data.doctorId) {
+      setServerError("Please select a practitioner before booking.");
+      return;
+    }
     try {
       const res = await createAppointmentAction(data);
       if (!res.success) {
@@ -208,9 +212,9 @@ function AppointmentFormInner({
 
   return (
     <>
-      <DialogHeader className="flex-row items-center justify-between border-b border-[#141618] bg-[#FAFAF7] px-4 py-2.5">
+      <DialogHeader className="flex-row items-center justify-between border-b border-primary bg-background px-4 py-2.5">
         <div className="flex items-center gap-2">
-          <CalendarIcon className="size-4 text-[#141618]" />
+          <CalendarIcon className="size-4 text-foreground" />
           <DialogTitle>BOOK CLINIC APPOINTMENT</DialogTitle>
         </div>
         <Button
@@ -218,7 +222,7 @@ function AppointmentFormInner({
           variant="ghost"
           size="xs"
           onClick={onClose}
-          className="size-6 p-0 hover:bg-[#EFECE6] text-[#141618]"
+          className="size-6 p-0 hover:bg-muted text-foreground"
         >
           <X className="size-3.5" />
           <span className="sr-only">Close</span>
@@ -227,10 +231,14 @@ function AppointmentFormInner({
 
       <form
         onSubmit={handleSubmit(handleFormSubmit)}
-        className="p-4 space-y-4 bg-white"
+        className="p-4 space-y-4 bg-card"
       >
         {serverError && (
-          <div className="flex items-start gap-2 border border-[#B91C1C] bg-[#FFF5F5] p-3 text-xs text-[#B91C1C]">
+          <div
+            role="alert"
+            aria-live="polite"
+            className="flex items-start gap-2 border border-clinical-critical bg-clinical-critical-bg p-3 text-xs text-clinical-critical"
+          >
             <AlertCircle className="size-4 shrink-0 mt-0.5" />
             <span>{serverError}</span>
           </div>
@@ -238,48 +246,55 @@ function AppointmentFormInner({
 
         {/* Patient Selection */}
         <div>
-          <label className="text-[11px] font-mono uppercase font-bold text-[#5A5D61] block mb-1">
+          <span id="apt-patient-label" className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
             Select Patient *
-          </label>
-          <div className="border border-[#141618] bg-[#FAFAF7] p-1.5 max-h-36 overflow-y-auto divide-y divide-[#D8D4CC]">
-            {patients.map((p) => {
-              const isSelected = watchedPatientId === p.id;
-              return (
-                <Button
-                  key={p.id}
-                  type="button"
-                  variant="ghost"
-                  onClick={() =>
-                    setValue("patientId", p.id, { shouldValidate: true })
-                  }
-                  className={`w-full justify-between rounded-none p-2 h-auto text-xs font-mono transition-colors text-left ${
-                    isSelected
-                      ? "bg-[#141618] text-[#FAFAF7] hover:bg-black hover:text-[#FAFAF7]"
-                      : "hover:bg-white text-[#141618]"
-                  }`}
-                >
-                  <div className="truncate">
-                    <span className="font-bold">{p.name}</span>
-                    <span className="text-[11px] opacity-75 ml-2">
-                      ({p.id} • {p.dob})
-                    </span>
-                  </div>
-                  {p.hasSevereAllergy && (
-                    <Badge
-                      variant="destructive"
-                      className={`text-[10px] uppercase font-bold shrink-0 ml-2 ${
-                        isSelected ? "bg-white text-[#B91C1C]" : ""
-                      }`}
-                    >
-                      Allergy
-                    </Badge>
-                  )}
-                </Button>
-              );
-            })}
+          </span>
+          <div role="group" aria-labelledby="apt-patient-label" className="border border-primary bg-background p-1.5 max-h-36 overflow-y-auto divide-y divide-neutral-border">
+            {patients.length === 0 ? (
+              <div className="p-3 text-center text-xs font-mono text-text-muted">
+                No patients registered. Please register a patient before booking.
+              </div>
+            ) : (
+              patients.map((p) => {
+                const isSelected = watchedPatientId === p.id;
+                return (
+                  <Button
+                    key={p.id}
+                    type="button"
+                    variant="ghost"
+                    onClick={() =>
+                      setValue("patientId", p.id, { shouldValidate: true })
+                    }
+                    className={`w-full justify-between rounded-none p-2 h-auto text-xs font-mono transition-colors text-left ${
+                      isSelected
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                        : "hover:bg-card text-foreground"
+                    }`}
+                  >
+                    <div className="truncate">
+                      <span className="font-bold">{p.name}</span>
+                      <span className="text-[11px] opacity-75 ml-2">
+                        ({p.id} • {p.dob})
+                      </span>
+                    </div>
+                    {p.hasSevereAllergy && (
+                      <Badge
+                        variant="destructive"
+                        aria-label="Severe allergy recorded"
+                        className={`text-[10px] uppercase font-bold shrink-0 ml-2 ${
+                          isSelected ? "bg-card text-clinical-critical" : ""
+                        }`}
+                      >
+                        Allergy
+                      </Badge>
+                    )}
+                  </Button>
+                );
+              })
+            )}
           </div>
           {errors.patientId && (
-            <p className="text-[11px] font-mono text-[#B91C1C] mt-1">
+            <p role="alert" className="text-[11px] font-mono text-clinical-critical mt-1">
               {errors.patientId.message}
             </p>
           )}
@@ -287,41 +302,47 @@ function AppointmentFormInner({
 
         {/* Clinician Picker */}
         <div>
-          <label className="text-[11px] font-mono uppercase font-bold text-[#5A5D61] block mb-1">
+          <span id="apt-doctor-label" className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
             Practitioner *
-          </label>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-            {doctors.map((doc) => {
-              const isSelected = watchedDoctorId === doc.id;
-              return (
-                <Button
-                  key={doc.id}
-                  type="button"
-                  variant={isSelected ? "default" : "outline"}
-                  size="xs"
-                  onClick={() =>
-                    setValue("doctorId", doc.id, { shouldValidate: true })
-                  }
-                  className={`rounded-none border text-xs font-mono text-left justify-start p-2 h-auto flex flex-col items-start ${
-                    isSelected
-                      ? "border-[#141618] bg-[#141618] text-[#FAFAF7] hover:bg-black"
-                      : "border-[#141618] bg-[#FAFAF7] text-[#141618] hover:bg-white"
-                  }`}
-                >
-                  <span className="font-bold text-[11px]">{doc.name}</span>
-                  {doc.room && (
-                    <span
-                      className={`text-[10px] ${isSelected ? "text-[#D8D4CC]" : "text-[#5A5D61]"}`}
-                    >
-                      {doc.room}
-                    </span>
-                  )}
-                </Button>
-              );
-            })}
+          </span>
+          <div role="group" aria-labelledby="apt-doctor-label" className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {doctors.length === 0 ? (
+              <div className="col-span-1 sm:col-span-3 border border-primary bg-background p-3 text-center text-xs font-mono text-text-muted">
+                No practitioners registered in clinic.
+              </div>
+            ) : (
+              doctors.map((doc) => {
+                const isSelected = watchedDoctorId === doc.id;
+                return (
+                  <Button
+                    key={doc.id}
+                    type="button"
+                    variant={isSelected ? "default" : "outline"}
+                    size="xs"
+                    onClick={() =>
+                      setValue("doctorId", doc.id, { shouldValidate: true })
+                    }
+                    className={`rounded-none border text-xs font-mono text-left justify-start p-2 h-auto flex flex-col items-start ${
+                      isSelected
+                        ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
+                        : "border-primary bg-background text-foreground hover:bg-card"
+                    }`}
+                  >
+                    <span className="font-bold text-[11px]">{doc.name}</span>
+                    {doc.room && (
+                      <span
+                        className={`text-[10px] ${isSelected ? "text-primary-foreground/80" : "text-text-muted"}`}
+                      >
+                        {doc.room}
+                      </span>
+                    )}
+                  </Button>
+                );
+              })
+            )}
           </div>
           {errors.doctorId && (
-            <p className="text-[11px] font-mono text-[#B91C1C] mt-1">
+            <p role="alert" className="text-[11px] font-mono text-clinical-critical mt-1">
               {errors.doctorId.message}
             </p>
           )}
@@ -329,10 +350,10 @@ function AppointmentFormInner({
 
         {/* Time Slot Picker */}
         <div>
-          <label className="text-[11px] font-mono uppercase font-bold text-[#5A5D61] block mb-1">
+          <span id="apt-time-label" className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
             Appointment Time *
-          </label>
-          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-9 gap-1 border border-[#141618] bg-[#FAFAF7] p-2">
+          </span>
+          <div role="group" aria-labelledby="apt-time-label" className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-9 gap-1 border border-primary bg-background p-2">
             {CLINIC_HOURS.map((slot) => {
               const isSelected = selectedTimeSlot === slot;
               return (
@@ -344,8 +365,8 @@ function AppointmentFormInner({
                   onClick={() => handleSelectTimeSlot(slot)}
                   className={`rounded-none border font-mono text-[11px] h-7 ${
                     isSelected
-                      ? "border-[#141618] bg-[#141618] text-[#FAFAF7] hover:bg-black"
-                      : "border-[#D8D4CC] bg-white text-[#141618] hover:border-[#141618]"
+                      ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "border-neutral-border bg-card text-foreground hover:border-primary"
                   }`}
                 >
                   {slot}
@@ -354,7 +375,7 @@ function AppointmentFormInner({
             })}
           </div>
           {errors.scheduledAt && (
-            <p className="text-[11px] font-mono text-[#B91C1C] mt-1">
+            <p role="alert" className="text-[11px] font-mono text-clinical-critical mt-1">
               {errors.scheduledAt.message}
             </p>
           )}
@@ -362,17 +383,18 @@ function AppointmentFormInner({
 
         {/* Visit Reason */}
         <div>
-          <label className="text-[11px] font-mono uppercase font-bold text-[#5A5D61] block mb-1">
+          <label htmlFor="apt-reason" className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
             Presenting Complaint / Reason
           </label>
           <Input
+            id="apt-reason"
             type="text"
             {...register("reason")}
             placeholder="e.g. Follow-up consultation, chest tightness, routine review..."
-            className="rounded-none border border-[#141618] bg-[#FAFAF7] text-xs font-mono"
+            className="rounded-none border border-primary bg-background text-xs font-mono"
           />
           {errors.reason && (
-            <p className="text-[11px] font-mono text-[#B91C1C] mt-1">
+            <p role="alert" className="text-[11px] font-mono text-clinical-critical mt-1">
               {errors.reason.message}
             </p>
           )}
@@ -387,8 +409,8 @@ function AppointmentFormInner({
             onClick={handleToggleWalkIn}
             className={`rounded-none border text-xs font-mono uppercase font-bold ${
               watchedIsWalkIn
-                ? "border-[#141618] bg-[#141618] text-[#FAFAF7]"
-                : "border-[#141618] bg-white text-[#141618]"
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-primary bg-card text-foreground"
             }`}
           >
             {watchedIsWalkIn
@@ -398,21 +420,21 @@ function AppointmentFormInner({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#D8D4CC]">
+        <div className="flex items-center justify-end gap-2 pt-3 border-t border-neutral-border">
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={onClose}
             disabled={isSubmitting}
-            className="rounded-none border border-[#141618] bg-white text-xs font-mono uppercase font-bold text-[#141618] hover:bg-[#FAFAF7]"
+            className="rounded-none border border-primary bg-card text-xs font-mono uppercase font-bold text-foreground hover:bg-muted"
           >
             Cancel
           </Button>
           <Button
             type="submit"
-            disabled={isSubmitting}
-            className="rounded-none border border-[#141618] bg-[#141618] text-xs font-mono uppercase font-bold text-[#FAFAF7] hover:bg-black"
+            disabled={isSubmitting || patients.length === 0 || doctors.length === 0}
+            className="rounded-none border border-primary bg-primary text-xs font-mono uppercase font-bold text-primary-foreground hover:bg-primary/90"
           >
             {isSubmitting ? (
               <>

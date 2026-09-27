@@ -29,27 +29,27 @@ export const DASHBOARD_STATUS_CONFIG: Record<
   "checked-in": {
     label: "Waiting in Clinic",
     badgeVariant: "amber",
-    rowBg: "bg-[#FFFDF5]/40",
+    rowBg: "bg-clinical-warning-bg/40",
   },
   scheduled: {
     label: "Scheduled",
     badgeVariant: "outline",
-    rowBg: "bg-white",
+    rowBg: "bg-card",
   },
   completed: {
     label: "Completed",
     badgeVariant: "green",
-    rowBg: "bg-[#FAFAF7]/50",
+    rowBg: "bg-clinical-resolved-bg/30",
   },
   "no-show": {
     label: "No-Show",
     badgeVariant: "destructive",
-    rowBg: "bg-white",
+    rowBg: "bg-clinical-critical-bg/30",
   },
   cancelled: {
     label: "Cancelled",
     badgeVariant: "muted",
-    rowBg: "bg-[#FAFAF7]/50",
+    rowBg: "bg-muted/40",
   },
 };
 
@@ -167,22 +167,22 @@ export function AppointmentQueue({
   return (
     <div className="space-y-4">
       {/* Section Header with Practitioner Filter */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#141618] pb-3 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-primary pb-3 mb-6">
         <div>
           <div className="flex items-center gap-2">
-            <Calendar className="size-4 text-[#141618]" />
-            <h1 className="text-base font-bold uppercase tracking-wider text-[#141618]">
+            <Calendar className="size-4 text-foreground" />
+            <h1 className="text-base font-bold uppercase tracking-wider text-foreground">
               Today&apos;s Clinic Appointments
             </h1>
           </div>
-          <p className="text-xs text-[#5A5D61] mt-0.5">
+          <p className="text-xs text-text-muted mt-0.5">
             Real-time patient check-in status and daily encounter queue.
           </p>
         </div>
 
         {/* Doctor Clinician Filter Dropdown */}
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-mono text-[#5A5D61] uppercase tracking-wider">
+          <span className="text-[11px] font-mono text-text-muted uppercase tracking-wider">
             Filter Clinician:
           </span>
           <div className="relative">
@@ -191,14 +191,14 @@ export function AppointmentQueue({
               variant="outline"
               size="sm"
               onClick={() => setDoctorMenuOpen(!doctorMenuOpen)}
-              className="rounded-none border-[#141618] bg-white px-3 py-1.5 text-xs font-medium text-[#141618] hover:bg-[#FAFAF7] flex items-center justify-between gap-2 min-w-[170px]"
+              className="rounded-none border border-primary bg-card px-3 py-1.5 text-xs font-medium text-foreground hover:bg-background flex items-center justify-between gap-2 min-w-[170px]"
             >
               <span className="truncate">{selectedDoctor}</span>
-              <ChevronDown className="size-3.5 text-[#141618] shrink-0" />
+              <ChevronDown className="size-3.5 text-foreground shrink-0" />
             </Button>
 
             {doctorMenuOpen && (
-              <div className="absolute right-0 top-full mt-1 z-40 w-56 border border-[#141618] bg-white p-1 shadow-[2px_2px_0px_#141618]">
+              <div className="absolute right-0 top-full mt-1 z-40 w-56 border border-primary bg-card p-1 shadow-[2px_2px_0px_var(--color-primary)]">
                 {doctorOptions.map((doc) => (
                   <Button
                     key={doc}
@@ -211,8 +211,8 @@ export function AppointmentQueue({
                     }}
                     className={`w-full justify-start rounded-none px-2.5 py-1.5 text-xs text-left h-auto font-mono ${
                       selectedDoctor === doc
-                        ? "bg-[#141618] text-[#FAFAF7] hover:bg-black hover:text-[#FAFAF7]"
-                        : "text-[#141618] hover:bg-[#FAFAF7]"
+                        ? "bg-primary text-primary-foreground hover:bg-black hover:text-primary-foreground"
+                        : "text-foreground hover:bg-background"
                     }`}
                   >
                     {doc}
@@ -226,12 +226,12 @@ export function AppointmentQueue({
 
       {/* Appointment Queue Table / List */}
       {filteredAppointments.length === 0 ? (
-        <div className="border border-dashed border-[#D8D4CC] p-12 text-center">
-          <Calendar className="mx-auto size-8 text-[#5A5D61] mb-2" />
-          <p className="text-sm font-semibold text-[#141618]">
+        <div className="border border-dashed border-neutral-border p-12 text-center bg-card">
+          <Calendar className="mx-auto size-8 text-text-muted mb-2" />
+          <p className="text-sm font-semibold text-foreground">
             No appointments scheduled
           </p>
-          <p className="text-xs text-[#5A5D61] mt-1">
+          <p className="text-xs text-text-muted mt-1">
             There are no scheduled visits matching the selected practitioner today.
           </p>
         </div>
@@ -244,13 +244,13 @@ export function AppointmentQueue({
             return (
               <article
                 key={apt.id}
-                className={`border border-[#141618] ${config.rowBg} p-4 shadow-[1px_1px_0px_#141618] transition-all`}
+                className={`border border-primary ${config.rowBg} p-4 shadow-[1px_1px_0px_var(--color-primary)] transition-all`}
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#D8D4CC] pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-border pb-3">
                   {/* Time slot & Patient Identity */}
                   <div className="flex items-start sm:items-center gap-3">
-                    <div className="flex items-center gap-1.5 font-mono text-sm font-bold text-[#141618] bg-white border border-[#141618] px-2 py-0.5 shrink-0">
-                      <Clock className="size-3.5 text-[#5A5D61]" />
+                    <div className="flex items-center gap-1.5 font-mono text-sm font-bold text-foreground bg-card border border-primary px-2 py-0.5 shrink-0">
+                      <Clock className="size-3.5 text-text-muted" />
                       <span>{apt.timeSlot}</span>
                     </div>
 
@@ -258,15 +258,15 @@ export function AppointmentQueue({
                       <div className="flex flex-wrap items-center gap-2">
                         <Link
                           href={`/patients/${apt.patientId}`}
-                          className="text-sm font-bold text-[#141618] hover:underline"
+                          className="text-sm font-bold text-foreground hover:underline"
                         >
                           {apt.patientName}
                         </Link>
-                        <span className="text-xs font-mono text-[#5A5D61]">
+                        <span className="text-xs font-mono text-text-muted">
                           ({apt.patientAge !== null ? `${apt.patientAge}y • ` : ""}DOB: {apt.patientDob})
                         </span>
                         {apt.isWalkIn && (
-                          <Badge className="border-[#141618] bg-[#141618] text-[#FAFAF7]">
+                          <Badge className="border-primary bg-primary text-primary-foreground">
                             Walk-In
                           </Badge>
                         )}
@@ -280,9 +280,9 @@ export function AppointmentQueue({
                           </Badge>
                         )}
                       </div>
-                      <span className="text-xs text-[#5A5D61] mt-0.5 block">
+                      <span className="text-xs text-text-muted mt-0.5 block">
                         Assigned Clinician:{" "}
-                        <strong className="text-[#141618]">
+                        <strong className="text-foreground">
                           {apt.doctorName}
                         </strong>
                       </span>
@@ -296,6 +296,8 @@ export function AppointmentQueue({
                         type="button"
                         variant="outline"
                         size="sm"
+                        aria-haspopup="menu"
+                        aria-expanded={statusMenuOpenId === apt.id}
                         onClick={() =>
                           setStatusMenuOpenId(
                             statusMenuOpenId === apt.id ? null : apt.id
@@ -314,8 +316,8 @@ export function AppointmentQueue({
 
                       {/* Dropdown status menu */}
                       {statusMenuOpenId === apt.id && (
-                        <div className="absolute right-0 top-full mt-1 z-40 w-48 border border-[#141618] bg-white p-1 shadow-[2px_2px_0px_#141618] divide-y divide-[#EFECE6]">
-                          <div className="px-2 py-1 text-[11px] font-mono uppercase text-[#5A5D61]">
+                        <div className="absolute right-0 top-full mt-1 z-40 w-48 border border-primary bg-card p-1 shadow-[2px_2px_0px_var(--color-primary)] divide-y divide-muted">
+                          <div className="px-2 py-1 text-[11px] font-mono uppercase text-text-muted">
                             Update Status:
                           </div>
                           <Button
@@ -325,10 +327,10 @@ export function AppointmentQueue({
                             onClick={() =>
                               handleStatusSelect(apt.id, "checked-in")
                             }
-                            className="w-full text-left justify-between rounded-none px-2 py-1.5 text-xs font-mono uppercase hover:bg-[#FAFAF7] h-auto"
+                            className="w-full text-left justify-between rounded-none px-2 py-1.5 text-xs font-mono uppercase hover:bg-background h-auto"
                           >
                             <span>Checked-in / Waiting</span>
-                            <span className="size-2 rounded-full bg-[#D97706]"></span>
+                            <span className="size-2 rounded-full bg-clinical-warning"></span>
                           </Button>
                           <Button
                             type="button"
@@ -337,10 +339,10 @@ export function AppointmentQueue({
                             onClick={() =>
                               handleStatusSelect(apt.id, "scheduled")
                             }
-                            className="w-full text-left justify-between rounded-none px-2 py-1.5 text-xs font-mono uppercase hover:bg-[#FAFAF7] h-auto"
+                            className="w-full text-left justify-between rounded-none px-2 py-1.5 text-xs font-mono uppercase hover:bg-background h-auto"
                           >
                             <span>Scheduled</span>
-                            <span className="size-2 rounded-full bg-[#D8D4CC]"></span>
+                            <span className="size-2 rounded-full bg-neutral-border"></span>
                           </Button>
                           <Button
                             type="button"
@@ -349,10 +351,10 @@ export function AppointmentQueue({
                             onClick={() =>
                               handleStatusSelect(apt.id, "completed")
                             }
-                            className="w-full text-left justify-between rounded-none px-2 py-1.5 text-xs font-mono uppercase hover:bg-[#FAFAF7] h-auto"
+                            className="w-full text-left justify-between rounded-none px-2 py-1.5 text-xs font-mono uppercase hover:bg-background h-auto"
                           >
                             <span>Completed</span>
-                            <span className="size-2 rounded-full bg-[#166534]"></span>
+                            <span className="size-2 rounded-full bg-clinical-resolved"></span>
                           </Button>
                           <Button
                             type="button"
@@ -361,10 +363,10 @@ export function AppointmentQueue({
                             onClick={() =>
                               handleStatusSelect(apt.id, "no-show")
                             }
-                            className="w-full text-left justify-between rounded-none px-2 py-1.5 text-xs font-mono uppercase hover:bg-[#FAFAF7] h-auto"
+                            className="w-full text-left justify-between rounded-none px-2 py-1.5 text-xs font-mono uppercase hover:bg-background h-auto"
                           >
                             <span>No-Show</span>
-                            <span className="size-2 rounded-full bg-[#B91C1C]"></span>
+                            <span className="size-2 rounded-full bg-clinical-critical"></span>
                           </Button>
                           <Button
                             type="button"
@@ -373,10 +375,10 @@ export function AppointmentQueue({
                             onClick={() =>
                               handleStatusSelect(apt.id, "cancelled")
                             }
-                            className="w-full text-left justify-between rounded-none px-2 py-1.5 text-xs font-mono uppercase hover:bg-[#FAFAF7] h-auto"
+                            className="w-full text-left justify-between rounded-none px-2 py-1.5 text-xs font-mono uppercase hover:bg-background h-auto"
                           >
                             <span>Cancelled</span>
-                            <span className="size-2 rounded-full bg-[#5A5D61]"></span>
+                            <span className="size-2 rounded-full bg-text-muted"></span>
                           </Button>
                         </div>
                       )}
@@ -387,10 +389,10 @@ export function AppointmentQueue({
                 {/* Reason for visit & Action Trigger */}
                 <div className="mt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div className="text-xs">
-                    <span className="font-mono text-[11px] uppercase tracking-wider text-[#5A5D61] mr-1.5">
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-text-muted mr-1.5">
                       Reason:
                     </span>
-                    <span className="text-[#141618] font-medium">
+                    <span className="text-foreground font-medium">
                       {apt.reason}
                     </span>
                   </div>
@@ -400,7 +402,7 @@ export function AppointmentQueue({
                       asChild
                       variant="outline"
                       size="sm"
-                      className="h-auto rounded-none border border-[#141618] bg-white px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-[#141618] hover:bg-[#FAFAF7]"
+                      className="h-auto rounded-none border border-primary bg-card px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-foreground hover:bg-background"
                     >
                       <Link href={`/patients/${apt.patientId}`}>
                         View Profile
@@ -415,8 +417,8 @@ export function AppointmentQueue({
                         onClick={() => handleToggleCheckIn(apt.id, apt.status)}
                         className={`h-auto rounded-none border px-2.5 py-1 text-xs font-semibold uppercase tracking-wider ${
                           isWaiting
-                            ? "border-[#141618] bg-white text-[#141618] hover:bg-[#FAFAF7]"
-                            : "border-[#141618] bg-[#141618] text-[#FAFAF7] hover:bg-black"
+                            ? "border-primary bg-card text-foreground hover:bg-background"
+                            : "border-primary bg-primary text-primary-foreground hover:bg-black"
                         }`}
                       >
                         <CheckCircle2 className="size-3 mr-1" />
@@ -431,8 +433,8 @@ export function AppointmentQueue({
                         size="sm"
                         className={`h-auto rounded-none border px-2.5 py-1 text-xs font-semibold uppercase tracking-wider ${
                           isWaiting
-                            ? "border-[#141618] bg-[#141618] text-[#FAFAF7] hover:bg-black"
-                            : "border-[#141618] bg-white text-[#141618] hover:bg-[#141618] hover:text-[#FAFAF7]"
+                            ? "border-primary bg-primary text-primary-foreground hover:bg-black"
+                            : "border-primary bg-card text-foreground hover:bg-primary hover:text-primary-foreground"
                         }`}
                       >
                         <Link

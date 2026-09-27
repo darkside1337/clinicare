@@ -36,7 +36,7 @@ export default function ErrorBoundary({ error, reset }: ErrorProps) {
 
       {/* Main Card Container */}
       <main className="flex-1 flex items-center justify-center p-4 sm:p-6">
-        <div className="w-full max-w-lg border border-[#B91C1C] bg-white shadow-[2px_2px_0px_#B91C1C]">
+        <div className="w-full max-w-lg border border-destructive bg-card shadow-[2px_2px_0px_var(--color-destructive)]">
           {/* Card Title Banner */}
           <div className="flex items-center justify-between border-b border-[#B91C1C] bg-[#FFF5F5] px-4 py-3">
             <div className="flex items-center gap-2">

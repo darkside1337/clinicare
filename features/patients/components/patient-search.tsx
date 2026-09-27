@@ -48,13 +48,13 @@ export function PatientSearch({
 
   return (
     <div className={`relative flex items-center ${className || ""}`}>
-      <Search className="pointer-events-none absolute left-3 size-3.5 text-[#5A5D61]" />
+      <Search className="pointer-events-none absolute left-3 size-3.5 text-text-muted" />
       <Input
         type="text"
         value={internalValue}
         onChange={(e) => setInternalValue(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-none border border-[#141618] bg-white pl-8 pr-8 py-1.5 text-xs font-mono placeholder:text-[#5A5D61]"
+        className="w-full rounded-none border border-primary bg-card pl-8 pr-8 py-1.5 text-xs font-mono placeholder:text-text-muted"
       />
       {internalValue && (
         <Button
@@ -62,7 +62,7 @@ export function PatientSearch({
           variant="ghost"
           size="xs"
           onClick={handleClear}
-          className="absolute right-1 size-6 p-0 hover:bg-transparent text-[#5A5D61] hover:text-[#141618]"
+          className="absolute right-1 size-6 p-0 hover:bg-transparent text-text-muted hover:text-foreground"
         >
           <X className="size-3" />
           <span className="sr-only">Clear search</span>

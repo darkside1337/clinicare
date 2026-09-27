@@ -103,7 +103,7 @@ export function PatientTable({
   return (
     <div className="space-y-4">
       {/* Filter Tabs and Real-Time Search Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border border-[#141618] bg-[#FAFAF7] p-2.5 shadow-[1px_1px_0px_#141618]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border border-primary bg-background p-2.5 shadow-[1px_1px_0px_var(--color-primary)]">
         {/* Status Tabs */}
         <div className="flex flex-wrap items-center gap-1.5">
           <Button
@@ -113,8 +113,8 @@ export function PatientTable({
             onClick={() => setActiveTab("all")}
             className={`rounded-none px-3 py-1 text-[11px] font-mono uppercase font-bold h-7 ${
               activeTab === "all"
-                ? "bg-[#141618] text-[#FAFAF7] hover:bg-black"
-                : "bg-transparent text-[#5A5D61] hover:text-[#141618] hover:bg-[#FAFAF7]"
+                ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                : "bg-transparent text-text-muted hover:text-foreground hover:bg-muted"
             }`}
           >
             All Records ({stats.all})
@@ -128,8 +128,8 @@ export function PatientTable({
               onClick={() => setActiveTab("allergies")}
               className={`rounded-none px-3 py-1 text-[11px] font-mono uppercase font-bold h-7 ${
                 activeTab === "allergies"
-                  ? "bg-[#B91C1C] text-[#FAFAF7] hover:bg-[#991B1B]"
-                  : "bg-transparent text-[#B91C1C] hover:bg-[#FFF5F5]"
+                  ? "bg-clinical-critical text-primary-foreground hover:bg-clinical-critical/90"
+                  : "bg-transparent text-clinical-critical hover:bg-clinical-critical-bg"
               }`}
             >
               Severe Allergies ({stats.allergies})
@@ -148,11 +148,11 @@ export function PatientTable({
       </div>
 
       {/* Master Clinical Table */}
-      <div className="border border-[#141618] bg-white shadow-[1px_1px_0px_#141618] overflow-hidden">
+      <div className="border border-primary bg-card shadow-[1px_1px_0px_var(--color-primary)] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-left">
             <thead>
-              <tr className="border-b border-[#141618] bg-[#FAFAF7] text-[11px] font-mono uppercase tracking-wider text-[#5A5D61]">
+              <tr className="border-b border-primary bg-background text-[11px] font-mono uppercase tracking-wider text-text-muted">
                 <th className="py-2.5 px-4 font-bold">Patient / Age</th>
                 <th className="py-2.5 px-4 font-bold">Sex / DOB</th>
                 <th className="py-2.5 px-4 font-bold">Contact Info</th>
@@ -163,12 +163,12 @@ export function PatientTable({
                 <th className="py-2.5 px-4 font-bold text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#D8D4CC] text-xs">
+            <tbody className="divide-y divide-neutral-border text-xs">
               {filteredPatients.length === 0 ? (
                 <tr>
-                  <td colSpan={role === "doctor" ? 6 : 5} className="py-12 text-center text-[#5A5D61]">
+                  <td colSpan={role === "doctor" ? 6 : 5} className="py-12 text-center text-text-muted">
                     <div className="max-w-md mx-auto space-y-1">
-                      <p className="font-bold text-[#141618] text-sm">No matching clinical records</p>
+                      <p className="font-bold text-foreground text-sm">No matching clinical records</p>
                       <p className="text-[11px] font-mono">
                         No registered patients match your active search and filter parameters.
                       </p>
@@ -194,32 +194,32 @@ export function PatientTable({
                   return (
                     <tr
                       key={patient.id}
-                      className="hover:bg-[#FAFAF7] transition-colors group"
+                      className="hover:bg-muted/50 transition-colors group"
                     >
                       {/* Name & Age */}
                       <td className="py-3 px-4 font-medium">
                         <Link
                           href={`/patients/${patient.id}`}
-                          className="font-bold text-sm text-[#141618] hover:underline block"
+                          className="font-bold text-sm text-foreground hover:underline block"
                         >
                           {patient.name}
                         </Link>
-                        <span className="text-[11px] font-mono text-[#5A5D61]">
+                        <span className="text-[11px] font-mono text-text-muted tabular-nums">
                           ID: {patient.id.slice(0, 8)} • {displayAge !== null ? `${displayAge}y` : "Age unrecorded"}
                         </span>
                       </td>
 
                       {/* Sex & DOB */}
-                      <td className="py-3 px-4 text-[#5A5D61] font-mono text-[11px]">
+                      <td className="py-3 px-4 text-text-muted font-mono text-[11px] tabular-nums">
                         <div>{patient.sex}</div>
                         <div>DOB: {patient.dob}</div>
                       </td>
 
                       {/* Contact Info */}
-                      <td className="py-3 px-4 text-[#141618] font-mono text-[11px]">
+                      <td className="py-3 px-4 text-foreground font-mono text-[11px] tabular-nums">
                         <div>{patient.phone || "—"}</div>
                         {patient.email && (
-                          <div className="text-[#5A5D61]">{patient.email}</div>
+                          <div className="text-text-muted">{patient.email}</div>
                         )}
                       </td>
 
@@ -229,6 +229,7 @@ export function PatientTable({
                           {hasSevere ? (
                             <Badge
                               variant="destructive"
+                              aria-label={`Severe allergy: ${allergySummary || "Severe Allergy"}`}
                               className="flex items-center gap-1 w-fit font-mono text-[11px]"
                             >
                               <AlertTriangle className="size-3" />
@@ -239,14 +240,14 @@ export function PatientTable({
                               {conditions.map((cond, idx) => (
                                 <span
                                   key={idx}
-                                  className="border border-[#D8D4CC] bg-[#FAFAF7] px-1.5 py-0.5 text-[11px] font-mono text-[#141618]"
+                                  className="border border-neutral-border bg-background px-1.5 py-0.5 text-[11px] font-mono text-foreground"
                                 >
                                   {cond}
                                 </span>
                               ))}
                             </div>
                           ) : (
-                            <span className="text-[11px] font-mono text-[#5A5D61]">
+                            <span className="text-[11px] font-mono text-text-muted">
                               Standard record
                             </span>
                           )}
@@ -254,7 +255,7 @@ export function PatientTable({
                       )}
 
                       {/* Registered Date */}
-                      <td className="py-3 px-4 text-[11px] font-mono text-[#5A5D61]">
+                      <td className="py-3 px-4 text-[11px] font-mono text-text-muted tabular-nums">
                         {"createdAt" in patient && patient.createdAt instanceof Date
                           ? patient.createdAt.toLocaleDateString("en-GB")
                           : "lastSeen" in patient
@@ -269,7 +270,7 @@ export function PatientTable({
                             asChild
                             variant="outline"
                             size="xs"
-                            className="rounded-none border border-[#141618] bg-white px-2 py-1 text-[11px] font-mono uppercase font-bold text-[#141618] hover:bg-[#FAFAF7]"
+                            className="rounded-none border border-primary bg-card px-2 py-1 text-[11px] font-mono uppercase font-bold text-foreground hover:bg-muted"
                           >
                             <Link href={`/patients/${patient.id}`}>
                               Profile
@@ -280,7 +281,7 @@ export function PatientTable({
                               asChild
                               variant="default"
                               size="xs"
-                              className="rounded-none border border-[#141618] bg-[#141618] px-2 py-1 text-[11px] font-mono uppercase font-bold text-[#FAFAF7] hover:bg-black"
+                              className="rounded-none border border-primary bg-primary px-2 py-1 text-[11px] font-mono uppercase font-bold text-primary-foreground hover:bg-primary/90"
                             >
                               <Link href={`/patients/${patient.id}/consultations/new`}>
                                 <Stethoscope className="size-3 mr-0.5" />
@@ -299,7 +300,7 @@ export function PatientTable({
         </div>
 
         {/* Table Footer */}
-        <div className="flex flex-wrap items-center justify-between border-t border-[#141618] bg-[#FAFAF7] px-4 py-2 text-[11px] font-mono text-[#5A5D61]">
+        <div className="flex flex-wrap items-center justify-between border-t border-primary bg-background px-4 py-2 text-[11px] font-mono text-text-muted">
           <span>
             Showing {filteredPatients.length} of {patients.length} registered patient records
           </span>

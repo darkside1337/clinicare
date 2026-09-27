@@ -35,6 +35,13 @@ export function ProblemList({
   className,
 }: ProblemListProps) {
   const [problems, setProblems] = useState<Problem[]>(initialProblems);
+  const [prevInitial, setPrevInitial] = useState<Problem[]>(initialProblems);
+
+  // Sync if prop updates (render-time adjustment, avoids setState-in-effect)
+  if (initialProblems !== prevInitial) {
+    setPrevInitial(initialProblems);
+    setProblems(initialProblems);
+  }
   const [isAddProblemOpen, setIsAddProblemOpen] = useState(false);
   const [newCondition, setNewCondition] = useState("");
   const [newStatus, setNewStatus] = useState<"active" | "resolved">("active");
@@ -119,15 +126,15 @@ export function ProblemList({
 
   return (
     <section className={`space-y-2.5 ${className || ""}`}>
-      <div className="flex items-center justify-between border-b border-[#141618] pb-1">
+      <div className="flex items-center justify-between border-b border-primary pb-1">
         <div className="flex items-center gap-1.5">
-          <Activity className="size-3.5 text-[#141618]" />
-          <h2 className="text-[11px] font-bold uppercase tracking-wider text-[#141618]">
+          <Activity className="size-3.5 text-foreground" />
+          <h2 className="text-[11px] font-bold uppercase tracking-wider text-foreground">
             Problem List &amp; Chronic Conditions
           </h2>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-mono text-[#5A5D61]">
+          <span className="text-[11px] font-mono text-text-muted">
             {problems.filter((p) => p.status === "active").length} ACTIVE
           </span>
           {!readOnly && (
@@ -139,7 +146,7 @@ export function ProblemList({
                 setFormError(null);
                 setIsAddProblemOpen(true);
               }}
-              className="h-5 rounded-none border-[#141618] px-1.5 text-[11px] font-mono uppercase tracking-wider hover:bg-[#141618] hover:text-[#FAFAF7]"
+              className="h-5 rounded-none border border-primary px-1.5 text-[11px] font-mono uppercase tracking-wider hover:bg-primary hover:text-primary-foreground"
             >
               <Plus className="size-2.5 mr-0.5" />
               Add
@@ -149,11 +156,11 @@ export function ProblemList({
       </div>
 
       {problems.length === 0 ? (
-        <div className="border border-dashed border-[#D8D4CC] p-3 text-center text-xs font-mono text-[#5A5D61]">
+        <div className="border border-dashed border-neutral-border p-3 text-center text-xs font-mono text-text-muted">
           No active problems recorded
         </div>
       ) : (
-        <div className="border border-[#141618] divide-y divide-[#D8D4CC] bg-white">
+        <div className="border border-primary divide-y divide-neutral-border bg-card">
           {problems.map((problem) => {
             const isActive = problem.status === "active";
             const isToggling = togglingId === problem.id;
@@ -162,11 +169,11 @@ export function ProblemList({
               <div key={problem.id} className="p-2.5 group">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <span className="text-xs font-medium text-[#141618]">
+                    <span className="text-xs font-medium text-foreground">
                       {problem.condition}
                     </span>
                     {problem.onsetDate && (
-                      <span className="block mt-0.5 text-[11px] font-mono text-[#5A5D61]">
+                      <span className="block mt-0.5 text-[11px] font-mono text-text-muted">
                         Onset: {problem.onsetDate}
                       </span>
                     )}
@@ -177,8 +184,8 @@ export function ProblemList({
                       <span
                         className={`h-5 text-[11px] font-mono uppercase px-2 py-0 border shrink-0 tracking-wider flex items-center ${
                           isActive
-                            ? "border-[#141618] bg-[#141618] text-[#FAFAF7]"
-                            : "border-[#166534] bg-[#F0FDF4] text-[#166534]"
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-clinical-resolved bg-clinical-resolved-bg text-clinical-resolved"
                         }`}
                       >
                         {isActive ? (
@@ -196,10 +203,11 @@ export function ProblemList({
                         disabled={isToggling}
                         onClick={() => handleToggleStatus(problem)}
                         title={isActive ? "Mark resolved" : "Re-activate"}
+                        aria-label={`Status: ${problem.status}. Click to toggle.`}
                         className={`h-5 text-[11px] font-mono uppercase px-2 py-0 border shrink-0 tracking-wider rounded-none ${
                           isActive
-                            ? "border-[#141618] bg-[#141618] text-[#FAFAF7] hover:bg-black"
-                            : "border-[#166534] bg-[#F0FDF4] text-[#166534] hover:bg-[#DCFCE7]"
+                            ? "border-primary bg-primary text-primary-foreground hover:bg-black"
+                            : "border-clinical-resolved bg-clinical-resolved-bg text-clinical-resolved hover:bg-clinical-resolved-bg/80"
                         }`}
                       >
                         {isToggling ? (
@@ -223,39 +231,47 @@ export function ProblemList({
       {/* Modal: Document Chronic Condition */}
       <Dialog open={isAddProblemOpen} onOpenChange={setIsAddProblemOpen}>
         <DialogPopup className="max-w-md">
-          <DialogHeader className="border-b border-[#141618] pb-3">
-            <DialogTitle className="text-sm font-bold uppercase tracking-wider text-[#141618]">
+          <DialogHeader className="border-b border-primary pb-3">
+            <DialogTitle className="text-sm font-bold uppercase tracking-wider text-foreground">
               Document Chronic Condition / Problem
             </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleAddProblem} className="p-4 space-y-4">
             {formError && (
-              <div className="border border-[#B91C1C] bg-[#FFF5F5] p-2 text-xs font-mono text-[#B91C1C]">
+              <div
+                role="alert"
+                aria-live="polite"
+                className="border border-clinical-critical bg-clinical-critical-bg p-2 text-xs font-mono text-clinical-critical"
+              >
                 {formError}
               </div>
             )}
 
             <div>
-              <label className="text-[11px] font-mono uppercase font-bold text-[#5A5D61] block mb-1">
+              <label
+                htmlFor="problem-condition-input"
+                className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1"
+              >
                 Medical Diagnosis / Problem *
               </label>
               <Input
+                id="problem-condition-input"
                 type="text"
                 required
                 value={newCondition}
                 onChange={(e) => setNewCondition(e.target.value)}
                 placeholder="e.g. Essential Hypertension, Asthma"
-                className="rounded-none border border-[#141618] bg-[#FAFAF7] text-xs font-mono"
+                className="rounded-none border border-primary bg-background text-xs font-mono"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-[11px] font-mono uppercase font-bold text-[#5A5D61] block mb-1">
+                <span className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
                   Status
-                </label>
-                <div className="flex border border-[#141618] bg-white h-9">
+                </span>
+                <div className="flex border border-primary bg-card h-9">
                   {(["active", "resolved"] as const).map((st) => (
                     <Button
                       key={st}
@@ -265,8 +281,8 @@ export function ProblemList({
                       onClick={() => setNewStatus(st)}
                       className={`flex-1 rounded-none text-xs font-mono uppercase font-bold h-full ${
                         newStatus === st
-                          ? "bg-[#141618] text-[#FAFAF7]"
-                          : "text-[#141618] hover:bg-[#FAFAF7]"
+                          ? "bg-primary text-primary-foreground"
+                          : "text-foreground hover:bg-background"
                       }`}
                     >
                       {st}
@@ -276,27 +292,31 @@ export function ProblemList({
               </div>
 
               <div>
-                <label className="text-[11px] font-mono uppercase font-bold text-[#5A5D61] block mb-1">
+                <label
+                  htmlFor="problem-onset-input"
+                  className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1"
+                >
                   Onset Year / Date
                 </label>
                 <Input
+                  id="problem-onset-input"
                   type="text"
                   value={newOnsetDate}
                   onChange={(e) => setNewOnsetDate(e.target.value)}
                   placeholder="e.g. 2021 or 05/2021"
-                  className="rounded-none border border-[#141618] bg-[#FAFAF7] text-xs font-mono h-9"
+                  className="rounded-none border border-primary bg-background text-xs font-mono h-9"
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#D8D4CC]">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-border">
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 disabled={isSubmitting}
                 onClick={() => setIsAddProblemOpen(false)}
-                className="rounded-none border border-[#141618] text-xs font-mono uppercase"
+                className="rounded-none border border-primary text-xs font-mono uppercase"
               >
                 Cancel
               </Button>
@@ -304,7 +324,7 @@ export function ProblemList({
                 type="submit"
                 size="sm"
                 disabled={isSubmitting}
-                className="rounded-none border border-[#141618] bg-[#141618] text-xs font-mono uppercase font-bold text-[#FAFAF7] hover:bg-black"
+                className="rounded-none border border-primary bg-primary text-xs font-mono uppercase font-bold text-primary-foreground hover:bg-black"
               >
                 {isSubmitting ? "Saving..." : "Save Problem"}
               </Button>

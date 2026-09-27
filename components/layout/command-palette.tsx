@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Search,
   Stethoscope,
   ArrowRight,
   Loader2,
@@ -18,7 +17,6 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandItem,
-  CommandSeparator,
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -168,16 +166,15 @@ export default function CommandPalette({
       title="PATIENT RECORD SEARCH"
       description="Search clinical patient directory and trigger walk-in consultations"
     >
-      <div className="flex items-center justify-between border-b border-primary bg-background px-4 py-2 text-xs font-mono">
-        <div className="flex items-center gap-2 font-bold uppercase text-foreground">
-          <Search className="size-4" />
+      <div className="flex items-center justify-between border-b border-primary bg-card px-4 py-2.5 text-xs font-mono">
+        <div className="flex items-center gap-2 font-bold uppercase tracking-wider text-foreground">
           <span>Patient Record Search</span>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant={role === "doctor" ? "outline" : "amber"} className="text-[10px] uppercase font-mono">
+          <Badge variant={role === "doctor" ? "outline" : "amber"} className="text-[10px] uppercase font-mono rounded-none">
             Access: {role}
           </Badge>
-          <span className="border border-neutral-border bg-card px-1.5 py-0.5 text-[10px] text-text-muted">
+          <span className="border border-neutral-border bg-background px-1.5 py-0.5 text-[10px] text-text-muted font-mono">
             ESC TO CLOSE
           </span>
         </div>
@@ -193,7 +190,8 @@ export default function CommandPalette({
       {actionError && (
         <div
           role="alert"
-          className="mx-2 mt-2 flex items-start gap-2 border border-clinical-critical bg-clinical-critical-bg p-2.5 text-xs font-mono text-clinical-critical"
+          aria-live="polite"
+          className="mx-3 mt-3 flex items-start gap-2 border border-clinical-critical bg-clinical-critical-bg p-2.5 text-xs font-mono text-clinical-critical"
         >
           <AlertCircle className="mt-0.5 size-4 shrink-0" />
           <span className="flex-1">{actionError}</span>
@@ -202,23 +200,23 @@ export default function CommandPalette({
             variant="ghost"
             size="xs"
             onClick={() => setActionError(null)}
-            className="h-6 shrink-0 px-1.5 text-clinical-critical hover:bg-card hover:text-clinical-critical"
+            className="h-6 shrink-0 px-1.5 text-clinical-critical hover:bg-card hover:text-clinical-critical rounded-none"
           >
             Dismiss
           </Button>
         </div>
       )}
 
-      <CommandList className="max-h-[380px] p-2">
+      <CommandList className="max-h-[380px] p-0">
         {isSearching && (
-          <div className="flex items-center justify-center gap-2 py-6 text-xs font-mono text-text-muted">
+          <div className="flex items-center justify-center gap-2 py-8 text-xs font-mono text-text-muted">
             <Loader2 className="size-4 animate-spin text-foreground" />
             <span>Searching tenant database...</span>
           </div>
         )}
 
         {!isSearching && query.trim() !== "" && patients.length === 0 && (
-          <CommandEmpty className="py-6 text-center text-xs font-mono text-text-muted">
+          <CommandEmpty className="py-8 text-center text-xs font-mono text-text-muted">
             No patient records matched &quot;{query}&quot;.
             <div className="mt-3">
               <Button
@@ -237,8 +235,19 @@ export default function CommandPalette({
         )}
 
         {!isSearching && query.trim() === "" && (
-          <div className="py-8 text-center text-xs font-mono text-text-muted">
-            Enter a search term above to find patients across the practice.
+          <div className="py-8 px-4 text-center space-y-2 font-mono">
+            <div className="text-xs font-bold uppercase tracking-wider text-foreground">
+              Patient Directory Search
+            </div>
+            <p className="text-[11px] text-text-muted max-w-sm mx-auto">
+              Search by patient name, date of birth, phone number, or email address.
+            </p>
+            <div className="flex items-center justify-center gap-2 pt-2 text-[10px] text-text-muted">
+              <span className="border border-neutral-border bg-card px-1.5 py-0.5">NAME</span>
+              <span className="border border-neutral-border bg-card px-1.5 py-0.5">DOB</span>
+              <span className="border border-neutral-border bg-card px-1.5 py-0.5">PHONE</span>
+              <span className="border border-neutral-border bg-card px-1.5 py-0.5">EMAIL</span>
+            </div>
           </div>
         )}
 
@@ -252,22 +261,22 @@ export default function CommandPalette({
                   key={patient.id}
                   value={`${patient.name} ${patient.dob} ${patient.phone ?? ""} ${patient.email ?? ""}`}
                   onSelect={() => handleSelectPatient(patient.id)}
-                  className="flex items-center justify-between border-b border-neutral-border/60 p-2.5 hover:bg-muted cursor-pointer"
+                  className="flex items-center justify-between border-b border-neutral-border/60 px-4 py-3 hover:bg-card/70 cursor-pointer transition-colors"
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="mt-0.5 flex size-6 shrink-0 items-center justify-center border border-primary bg-card font-mono text-[10px] font-bold uppercase text-foreground">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex size-7 shrink-0 items-center justify-center border border-primary bg-card font-mono text-[11px] font-bold uppercase text-foreground">
                       {patient.sex?.charAt(0) || "P"}
                     </div>
-                    <div className="space-y-0.5">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-foreground uppercase">
+                    <div className="space-y-0.5 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-bold text-foreground uppercase tracking-wide text-xs">
                           {patient.name}
                         </span>
                         <Badge
                           variant="outline"
-                          className="font-mono text-[10px] px-1 py-0 h-4 border-neutral-border text-text-muted"
+                          className="font-mono text-[10px] px-1.5 py-0 h-4 rounded-none border-neutral-border text-text-muted"
                         >
-                          <Calendar className="size-2.5 mr-0.5 inline" />
+                          <Calendar className="size-2.5 mr-1 inline" />
                           DOB: {patient.dob}
                         </Badge>
                       </div>
@@ -278,18 +287,18 @@ export default function CommandPalette({
                             {patient.phone}
                           </span>
                         )}
-                        {patient.email && <span>{patient.email}</span>}
+                        {patient.email && <span className="truncate">{patient.email}</span>}
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-2 shrink-0 ml-4">
                     <Button
                       type="button"
                       variant="ghost"
                       size="xs"
                       onClick={(e) => handleSelectPatient(patient.id, e)}
-                      className="rounded-none font-mono text-[11px] text-text-muted hover:text-foreground hover:bg-card h-7 px-2"
+                      className="rounded-none font-mono text-[11px] text-text-muted hover:text-foreground hover:bg-background h-7 px-2.5"
                     >
                       <span>Profile</span>
                       <ArrowRight className="size-3 ml-1" />
@@ -303,16 +312,16 @@ export default function CommandPalette({
                         size="xs"
                         disabled={isConsultingThis || !!activeConsultationPatientId}
                         onClick={(e) => handleStartConsultation(e, patient.id)}
-                        className="rounded-none border border-primary bg-primary font-mono text-[11px] text-primary-foreground hover:bg-black h-7 px-2.5"
+                        className="rounded-none border border-primary bg-primary font-mono text-[11px] text-primary-foreground hover:bg-primary/90 h-7 px-3 shadow-[1px_1px_0px_var(--color-primary)]"
                       >
                         {isConsultingThis ? (
                           <>
-                            <Loader2 className="size-3 animate-spin mr-1" />
+                            <Loader2 className="size-3 animate-spin mr-1.5" />
                             <span>Starting...</span>
                           </>
                         ) : (
                           <>
-                            <Stethoscope className="size-3 mr-1" />
+                            <Stethoscope className="size-3 mr-1.5" />
                             <span>Consult</span>
                           </>
                         )}
@@ -326,9 +335,17 @@ export default function CommandPalette({
         )}
       </CommandList>
 
-      <CommandSeparator className="bg-border" />
-      <div className="flex items-center justify-between bg-background px-4 py-2 text-[10px] font-mono text-text-muted">
-        <span>↑↓ Navigate • ↵ View Profile</span>
+      <div className="flex items-center justify-between border-t border-primary bg-card px-4 py-2 text-[10px] font-mono text-text-muted">
+        <div className="flex items-center gap-3">
+          <span>
+            <span className="border border-neutral-border bg-background px-1 py-0.5 mr-1 font-mono">↑↓</span>
+            Navigate
+          </span>
+          <span>
+            <span className="border border-neutral-border bg-background px-1 py-0.5 mr-1 font-mono">↵</span>
+            View Profile
+          </span>
+        </div>
         <span>Doctor: Start Consult creates Walk-In appointment</span>
       </div>
     </CommandDialog>

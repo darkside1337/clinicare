@@ -5,6 +5,8 @@ import {
   patients,
   appointments,
   user,
+  prescriptions,
+  prescriptionItems,
   type Consultation,
 } from "@/lib/db/schema";
 import type {
@@ -135,6 +137,27 @@ export async function createConsultation(
           eq(appointments.id, resolvedAppointmentId!)
         )
       );
+
+    // Atomically persist attached prescription order if items were provided
+    if (input.prescriptionItems && input.prescriptionItems.length > 0) {
+      const [newPrescription] = await tx
+        .insert(prescriptions)
+        .values({
+          consultationId: created.id,
+        })
+        .returning();
+
+      await tx.insert(prescriptionItems).values(
+        input.prescriptionItems.map((item) => ({
+          prescriptionId: newPrescription.id,
+          medication: item.medication,
+          dosage: item.dosage,
+          frequency: item.frequency,
+          duration: item.duration,
+          instructions: item.instructions || null,
+        }))
+      );
+    }
 
     return created;
   });

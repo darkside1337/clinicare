@@ -2,6 +2,8 @@ import { z } from "zod";
 import { createSelectSchema } from "drizzle-zod";
 import { consultations } from "@/lib/db/schema";
 
+import { prescriptionItemSchema } from "@/features/prescriptions/schema";
+
 /**
  * Base Drizzle-Zod select schema.
  */
@@ -26,10 +28,12 @@ export const consultationSchema = z.object({
 /**
  * Schema for creating a consultation.
  * patientId is required. appointmentId is optional (auto-provisions walk-in if omitted).
+ * Optionally accepts initial prescription items to persist atomically with the encounter.
  */
 export const createConsultationSchema = consultationSchema.extend({
   patientId: z.string().min(1, "Patient ID is required"),
   appointmentId: z.string().optional(),
+  prescriptionItems: z.array(prescriptionItemSchema).optional(),
 });
 
 /**

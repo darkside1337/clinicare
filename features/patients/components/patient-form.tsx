@@ -128,75 +128,81 @@ export function PatientForm({
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
       {serverError && (
-        <div className="border border-[#B91C1C] bg-[#FFF5F5] p-3 text-xs font-mono text-[#B91C1C] flex items-center gap-2">
+        <div
+          role="alert"
+          aria-live="polite"
+          className="border border-clinical-critical bg-clinical-critical-bg p-3 text-xs font-mono text-clinical-critical flex items-center gap-2"
+        >
           <AlertCircle className="size-4 shrink-0" />
           <span>{serverError}</span>
         </div>
       )}
 
       {/* SECTION 1: Patient Demographics */}
-      <section className="border border-[#141618] bg-white p-5 shadow-[1px_1px_0px_#141618] space-y-4">
-        <div className="flex items-center justify-between border-b border-[#D8D4CC] pb-1.5">
-          <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-[#141618] flex items-center gap-1.5">
-            <User className="size-3.5 text-[#141618]" />
+      <section className="border border-primary bg-card p-5 shadow-[1px_1px_0px_var(--color-primary)] space-y-4">
+        <div className="flex items-center justify-between border-b border-neutral-border pb-1.5">
+          <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+            <User className="size-3.5 text-foreground" />
             <span>1. Primary Demographics</span>
           </h2>
-          <span className="text-[11px] font-mono text-[#5A5D61]">
+          <span className="text-[11px] font-mono text-text-muted">
             * MANDATORY FIELDS
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="sm:col-span-2">
-            <label className="text-[11px] font-mono uppercase font-bold text-[#5A5D61] block mb-1">
+            <label htmlFor="patient-name" className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
               Full Patient Name *
             </label>
             <Input
+              id="patient-name"
               type="text"
               {...register("name")}
               placeholder="e.g. Eleanor Vance-Croft"
-              className={`rounded-none border bg-[#FAFAF7] text-xs font-mono ${
-                errors.name ? "border-[#B91C1C]" : "border-[#141618]"
+              className={`rounded-none border bg-background text-xs font-mono ${
+                errors.name ? "border-clinical-critical" : "border-primary"
               }`}
             />
             {errors.name && (
-              <span className="text-[11px] font-mono text-[#B91C1C] mt-1 block">
+              <span role="alert" className="text-[11px] font-mono text-clinical-critical mt-1 block">
                 {errors.name.message}
               </span>
             )}
           </div>
 
           <div>
-            <label className="text-[11px] font-mono uppercase font-bold text-[#5A5D61] block mb-1">
+            <label htmlFor="patient-dob" className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
               Date of Birth (DD/MM/YYYY or YYYY-MM-DD) *
             </label>
             <div className="flex items-center gap-2">
               <Input
+                id="patient-dob"
                 type="text"
                 {...register("dob")}
                 placeholder="14/08/1985"
-                className={`rounded-none border bg-[#FAFAF7] text-xs font-mono ${
-                  errors.dob ? "border-[#B91C1C]" : "border-[#141618]"
+                className={`rounded-none border bg-background text-xs font-mono ${
+                  errors.dob ? "border-clinical-critical" : "border-primary"
                 }`}
               />
               {calculatedAge !== null && (
-                <span className="border border-[#141618] bg-[#FAFAF7] px-2 py-1 text-[11px] font-mono font-bold shrink-0">
+                <span className="border border-primary bg-background px-2 py-1 text-[11px] font-mono font-bold shrink-0">
                   {calculatedAge} YRS
                 </span>
               )}
             </div>
             {errors.dob && (
-              <span className="text-[11px] font-mono text-[#B91C1C] mt-1 block">
+              <span role="alert" className="text-[11px] font-mono text-clinical-critical mt-1 block">
                 {errors.dob.message}
               </span>
             )}
           </div>
 
           <div>
-            <label className="text-[11px] font-mono uppercase font-bold text-[#5A5D61] block mb-1">
+            <label className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
               Biological Sex *
             </label>
-            <div className="flex items-center border border-[#141618] bg-white h-9">
+            <div className="flex items-center border border-primary bg-card h-9">
               {(["Female", "Male", "Other"] as const).map((s) => (
                 <Button
                   key={s}
@@ -206,8 +212,8 @@ export function PatientForm({
                   onClick={() => setValue("sex", s, { shouldValidate: true })}
                   className={`flex-1 rounded-none text-xs font-mono uppercase font-bold h-full ${
                     watchedSex === s
-                      ? "bg-[#141618] text-[#FAFAF7] hover:bg-black hover:text-[#FAFAF7]"
-                      : "text-[#5A5D61] hover:bg-[#FAFAF7]"
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                      : "text-text-muted hover:bg-muted"
                   }`}
                 >
                   {s}
@@ -215,7 +221,7 @@ export function PatientForm({
               ))}
             </div>
             {errors.sex && (
-              <span className="text-[11px] font-mono text-[#B91C1C] mt-1 block">
+              <span role="alert" className="text-[11px] font-mono text-clinical-critical mt-1 block">
                 {errors.sex.message}
               </span>
             )}
@@ -224,62 +230,65 @@ export function PatientForm({
       </section>
 
       {/* SECTION 2: Contact Information */}
-      <section className="border border-[#141618] bg-white p-5 shadow-[1px_1px_0px_#141618] space-y-4">
-        <div className="flex items-center justify-between border-b border-[#D8D4CC] pb-1.5">
-          <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-[#141618] flex items-center gap-1.5">
-            <Home className="size-3.5 text-[#141618]" />
+      <section className="border border-primary bg-card p-5 shadow-[1px_1px_0px_var(--color-primary)] space-y-4">
+        <div className="flex items-center justify-between border-b border-neutral-border pb-1.5">
+          <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+            <Home className="size-3.5 text-foreground" />
             <span>2. Contact &amp; Residential Information</span>
           </h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-[11px] font-mono uppercase font-bold text-[#5A5D61] block mb-1">
+            <label htmlFor="patient-phone" className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
               Primary Telephone Number
             </label>
             <Input
+              id="patient-phone"
               type="tel"
               {...register("phone")}
               placeholder="+44 7700 900000"
-              className={`rounded-none border bg-[#FAFAF7] text-xs font-mono ${
-                errors.phone ? "border-[#B91C1C]" : "border-[#141618]"
+              className={`rounded-none border bg-background text-xs font-mono ${
+                errors.phone ? "border-clinical-critical" : "border-primary"
               }`}
             />
             {errors.phone && (
-              <span className="text-[11px] font-mono text-[#B91C1C] mt-1 block">
+              <span role="alert" className="text-[11px] font-mono text-clinical-critical mt-1 block">
                 {errors.phone.message}
               </span>
             )}
           </div>
 
           <div>
-            <label className="text-[11px] font-mono uppercase font-bold text-[#5A5D61] block mb-1">
+            <label htmlFor="patient-email" className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
               Email Address
             </label>
             <Input
+              id="patient-email"
               type="email"
               {...register("email")}
               placeholder="patient@example.com"
-              className={`rounded-none border bg-[#FAFAF7] text-xs font-mono ${
-                errors.email ? "border-[#B91C1C]" : "border-[#141618]"
+              className={`rounded-none border bg-background text-xs font-mono ${
+                errors.email ? "border-clinical-critical" : "border-primary"
               }`}
             />
             {errors.email && (
-              <span className="text-[11px] font-mono text-[#B91C1C] mt-1 block">
+              <span role="alert" className="text-[11px] font-mono text-clinical-critical mt-1 block">
                 {errors.email.message}
               </span>
             )}
           </div>
 
           <div className="sm:col-span-2">
-            <label className="text-[11px] font-mono uppercase font-bold text-[#5A5D61] block mb-1">
+            <label htmlFor="patient-address" className="text-[11px] font-mono uppercase font-bold text-text-muted block mb-1">
               Residential Address / Postcode
             </label>
             <Input
+              id="patient-address"
               type="text"
               {...register("address")}
               placeholder="e.g. 14 Kensington Gardens, London W8 4PX"
-              className="rounded-none border border-[#141618] bg-[#FAFAF7] text-xs font-mono"
+              className="rounded-none border border-primary bg-background text-xs font-mono"
             />
           </div>
         </div>
@@ -292,14 +301,14 @@ export function PatientForm({
           variant="outline"
           onClick={() => router.back()}
           disabled={isSubmitting}
-          className="w-full sm:w-auto rounded-none border border-[#141618] bg-white px-5 py-2 text-xs font-mono uppercase font-bold text-[#141618] hover:bg-[#FAFAF7]"
+          className="w-full sm:w-auto rounded-none border border-primary bg-card px-5 py-2 text-xs font-mono uppercase font-bold text-foreground hover:bg-muted"
         >
           Cancel
         </Button>
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full sm:w-auto rounded-none border border-[#141618] bg-[#141618] px-6 py-2 text-xs font-mono uppercase font-bold text-[#FAFAF7] hover:bg-black transition-colors"
+          className="w-full sm:w-auto rounded-none border border-primary bg-primary px-6 py-2 text-xs font-mono uppercase font-bold text-primary-foreground hover:bg-primary/90 transition-colors"
         >
           {isSubmitting ? (
             <>
