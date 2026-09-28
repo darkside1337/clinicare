@@ -5,6 +5,8 @@ import { requireDoctor } from "@/lib/auth/require-doctor";
 import { listPatients } from "@/features/patients/queries";
 import { createWalkInAppointment } from "@/features/appointments/mutations";
 
+import type { ActionResult } from "@/lib/actions";
+
 export interface CommandPalettePatientResult {
   id: string;
   name: string;
@@ -14,34 +16,38 @@ export interface CommandPalettePatientResult {
   email: string | null;
 }
 
-export interface ActionResult<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
-
 /**
  * Searches patients by query string scoped strictly to the authenticated user's clinicId.
  */
 export async function searchPatientsAction(
   query: string
-): Promise<CommandPalettePatientResult[]> {
-  const session = await getSession();
-  const cleanQuery = query?.trim() ?? "";
-  if (!cleanQuery) {
-    return [];
+): Promise<ActionResult<CommandPalettePatientResult[]>> {
+  try {
+    const session = await getSession();
+    const cleanQuery = query?.trim() ?? "";
+    if (!cleanQuery) {
+      return { success: true, data: [] };
+    }
+
+    const patientRows = await listPatients(session.clinicId, cleanQuery);
+
+    return {
+      success: true,
+      data: patientRows.map((p) => ({
+        id: p.id,
+        name: p.name,
+        dob: p.dob,
+        sex: p.sex,
+        phone: p.phone,
+        email: p.email,
+      })),
+    };
+  } catch (error: unknown) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to search patients.",
+    };
   }
-
-  const patientRows = await listPatients(session.clinicId, cleanQuery);
-
-  return patientRows.map((p) => ({
-    id: p.id,
-    name: p.name,
-    dob: p.dob,
-    sex: p.sex,
-    phone: p.phone,
-    email: p.email,
-  }));
 }
 
 export interface StartWalkInResult {
@@ -56,12 +62,13 @@ export interface StartWalkInResult {
 export async function startWalkInConsultationAction(
   patientId: string
 ): Promise<ActionResult<StartWalkInResult>> {
-  try {
-    const session = await requireDoctor();
-    if (!patientId) {
-      return { success: false, error: "Patient ID is required." };
-    }
+  const session = await requireDoctor();
 
+  if (!patientId) {
+    return { success: false, error: "Patient ID is required." };
+  }
+
+  try {
     const appointment = await createWalkInAppointment(
       session.clinicId,
       patientId,

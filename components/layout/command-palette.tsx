@@ -110,8 +110,13 @@ export default function CommandPalette({
 
     const timeoutId = setTimeout(async () => {
       try {
-        const results = await searchPatientsAction(cleanQuery);
-        setPatients(results);
+        const res = await searchPatientsAction(cleanQuery);
+        if (res.success) {
+          setPatients(res.data);
+        } else {
+          setPatients([]);
+          setActionError(res.error || "Patient search failed.");
+        }
       } catch (err) {
         console.error("Failed to search patients:", err);
         setPatients([]);
@@ -143,10 +148,10 @@ export default function CommandPalette({
     setActionError(null);
     try {
       const result = await startWalkInConsultationAction(patientId);
-      if (result.success && result.data?.redirectUrl) {
+      if (result.success) {
         setIsOpen(false);
         startTransition(() => {
-          router.push(result.data!.redirectUrl);
+          router.push(result.data.redirectUrl);
         });
       } else {
         setActionError(result.error || "Unable to start walk-in consultation.");

@@ -1,8 +1,6 @@
 import React from "react";
 import { getSession } from "@/lib/auth/session";
-import { db } from "@/lib/db/client";
-import { clinics } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { getClinicById } from "@/features/clinics/queries";
 import { PracticeNav } from "@/components/layout/nav";
 import { AppSidebar } from "@/components/layout/sidebar";
 import CommandPalette from "@/components/layout/command-palette";
@@ -16,11 +14,7 @@ export default async function AppLayout({
 
   let clinicName = "CliniCare Practice";
   try {
-    const [clinic] = await db
-      .select({ name: clinics.name })
-      .from(clinics)
-      .where(eq(clinics.id, session.clinicId))
-      .limit(1);
+    const clinic = await getClinicById(session.clinicId);
     if (clinic?.name) {
       clinicName = clinic.name;
     }

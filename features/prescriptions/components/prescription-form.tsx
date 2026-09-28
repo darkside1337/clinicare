@@ -18,7 +18,7 @@ import {
   prescriptionItemSchema,
   type PrescriptionItemInput,
 } from "../schema";
-import { createPrescriptionAction } from "../actions";
+import { createPrescriptionAction } from "@/app/(app)/patients/[id]/consultations/[consultationId]/actions";
 import type { PrescriptionWithItems } from "../queries";
 
 export interface PrescriptionItemDraft {

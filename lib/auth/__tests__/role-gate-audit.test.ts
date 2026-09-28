@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { ForbiddenError } from "@/lib/auth/require-doctor";
 
 // Mock ONLY session.ts — requireDoctor runs its REAL implementation
 const mockGetSession = vi.fn();
@@ -42,8 +43,10 @@ import {
   updatePatientAction,
 } from "@/app/(app)/patients/[id]/actions";
 import { createConsultationAction } from "@/app/(app)/patients/[id]/consultations/new/actions";
-import { updateConsultationAction } from "@/app/(app)/patients/[id]/consultations/[consultationId]/actions";
-import { createPrescriptionAction } from "@/features/prescriptions/actions";
+import {
+  updateConsultationAction,
+  createPrescriptionAction,
+} from "@/app/(app)/patients/[id]/consultations/[consultationId]/actions";
 import { startWalkInConsultationAction } from "@/app/(app)/actions";
 
 describe("Role-Gate Audit: Server Action Role Enforcement", () => {
@@ -69,99 +72,75 @@ describe("Role-Gate Audit: Server Action Role Enforcement", () => {
     });
 
     it("addAllergyAction rejects receptionists with Forbidden error", async () => {
-      const res = await addAllergyAction("pat-1", {
-        substance: "Penicillin",
-        severity: "severe",
-        reaction: "Anaphylaxis",
-      });
-
-      expect(res.success).toBe(false);
-      if (!res.success) {
-        expect(res.error).toMatch(/Forbidden|Doctor role required/i);
-      }
+      await expect(
+        addAllergyAction("pat-1", {
+          substance: "Penicillin",
+          severity: "severe",
+          reaction: "Anaphylaxis",
+        })
+      ).rejects.toThrow(ForbiddenError);
     });
 
     it("deleteAllergyAction rejects receptionists with Forbidden error", async () => {
-      const res = await deleteAllergyAction("all-1", "pat-1");
-
-      expect(res.success).toBe(false);
-      if (!res.success) {
-        expect(res.error).toMatch(/Forbidden|Doctor role required/i);
-      }
+      await expect(
+        deleteAllergyAction("all-1", "pat-1")
+      ).rejects.toThrow(ForbiddenError);
     });
 
     it("addProblemAction rejects receptionists with Forbidden error", async () => {
-      const res = await addProblemAction("pat-1", {
-        condition: "Hypertension",
-        status: "active",
-      });
-
-      expect(res.success).toBe(false);
-      if (!res.success) {
-        expect(res.error).toMatch(/Forbidden|Doctor role required/i);
-      }
+      await expect(
+        addProblemAction("pat-1", {
+          condition: "Hypertension",
+          status: "active",
+        })
+      ).rejects.toThrow(ForbiddenError);
     });
 
     it("updateProblemAction rejects receptionists with Forbidden error", async () => {
-      const res = await updateProblemAction("prob-1", "pat-1", {
-        status: "resolved",
-      });
-
-      expect(res.success).toBe(false);
-      if (!res.success) {
-        expect(res.error).toMatch(/Forbidden|Doctor role required/i);
-      }
+      await expect(
+        updateProblemAction("prob-1", "pat-1", {
+          status: "resolved",
+        })
+      ).rejects.toThrow(ForbiddenError);
     });
 
     it("createConsultationAction rejects receptionists with Forbidden error", async () => {
-      const res = await createConsultationAction("pat-1", {
-        patientId: "pat-1",
-        chiefComplaint: "Severe migraine",
-      });
-
-      expect(res.success).toBe(false);
-      if (!res.success) {
-        expect(res.error).toMatch(/Forbidden|Doctor role required/i);
-      }
+      await expect(
+        createConsultationAction("pat-1", {
+          patientId: "pat-1",
+          chiefComplaint: "Severe migraine",
+        })
+      ).rejects.toThrow(ForbiddenError);
     });
 
     it("updateConsultationAction rejects receptionists with Forbidden error", async () => {
-      const res = await updateConsultationAction("pat-1", "cons-1", {
-        notes: "Follow up in 2 weeks",
-      });
-
-      expect(res.success).toBe(false);
-      if (!res.success) {
-        expect(res.error).toMatch(/Forbidden|Doctor role required/i);
-      }
+      await expect(
+        updateConsultationAction("pat-1", "cons-1", {
+          notes: "Follow up in 2 weeks",
+        })
+      ).rejects.toThrow(ForbiddenError);
     });
 
     it("createPrescriptionAction rejects receptionists with Forbidden error", async () => {
-      const res = await createPrescriptionAction("pat-1", {
-        consultationId: "cons-1",
-        items: [
-          {
-            medication: "Amoxicillin",
-            dosage: "500mg",
-            frequency: "TDS",
-            duration: "7 days",
-          },
-        ],
-      });
-
-      expect(res.success).toBe(false);
-      if (!res.success) {
-        expect(res.error).toMatch(/Forbidden|Doctor role required/i);
-      }
+      await expect(
+        createPrescriptionAction("pat-1", {
+          consultationId: "cons-1",
+          items: [
+            {
+              medication: "Amoxicillin",
+              dosage: "500mg",
+              frequency: "TDS",
+              duration: "7 days",
+            },
+          ],
+        })
+      ).rejects.toThrow(ForbiddenError);
     });
 
     it("startWalkInConsultationAction rejects receptionists with Forbidden error", async () => {
-      const res = await startWalkInConsultationAction("pat-1");
-
-      expect(res.success).toBe(false);
-      if (!res.success) {
-        expect(res.error).toMatch(/Forbidden|Doctor role required/i);
-      }
+      await expect(
+        startWalkInConsultationAction("pat-1")
+      ).rejects.toThrow(ForbiddenError);
     });
 
     it("updatePatientAction allows receptionists to update administrative demographics", async () => {

@@ -15,21 +15,21 @@ export async function createConsultationAction(
   patientId: string,
   input: unknown
 ): Promise<ActionResult<Consultation>> {
+  const session = await requireDoctor();
+
+  const parsed = createConsultationSchema.safeParse({
+    ...(input as Record<string, unknown>),
+    patientId,
+  });
+
+  if (!parsed.success) {
+    const errorMsg = parsed.error.issues
+      .map((issue) => issue.message)
+      .join(", ");
+    return { success: false, error: errorMsg };
+  }
+
   try {
-    const session = await requireDoctor();
-
-    const parsed = createConsultationSchema.safeParse({
-      ...(input as Record<string, unknown>),
-      patientId,
-    });
-
-    if (!parsed.success) {
-      const errorMsg = parsed.error.issues
-        .map((issue) => issue.message)
-        .join(", ");
-      return { success: false, error: errorMsg };
-    }
-
     const consultation = await createConsultation(
       session.clinicId,
       session.user.id,

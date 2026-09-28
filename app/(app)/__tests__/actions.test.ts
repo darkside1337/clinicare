@@ -43,11 +43,11 @@ describe("App Shell Server Actions (app/(app)/actions.ts)", () => {
       mockGetSession.mockResolvedValueOnce(fakeSession);
 
       const resEmpty = await searchPatientsAction("");
-      expect(resEmpty).toEqual([]);
+      expect(resEmpty).toEqual({ success: true, data: [] });
       expect(mockListPatients).not.toHaveBeenCalled();
 
       const resWhitespace = await searchPatientsAction("   ");
-      expect(resWhitespace).toEqual([]);
+      expect(resWhitespace).toEqual({ success: true, data: [] });
       expect(mockListPatients).not.toHaveBeenCalled();
     });
 
@@ -70,16 +70,19 @@ describe("App Shell Server Actions (app/(app)/actions.ts)", () => {
 
       expect(mockGetSession).toHaveBeenCalledTimes(1);
       expect(mockListPatients).toHaveBeenCalledWith("clinic-test-1", "John");
-      expect(results).toEqual([
-        {
-          id: "pat-1",
-          name: "John Doe",
-          dob: "1980-05-12",
-          sex: "male",
-          phone: "+44 7700 900123",
-          email: "john@example.com",
-        },
-      ]);
+      expect(results).toEqual({
+        success: true,
+        data: [
+          {
+            id: "pat-1",
+            name: "John Doe",
+            dob: "1980-05-12",
+            sex: "male",
+            phone: "+44 7700 900123",
+            email: "john@example.com",
+          },
+        ],
+      });
     });
   });
 
@@ -114,19 +117,17 @@ describe("App Shell Server Actions (app/(app)/actions.ts)", () => {
       });
     });
 
-    it("returns error result when requireDoctor throws ForbiddenError", async () => {
+    it("rethrows ForbiddenError when requireDoctor throws", async () => {
       mockRequireDoctor.mockRejectedValueOnce(
         new Error("Forbidden: Doctor role required.")
       );
 
-      const res = await startWalkInConsultationAction("pat-1");
+      await expect(startWalkInConsultationAction("pat-1")).rejects.toThrow(
+        "Forbidden: Doctor role required."
+      );
 
       expect(mockRequireDoctor).toHaveBeenCalledTimes(1);
       expect(mockCreateWalkInAppointment).not.toHaveBeenCalled();
-      expect(res).toEqual({
-        success: false,
-        error: "Forbidden: Doctor role required.",
-      });
     });
 
     it("returns error result when patientId is missing", async () => {
