@@ -25,7 +25,7 @@ vi.mock("@/lib/auth/auth", () => ({
 }));
 
 // Import after mocks are established
-import { getSession } from "@/lib/auth/session";
+import { getSession, getOptionalSession } from "@/lib/auth/session";
 
 describe("lib/auth/session.ts - getSession", () => {
   beforeEach(() => {
@@ -146,6 +146,72 @@ describe("lib/auth/session.ts - getSession", () => {
 
       await expect(getSession()).rejects.toThrow("NEXT_REDIRECT:/login/not-set-up");
       expect(mockRedirect).toHaveBeenCalledWith("/login/not-set-up");
+    });
+  });
+
+  describe("getOptionalSession", () => {
+    it("returns null when session is absent without redirecting", async () => {
+      mockGetSession.mockResolvedValueOnce(null);
+
+      const session = await getOptionalSession();
+      expect(session).toBeNull();
+      expect(mockRedirect).not.toHaveBeenCalled();
+    });
+
+    it("returns null when session has no clinicId without redirecting", async () => {
+      mockGetSession.mockResolvedValueOnce({
+        user: {
+          id: "u-1",
+          name: "Unassigned",
+          email: "unassigned@test.com",
+          clinicId: null,
+          role: "doctor",
+        },
+      });
+
+      const session = await getOptionalSession();
+      expect(session).toBeNull();
+      expect(mockRedirect).not.toHaveBeenCalled();
+    });
+
+    it("returns null when role is invalid without redirecting", async () => {
+      mockGetSession.mockResolvedValueOnce({
+        user: {
+          id: "u-1",
+          name: "Admin User",
+          email: "admin@test.com",
+          clinicId: "clinic-1",
+          role: "admin",
+        },
+      });
+
+      const session = await getOptionalSession();
+      expect(session).toBeNull();
+      expect(mockRedirect).not.toHaveBeenCalled();
+    });
+
+    it("returns SessionContext when valid doctor session is present", async () => {
+      mockGetSession.mockResolvedValueOnce({
+        user: {
+          id: "doc-1",
+          name: "Dr. Gregory House",
+          email: "house@clinic.dev",
+          clinicId: "clinic-test",
+          role: "doctor",
+        },
+      });
+
+      const session = await getOptionalSession();
+      expect(mockRedirect).not.toHaveBeenCalled();
+      expect(session).toEqual({
+        user: {
+          id: "doc-1",
+          name: "Dr. Gregory House",
+          email: "house@clinic.dev",
+        },
+        clinicId: "clinic-test",
+        role: "doctor",
+      });
     });
   });
 });

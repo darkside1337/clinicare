@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { headers } from "next/headers";
 import {
   ArrowRight,
   UserCheck,
@@ -15,7 +14,7 @@ import {
   LogIn,
   KeyRound,
 } from "lucide-react";
-import { auth } from "@/lib/auth/auth";
+import { getOptionalSession } from "@/lib/auth/session";
 import {
   loginAsDoctorAction,
   loginAsReceptionistAction,
@@ -33,33 +32,15 @@ import {
 } from "@/components/ui/card";
 
 export default async function Home() {
-  const reqHeaders = await headers();
-  let activeSession: {
-    name: string;
-    email: string;
-    role: string;
-    clinicId?: string | null;
-  } | null = null;
-
-  try {
-    const session = await auth.api.getSession({
-      headers: reqHeaders,
-    });
-    if (session?.user) {
-      const user = session.user as typeof session.user & {
-        role?: string | null;
-        clinicId?: string | null;
-      };
-      activeSession = {
-        name: user.name,
-        email: user.email,
-        role: user.role || "doctor",
-        clinicId: user.clinicId,
-      };
-    }
-  } catch {
-    activeSession = null;
-  }
+  const session = await getOptionalSession();
+  const activeSession = session
+    ? {
+        name: session.user.name,
+        email: session.user.email,
+        role: session.role,
+        clinicId: session.clinicId,
+      }
+    : null;
 
   return (
     <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-primary)] selection:bg-[var(--color-primary)] selection:text-[var(--color-background)]">
