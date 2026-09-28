@@ -23,11 +23,13 @@ export const auth = betterAuth({
       clinicId: {
         type: "string",
         required: false,
+        input: false,
       },
       role: {
         type: "string",
         required: false,
-        defaultValue: "doctor",
+        input: false,
+        defaultValue: "receptionist",
       },
     },
   },
