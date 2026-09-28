@@ -209,14 +209,19 @@ Relationships: patients, appointments, consultations, and prescriptions are all 
 ## 10. Routes
 
 ```
-/login
-/dashboard
-/patients
-/patients/[id]
-/patients/[id]/consultations/new
-/patients/[id]/consultations/[id]
-/appointments
-/api/auth/[...all]
+/                                             -- Public landing page & sandbox demo persona hub
+/login                                        -- Staff OAuth sign-in
+/login/not-set-up                             -- Holding page for accounts without clinic assignment
+/dashboard                                    -- Practice dashboard & agenda
+/patients                                     -- Patient directory
+/patients/new                                 -- Register new patient
+/patients/[id]                                -- Patient profile & clinical timeline
+/patients/[id]/consultations/new              -- Dedicated consultation recording form
+/patients/[id]/consultations/[consultationId] -- Consultation encounter review & prescription ordering
+/appointments                                 -- Clinic calendar & day view
+/prescriptions/[id]/pdf                       -- Prescription PDF generation & export
+/settings                                     -- Practice settings & logo upload
+/api/auth/[...all]                            -- Better Auth API endpoints
 ```
 
 ## 11. Tech Stack

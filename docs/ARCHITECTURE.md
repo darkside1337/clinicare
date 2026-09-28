@@ -26,6 +26,11 @@ export async function getSession(): Promise<{
   // reads the Better Auth session, throws/redirects to /login if absent,
   // throws if the account has no clinic/role assignment yet (see PRD 8.1)
 }
+
+// For public routes (e.g. landing page /), a non-redirecting counterpart resolves session if present:
+export async function getOptionalSession(): Promise<SessionContext | null> {
+  // returns SessionContext if valid session and clinic assigned, else null
+}
 ```
 
 - Called at the top of **every** Server Component that renders protected data and **every** Server Action.
@@ -48,32 +53,48 @@ Feature-based. Each domain owns its own components, queries, mutations, and vali
 
 ```
 app/
+  page.tsx                        -- Landing page & interactive sandbox persona switcher
+  actions/
+    sandbox-auth.ts               -- Non-production persona quick-login actions
   api/
-      auth/
-        [...all]/
-          route.ts                -- Better Auth API route handler
-    (auth)/
-      login/
-        page.tsx
-    (app)/
-      dashboard/
-        page.tsx
-      patients/
-        page.tsx
-        actions.ts                -- server actions for this route
-        [id]/
-          page.tsx
-          actions.ts
-          consultations/
-            new/
-              page.tsx
-              actions.ts
-            [id]/
-              page.tsx
-              actions.ts
-      appointments/
+    auth/
+      [...all]/
+        route.ts                  -- Better Auth API route handler
+  (auth)/
+    login/
+      page.tsx
+      not-set-up/
+        page.tsx                  -- Holding page for unassigned accounts
+  (app)/
+    layout.tsx                    -- App shell with sidebar, navigation, command palette
+    actions.ts                    -- Global actions (patient search, walk-in consultation)
+    dashboard/
+      page.tsx
+    patients/
+      page.tsx
+      actions.ts                  -- server actions for this route
+      new/
+        page.tsx                  -- new patient registration
+      [id]/
         page.tsx
         actions.ts
+        consultations/
+          new/
+            page.tsx
+            actions.ts
+          [consultationId]/
+            page.tsx
+            actions.ts            -- update notes, create itemized prescription
+    appointments/
+      page.tsx
+      actions.ts
+    prescriptions/
+      [id]/
+        pdf/
+          route.ts                -- prescription PDF binary download handler
+    settings/
+      page.tsx                    -- practice identity, branding & assets
+      actions.ts                  -- upload clinic logo action
   features/
     patients/
       queries.ts                  -- getPatient, listPatients, getPatientSummary
@@ -101,11 +122,16 @@ app/
       components/
       pdf/
         prescription-document.tsx  -- @react-pdf/renderer template
+    clinics/
+      queries.ts                  -- getClinicById
+      mutations.ts                -- updateClinicLogo
+      schema.ts                   -- clinicLogoSchema
+      components/
   lib/
     auth/
       auth.ts                     -- Better Auth server config (drizzleAdapter + additionalFields)
       client.ts                   -- Better Auth browser client
-      session.ts                  -- getSession helper (authoritative session/role resolution)
+      session.ts                  -- getSession, getOptionalSession helpers
       require-doctor.ts           -- requireDoctor helper
     db/
       auth-schema.ts              -- Better Auth generated schema (user, session, account, verification)
@@ -216,6 +242,6 @@ Prescription PDFs are built with `@react-pdf/renderer` components living in `fea
 ## 12. What This Architecture Deliberately Avoids
 
 - No client-side data-fetching/caching library (TanStack Query, SWR) — Server Components + Server Actions + `revalidatePath`/`router.refresh()` cover MVP needs.
-- No API route layer for internal data access — Server Actions are the only mutation path; Server Components query directly.
+- No API route layer for internal data access — Server Actions are the only mutation path; Server Components query directly. Route Handlers are reserved exclusively for auth protocol endpoints (`/api/auth/[...all]`) and streaming binary documents (`/prescriptions/[id]/pdf`).
 - No Row Level Security — a second enforcement layer is deferred until there's a concrete reason to add one (e.g. exposing a public API later).
 - No global state management library — session/clinic context is resolved per-request via `getSession()`, not held in client state.
