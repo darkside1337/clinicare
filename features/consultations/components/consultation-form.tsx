@@ -15,7 +15,7 @@ import {
 import { createConsultationAction } from "@/app/(app)/patients/[id]/consultations/new/actions";
 import { updateConsultationAction } from "@/app/(app)/patients/[id]/consultations/[consultationId]/actions";
 import type { Consultation } from "@/lib/db/schema";
-import type { PrescriptionItemDraft } from "@/features/prescriptions/components/prescription-form";
+import type { PrescriptionItemDraft } from "@/features/prescriptions/types";
 
 export interface ConsultationFormProps {
   patientId?: string;

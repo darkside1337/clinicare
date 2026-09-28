@@ -6,10 +6,8 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ConsultationForm } from "@/features/consultations/components/consultation-form";
-import {
-  PrescriptionForm,
-  type PrescriptionItemDraft,
-} from "@/features/prescriptions/components/prescription-form";
+import { PrescriptionForm } from "@/features/prescriptions/components/prescription-form";
+import type { PrescriptionItemDraft } from "@/features/prescriptions/types";
 import type { Patient, Consultation } from "@/lib/db/schema";
 
 interface ConsultationNewClientProps {

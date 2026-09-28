@@ -21,14 +21,7 @@ import {
 import { createPrescriptionAction } from "@/app/(app)/patients/[id]/consultations/[consultationId]/actions";
 import type { PrescriptionWithItems } from "../queries";
 
-export interface PrescriptionItemDraft {
-  id: string;
-  medication: string;
-  dosage: string;
-  frequency: string;
-  duration: string;
-  instructions: string;
-}
+import type { PrescriptionItemDraft } from "../types";
 
 interface PrescriptionFormProps {
   items?: PrescriptionItemDraft[];
