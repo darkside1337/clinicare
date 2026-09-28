@@ -67,6 +67,15 @@ Built on Next.js 16 (App Router), React 19, Tailwind CSS v4, Shadcn UI primitive
 
 ---
 
+## Demo
+
+The public demo deployment serves fictional seed data that resets periodically. Do not enter real patient information.
+
+- `DEMO_MODE=true` must only ever be set on a deployment whose database contains nothing but seed data.
+- `pnpm db:reset-demo` truncates all app tables and re-seeds. It refuses to run unless `DEMO_MODE` is exactly `"true"` and `--confirm=<project-ref>` (printed from the target connection string, credentials never shown) is passed.
+
+---
+
 ## Scripts & Development
 
 | Command | Description |
@@ -78,6 +87,7 @@ Built on Next.js 16 (App Router), React 19, Tailwind CSS v4, Shadcn UI primitive
 | `pnpm db:generate` | Generates SQL migrations from Drizzle schema |
 | `pnpm db:migrate` | Applies migrations to target Postgres database |
 | `pnpm db:seed` | Populates database with sample clinic, staff personas, and patients |
+| `pnpm db:reset-demo` | Truncates app tables and re-seeds (demo databases only, guarded) |
 
 ---
 
