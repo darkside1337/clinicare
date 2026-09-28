@@ -12,7 +12,13 @@ import {
   loginAsReceptionistAction,
 } from "@/app/actions/sandbox-auth";
 
-export default function LoginView() {
+export default function LoginView({
+  demoEnabled,
+  showDemoBanner,
+}: {
+  demoEnabled: boolean;
+  showDemoBanner: boolean;
+}) {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
@@ -110,9 +116,15 @@ export default function LoginView() {
             </Button>
           </div>
 
-          {/* Sandbox Test Personas Quick Access (dev-only; never rendered in production) */}
-          {process.env.NODE_ENV !== "production" && (
+          {/* Sandbox Test Personas Quick Access (demo mode only) */}
+          {demoEnabled && (
           <div className="border border-[#141618] bg-[#FAFAF7] p-3.5 space-y-2">
+            {showDemoBanner && (
+              <p className="border border-[#141618] bg-[#141618] p-2 text-[11px] font-mono font-bold uppercase tracking-wider text-[#FAFAF7]">
+                Demo environment. Data is fictional and resets periodically. Do
+                not enter real patient information.
+              </p>
+            )}
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-mono uppercase tracking-widest font-bold text-[#141618]">
                 Sandbox Quick Access

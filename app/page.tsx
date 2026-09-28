@@ -15,6 +15,7 @@ import {
   KeyRound,
 } from "lucide-react";
 import { getOptionalSession } from "@/lib/auth/session";
+import { isDemoLoginEnabled } from "@/lib/auth/demo-mode";
 import {
   loginAsDoctorAction,
   loginAsReceptionistAction,
@@ -155,8 +156,8 @@ export default async function Home() {
           </Card>
         )}
 
-        {/* Section 1: Interactive Sandbox Workstations (dev-only; never rendered in production) */}
-        {process.env.NODE_ENV !== "production" && (
+        {/* Section 1: Interactive Sandbox Workstations (demo mode only) */}
+        {isDemoLoginEnabled() && (
           <div className="space-y-4">
             <div className="flex items-center justify-between border-b border-[var(--color-neutral-border)] pb-2">
               <div>
