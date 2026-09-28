@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { getOptionalSession } from "@/lib/auth/session";
 import { isDemoLoginEnabled } from "@/lib/auth/demo-mode";
+import CliniCareLogo from "@/components/brand/clinicare-logo";
 import {
   loginAsDoctorAction,
   loginAsReceptionistAction,
@@ -48,9 +49,7 @@ export default async function Home() {
       {/* Clinic System Topbar */}
       <header className="border-b border-[var(--color-primary)] px-4 py-3 md:px-6 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-3">
-          <span className="font-mono text-xs uppercase font-bold tracking-widest text-[var(--color-primary)]">
-            CLINICARE
-          </span>
+          <CliniCareLogo size={18} />
           <span className="text-[var(--color-neutral-border)]">/</span>
           <span className="text-xs font-mono text-[var(--color-text-muted)]">
             PRACTICE MANAGEMENT

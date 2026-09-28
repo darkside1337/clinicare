@@ -11,6 +11,7 @@ import {
   loginAsDoctorAction,
   loginAsReceptionistAction,
 } from "@/app/actions/sandbox-auth";
+import CliniCareLogo from "@/components/brand/clinicare-logo";
 
 export default function LoginView({
   demoEnabled,
@@ -43,6 +44,7 @@ export default function LoginView({
     <div className="w-full max-w-md border border-[#141618] bg-white p-6 sm:p-8 shadow-[2px_2px_0px_#141618] space-y-6">
       {/* Card Header */}
       <div className="space-y-2 border-b border-[#141618] pb-4">
+            <CliniCareLogo size={22} />
             <div className="flex items-center justify-between">
               <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#5A5D61]">
                 PRACTICE ACCESS

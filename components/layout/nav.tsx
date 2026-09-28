@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LogOut, Search, Building2, Menu, X, UserPlus } from "lucide-react";
 import { logoutSandboxAction } from "@/app/actions/sandbox-auth";
+import CliniCareLogo from "@/components/brand/clinicare-logo";
+import CliniCareMark from "@/components/brand/clinicare-mark";
 
 export interface PracticeNavProps {
   clinicName?: string;
@@ -57,7 +59,8 @@ export function PracticeNav({
           href="/dashboard"
           className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-foreground hover:opacity-75 transition-opacity"
         >
-          <span>CLINICARE</span>
+          <CliniCareLogo size={18} className="hidden sm:inline-flex" />
+          <CliniCareMark size={18} decorative className="sm:hidden" />
           <span className="text-[11px] text-text-muted hidden sm:inline flex items-center gap-1">
             / <Building2 className="size-3 inline" /> {clinicName}
           </span>
