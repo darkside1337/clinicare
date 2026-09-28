@@ -18,9 +18,9 @@ Build & Database: `pnpm build`, `pnpm db:generate`, `pnpm db:migrate`
 
 ## UI & Styling Workflow
 
-- **Mobile-first:** Build every screen mobile-first using base Tailwind classes, layering `md:` and `lg:` for progressive enhancement. Follow `docs/DESIGN.md` for per-breakpoint specs.
+- **Mobile-first:** Build every screen mobile-first using base Tailwind classes, layering `md:` and `lg:` for progressive enhancement. Follow `DESIGN.md` for per-breakpoint specs.
 - **Shadcn Component Architecture:** Use Shadcn UI primitives (`components/ui/`) for all buttons, inputs, dialogs, cards, dropdowns, and badges. Do not use raw HTML tags or custom CSS where a Shadcn primitive applies.
-- **On-Demand Components:** Install missing components with `pnpm dlx shadcn@latest add <component>` and match `docs/DESIGN.md` design tokens.
+- **On-Demand Components:** Install missing components with `pnpm dlx shadcn@latest add <component>` and match `DESIGN.md` design tokens.
 - **Pre-Completion UI Audit:** Before marking UI tasks complete or committing, run `git diff` on modified pages and verify that native `<button>`, `<input>`, or un-abstracted container tags outside `components/ui/` are replaced with Shadcn components.
 
 ## Architectural Boundaries

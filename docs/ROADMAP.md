@@ -382,7 +382,7 @@ Implements the full patients domain — queries, mutations, schema validation, a
   - Renders clinic name, logo (if available), doctor name, patient name + DOB, date.
   - Items table: medication, dosage, frequency, duration, instructions.
   - Signature line.
-  - UK date format (`DD/MM/YYYY`) — confirm against `docs/DESIGN.md`.
+  - UK date format (`DD/MM/YYYY`) — confirm against `DESIGN.md`.
   - A5 or A4 page size, print-safe margins.
   - Renders exactly **one** prescription per PDF (not all of a consultation's prescriptions combined) — each is downloaded/printed independently.
 
@@ -419,8 +419,8 @@ Implements the full patients domain — queries, mutations, schema validation, a
 ### 7.1 Design Tokens
 
 - [x] Apply `DESIGN.md` color tokens to `tailwind.config.ts` (or via CSS variables in `app/globals.css`).
-- [x] Load fonts specified in `docs/DESIGN.md` via `next/font/google` in `app/layout.tsx`.
-- [x] Configure Tailwind to use the custom CSS variables per `docs/DESIGN.md`.
+- [x] Load fonts specified in `DESIGN.md` via `next/font/google` in `app/layout.tsx`.
+- [x] Configure Tailwind to use the custom CSS variables per `DESIGN.md`.
 
 ### 7.2 App Layout
 
@@ -554,9 +554,9 @@ Builds every route as a thin orchestration layer over the feature modules.
 ### 10.1 Design System Compliance
 
 - [x] Run `git diff` on all modified pages; replace any raw `<button>`, `<input>`, `<select>`, or `<textarea>` outside `components/ui/` with Shadcn primitives.
-- [x] Verify allergy severity badges use the color tokens specified in `docs/DESIGN.md`.
-- [x] Verify all timestamps rendered per the date format specified in `docs/DESIGN.md`.
-- [x] Verify any numeric-display treatment (tabular numerals, etc.) specified in `docs/DESIGN.md` is applied to dates, dosages, and record IDs.
+- [x] Verify allergy severity badges use the color tokens specified in `DESIGN.md`.
+- [x] Verify all timestamps rendered per the date format specified in `DESIGN.md`.
+- [x] Verify any numeric-display treatment (tabular numerals, etc.) specified in `DESIGN.md` is applied to dates, dosages, and record IDs.
 
 ### 10.2 Empty States
 
