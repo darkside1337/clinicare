@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // Mock requireDoctor
 const mockRequireDoctor = vi.fn();
@@ -121,5 +121,39 @@ describe("app/(app)/settings/actions.ts - uploadClinicLogoAction", () => {
       "clinic-test",
       "https://example.com/storage/clinic-test/logo.png"
     );
+  });
+
+  describe("Demo-mode abuse limits", () => {
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    it("refuses logo upload for demo persona accounts in production without touching storage", async () => {
+      vi.stubEnv("NODE_ENV", "production");
+      mockRequireDoctor.mockResolvedValueOnce({
+        user: {
+          id: "user-doctor-1",
+          name: "Dr. Sarah Mitchell, MD",
+          email: "doctor@clinicare.dev",
+        },
+        clinicId: "clinic-dev",
+        role: "doctor" as const,
+      });
+
+      const formData = new FormData();
+      formData.append(
+        "logo",
+        new File(["pngcontent"], "logo.png", { type: "image/png" })
+      );
+
+      const result = await uploadClinicLogoAction(formData);
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Disabled in the demo.");
+      }
+      expect(mockUploadClinicLogo).not.toHaveBeenCalled();
+      expect(mockUpdateClinicLogo).not.toHaveBeenCalled();
+    });
   });
 });

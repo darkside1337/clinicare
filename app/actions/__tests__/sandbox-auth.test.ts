@@ -168,4 +168,68 @@ describe("app/actions/sandbox-auth.ts", () => {
       expect(mockTestLogin).not.toHaveBeenCalled();
     });
   });
+
+  describe("DEMO_MODE in production", () => {
+    beforeEach(() => {
+      vi.stubEnv("NODE_ENV", "production");
+      vi.stubEnv("DEMO_MODE", "true");
+    });
+
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    it("should allow loginAsDoctorAction when DEMO_MODE=true", async () => {
+      mockTestLogin.mockResolvedValueOnce({
+        session: { id: "s-3", userId: DEMO_PERSONAS.doctor.userId },
+        user: { id: DEMO_PERSONAS.doctor.userId, name: DEMO_PERSONAS.doctor.name },
+        cookies: [
+          {
+            name: "better-auth.session_token",
+            value: "test-token-demo",
+            path: "/",
+            httpOnly: true,
+            secure: true,
+            sameSite: "Lax",
+          },
+        ],
+      });
+
+      await expect(loginAsDoctorAction()).rejects.toThrow(
+        "NEXT_REDIRECT:/dashboard"
+      );
+      expect(mockTestLogin).toHaveBeenCalledWith({
+        userId: "user-doctor-1",
+      });
+    });
+
+    it("should reject a persona whose clinicId is not the demo clinic", async () => {
+      mockDbWhere.mockResolvedValueOnce([{ clinicId: "other-clinic" }]);
+
+      await expect(loginAsDoctorAction()).rejects.toThrow(
+        "Demo persona is not assigned to the demo clinic."
+      );
+      expect(mockTestLogin).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Demo-clinic guard", () => {
+    it("should reject a persona whose clinicId is not the demo clinic in development", async () => {
+      mockDbWhere.mockResolvedValueOnce([{ clinicId: "other-clinic" }]);
+
+      await expect(loginAsDemoPersona("receptionist")).rejects.toThrow(
+        "Demo persona is not assigned to the demo clinic."
+      );
+      expect(mockTestLogin).not.toHaveBeenCalled();
+    });
+
+    it("should reject when the persona user row is missing", async () => {
+      mockDbWhere.mockResolvedValueOnce([]);
+
+      await expect(loginAsDoctorAction()).rejects.toThrow(
+        "Demo persona is not assigned to the demo clinic."
+      );
+      expect(mockTestLogin).not.toHaveBeenCalled();
+    });
+  });
 });
