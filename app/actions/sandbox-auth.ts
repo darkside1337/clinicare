@@ -2,11 +2,30 @@
 
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth/auth";
-import { DEMO_PERSONAS, type DemoRole } from "@/lib/auth/demo-personas";
+import { isDemoLoginEnabled } from "@/lib/auth/demo-mode";
+import {
+  DEMO_CLINIC_ID,
+  DEMO_PERSONAS,
+  type DemoRole,
+} from "@/lib/auth/demo-personas";
+import { db } from "@/lib/db/client";
+import { user } from "@/lib/db/schema";
+
+type TestLogin = (args: { userId: string }) => Promise<{
+  cookies: Array<{
+    name: string;
+    value: string;
+    path?: string | null;
+    httpOnly?: boolean | null;
+    sameSite?: string | null;
+    expires?: number | string | Date | null;
+  }>;
+}>;
 
 export async function loginAsDemoPersona(role: DemoRole) {
-  if (process.env.NODE_ENV === "production") {
+  if (!isDemoLoginEnabled()) {
     throw new Error("Demo login disabled in production.");
   }
 
@@ -15,7 +34,21 @@ export async function loginAsDemoPersona(role: DemoRole) {
     throw new Error(`Invalid demo persona: ${role}`);
   }
 
-  const ctx = await auth.$context;
+  // A demo login must never reach a non-demo clinic, even if the seeded
+  // user row was reassigned. Fail closed when the row is missing too.
+  const [personaRow] = await db
+    .select({ clinicId: user.clinicId })
+    .from(user)
+    .where(eq(user.id, persona.userId));
+  if (!personaRow || personaRow.clinicId !== DEMO_CLINIC_ID) {
+    throw new Error("Demo persona is not assigned to the demo clinic.");
+  }
+
+  // getAuthPlugins() is conditional, so ctx.test is not in the inferred
+  // type. Re-verify this cast after upgrading better-auth.
+  const ctx = (await auth.$context) as Awaited<typeof auth.$context> & {
+    test?: { login: TestLogin };
+  };
   if (!ctx.test) {
     throw new Error("Better Auth testUtils plugin is not initialized.");
   }

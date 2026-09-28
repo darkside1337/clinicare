@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-const { mockCookieSet, mockCookieDelete, mockRedirect, mockTestLogin, mockSignOut } = vi.hoisted(() => ({
+const { mockCookieSet, mockCookieDelete, mockRedirect, mockTestLogin, mockSignOut, mockDbWhere } = vi.hoisted(() => ({
   mockCookieSet: vi.fn(),
   mockCookieDelete: vi.fn(),
   mockRedirect: vi.fn((url: string) => {
@@ -8,6 +8,7 @@ const { mockCookieSet, mockCookieDelete, mockRedirect, mockTestLogin, mockSignOu
   }),
   mockTestLogin: vi.fn(),
   mockSignOut: vi.fn(),
+  mockDbWhere: vi.fn(),
 }));
 
 // Mock next/headers
@@ -22,6 +23,17 @@ vi.mock("next/headers", () => ({
 // Mock next/navigation
 vi.mock("next/navigation", () => ({
   redirect: (url: string) => mockRedirect(url),
+}));
+
+// Mock DB user lookup (demo-clinic guard)
+vi.mock("@/lib/db/client", () => ({
+  db: {
+    select: vi.fn(() => ({
+      from: vi.fn(() => ({
+        where: (...args: unknown[]) => mockDbWhere(...args),
+      })),
+    })),
+  },
 }));
 
 // Mock Better Auth instance
@@ -49,6 +61,7 @@ import { DEMO_PERSONAS } from "@/lib/auth/demo-personas";
 describe("app/actions/sandbox-auth.ts", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockDbWhere.mockResolvedValue([{ clinicId: "clinic-dev" }]);
   });
 
   it("should log in as doctor with seeded doctor ID and set session cookies", async () => {

@@ -1,4 +1,5 @@
 import { client, db } from "./client";
+import { DEMO_CLINIC_ID } from "../auth/demo-personas";
 import {
   clinics,
   user,
@@ -16,7 +17,7 @@ export async function seed() {
   await db
     .insert(clinics)
     .values({
-      id: "clinic-dev",
+      id: DEMO_CLINIC_ID,
       name: "Apex Family Medicine",
       logoUrl: null,
       createdAt: new Date(),
@@ -69,7 +70,7 @@ export async function seed() {
         name: staff.name,
         email: staff.email,
         emailVerified: true,
-        clinicId: "clinic-dev",
+        clinicId: DEMO_CLINIC_ID,
         role: staff.role,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -79,7 +80,7 @@ export async function seed() {
         set: {
           name: staff.name,
           role: staff.role,
-          clinicId: "clinic-dev",
+          clinicId: DEMO_CLINIC_ID,
         },
       });
   }
@@ -90,7 +91,7 @@ export async function seed() {
     // Baseline test patients
     {
       id: "patient-1",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       name: "Eleanor Vance",
       dob: "1988-04-12",
       sex: "Female",
@@ -102,7 +103,7 @@ export async function seed() {
     },
     {
       id: "patient-2",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       name: "Marcus Holloway",
       dob: "1975-09-28",
       sex: "Male",
@@ -114,7 +115,7 @@ export async function seed() {
     },
     {
       id: "patient-3",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       name: "Chloe Zhao",
       dob: "2001-12-05",
       sex: "Female",
@@ -127,7 +128,7 @@ export async function seed() {
     // Mock patient directory records
     {
       id: "pat-84920",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       name: "Eleanor Vance-Croft",
       dob: "1972-08-14",
       sex: "Female",
@@ -139,7 +140,7 @@ export async function seed() {
     },
     {
       id: "pat-93821",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       name: "Arthur Pendelton",
       dob: "1959-11-03",
       sex: "Male",
@@ -151,7 +152,7 @@ export async function seed() {
     },
     {
       id: "pat-91024",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       name: "Arthur Pendelton",
       dob: "1958-11-22",
       sex: "Male",
@@ -163,7 +164,7 @@ export async function seed() {
     },
     {
       id: "pat-48201",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       name: "Chloe Sterling",
       dob: "1995-05-22",
       sex: "Female",
@@ -175,7 +176,7 @@ export async function seed() {
     },
     {
       id: "pat-38291",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       name: "Chloe Sterling",
       dob: "1995-08-03",
       sex: "Female",
@@ -187,7 +188,7 @@ export async function seed() {
     },
     {
       id: "pat-77402",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       name: "David O'Connor",
       dob: "1983-02-19",
       sex: "Male",
@@ -199,7 +200,7 @@ export async function seed() {
     },
     {
       id: "pat-19842",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       name: "Grace Holloway",
       dob: "2001-07-30",
       sex: "Female",
@@ -211,7 +212,7 @@ export async function seed() {
     },
     {
       id: "pat-50291",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       name: "Benjamin Miller",
       dob: "1964-04-12",
       sex: "Male",
@@ -223,7 +224,7 @@ export async function seed() {
     },
     {
       id: "pat-66382",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       name: "Sophia Zhang",
       dob: "1990-10-09",
       sex: "Female",
@@ -235,7 +236,7 @@ export async function seed() {
     },
     {
       id: "pat-39281",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       name: "George MacIntyre",
       dob: "1949-03-18",
       sex: "Male",
@@ -247,7 +248,7 @@ export async function seed() {
     },
     {
       id: "pat-44910",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       name: "George MacIntyre",
       dob: "1949-01-05",
       sex: "Male",
@@ -259,7 +260,7 @@ export async function seed() {
     },
     {
       id: "pat-92841",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       name: "Fiona Gallagher",
       dob: "1988-12-05",
       sex: "Female",
@@ -271,7 +272,7 @@ export async function seed() {
     },
     {
       id: "pat-12093",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       name: "Fatima Al-Mansoor",
       dob: "1988-06-18",
       sex: "Female",
@@ -564,7 +565,7 @@ export async function seed() {
     // Baseline test appointments
     {
       id: "appt-1",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       patientId: "patient-1",
       doctorId: "user-doctor-1",
       scheduledAt: new Date(now + 2 * 3600 * 1000), // in 2 hours
@@ -574,7 +575,7 @@ export async function seed() {
     },
     {
       id: "appt-2",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       patientId: "patient-2",
       doctorId: "user-doctor-1",
       scheduledAt: new Date(now - 30 * 60 * 1000), // 30 mins ago
@@ -584,7 +585,7 @@ export async function seed() {
     },
     {
       id: "appt-3",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       patientId: "patient-3",
       doctorId: "user-doctor-1",
       scheduledAt: new Date(now), // current walk-in
@@ -594,7 +595,7 @@ export async function seed() {
     },
     {
       id: "appt-4",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       patientId: "patient-1",
       doctorId: "user-doctor-1",
       scheduledAt: new Date(now - 7 * 24 * 3600 * 1000), // 7 days ago
@@ -604,7 +605,7 @@ export async function seed() {
     },
     {
       id: "appt-5",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       patientId: "patient-2",
       doctorId: "user-doctor-1",
       scheduledAt: new Date(now - 14 * 24 * 3600 * 1000), // 14 days ago
@@ -616,7 +617,7 @@ export async function seed() {
     // Today's clinic schedule appointments
     {
       id: "apt-today-01",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       patientId: "pat-84920",
       doctorId: "doc-finch",
       scheduledAt: atToday(9, 0),
@@ -626,7 +627,7 @@ export async function seed() {
     },
     {
       id: "apt-today-02",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       patientId: "pat-48201",
       doctorId: "doc-finch",
       scheduledAt: atToday(9, 30),
@@ -636,7 +637,7 @@ export async function seed() {
     },
     {
       id: "apt-today-03",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       patientId: "pat-93821",
       doctorId: "doc-rostova",
       scheduledAt: atToday(9, 0),
@@ -646,7 +647,7 @@ export async function seed() {
     },
     {
       id: "apt-today-04",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       patientId: "pat-77402",
       doctorId: "doc-finch",
       scheduledAt: atToday(10, 30),
@@ -656,7 +657,7 @@ export async function seed() {
     },
     {
       id: "apt-today-05",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       patientId: "pat-19842",
       doctorId: "doc-rostova",
       scheduledAt: atToday(10, 0),
@@ -666,7 +667,7 @@ export async function seed() {
     },
     {
       id: "apt-today-06",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       patientId: "pat-50291",
       doctorId: "doc-brody",
       scheduledAt: atToday(9, 30),
@@ -676,7 +677,7 @@ export async function seed() {
     },
     {
       id: "apt-today-07",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       patientId: "pat-66382",
       doctorId: "doc-finch",
       scheduledAt: atToday(11, 30),
@@ -686,7 +687,7 @@ export async function seed() {
     },
     {
       id: "apt-today-08",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       patientId: "pat-39281",
       doctorId: "doc-rostova",
       scheduledAt: atToday(11, 0),
@@ -696,7 +697,7 @@ export async function seed() {
     },
     {
       id: "apt-today-09",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       patientId: "pat-92841",
       doctorId: "doc-brody",
       scheduledAt: atToday(10, 30),
@@ -706,7 +707,7 @@ export async function seed() {
     },
     {
       id: "apt-today-10",
-      clinicId: "clinic-dev",
+      clinicId: DEMO_CLINIC_ID,
       patientId: "pat-84920",
       doctorId: "doc-finch",
       scheduledAt: atToday(14, 30),

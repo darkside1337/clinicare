@@ -1,3 +1,5 @@
+export const DEMO_CLINIC_ID = "clinic-dev";
+
 export const DEMO_PERSONAS = {
   doctor: {
     userId: "user-doctor-1",
