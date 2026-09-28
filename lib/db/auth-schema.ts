@@ -13,7 +13,7 @@ export const user = pgTable("user", {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
   clinicId: text("clinic_id"),
-  role: text("role").default("doctor"),
+  role: text("role").default("receptionist"),
 });
 
 export const session = pgTable(

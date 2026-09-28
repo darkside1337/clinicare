@@ -19,6 +19,7 @@ export const auth = betterAuth({
     },
   },
   user: {
+    // input: false is enforced by Better Auth's parseInputData; re-verify after upgrading better-auth.
     additionalFields: {
       clinicId: {
         type: "string",
