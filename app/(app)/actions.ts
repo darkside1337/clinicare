@@ -5,7 +5,7 @@ import { requireDoctor } from "@/lib/auth/require-doctor";
 import { listPatients } from "@/features/patients/queries";
 import { createWalkInAppointment } from "@/features/appointments/mutations";
 
-import type { ActionResult } from "@/lib/actions";
+import type { ActionResult } from "@/lib/action-result";
 
 export interface CommandPalettePatientResult {
   id: string;

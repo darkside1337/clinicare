@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getSession } from "@/lib/auth/session";
-import type { ActionResult } from "@/lib/actions";
+import type { ActionResult } from "@/lib/action-result";
 import { patientSchema, type PatientInput } from "@/features/patients/schema";
 import { createPatient } from "@/features/patients/mutations";
 import type { Patient } from "@/lib/db/schema";

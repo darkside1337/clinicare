@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getSession } from "@/lib/auth/session";
 import { requireDoctor } from "@/lib/auth/require-doctor";
-import type { ActionResult } from "@/lib/actions";
+import type { ActionResult } from "@/lib/action-result";
 import {
   patientSchema,
   allergySchema,

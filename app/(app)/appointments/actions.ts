@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getSession } from "@/lib/auth/session";
-import type { ActionResult } from "@/lib/actions";
+import type { ActionResult } from "@/lib/action-result";
 import {
   createAppointmentSchema,
   updateAppointmentSchema,
