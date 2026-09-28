@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requireDoctor } from "@/lib/auth/require-doctor";
+import { DEMO_PERSONAS } from "@/lib/auth/demo-personas";
 import type { ActionResult } from "@/lib/action-result";
 import { uploadClinicLogo } from "@/lib/supabase/storage";
 import { updateClinicLogo } from "@/features/clinics/mutations";
@@ -17,6 +18,17 @@ export async function uploadClinicLogoAction(
   formData: FormData
 ): Promise<ActionResult<{ logoUrl: string }>> {
   const session = await requireDoctor();
+
+  // Shared public demo accounts must not write arbitrary files to Storage.
+  const demoUserIds: string[] = Object.values(DEMO_PERSONAS).map(
+    (p) => p.userId
+  );
+  if (
+    process.env.NODE_ENV === "production" &&
+    demoUserIds.includes(session.user.id)
+  ) {
+    return { success: false, error: "Disabled in the demo." };
+  }
 
   const file = formData.get("logo");
   const parsed = clinicLogoSchema.safeParse(file);
