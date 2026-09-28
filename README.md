@@ -1,199 +1,196 @@
-# C L I N I C A R E
+# CliniCare
 
-<p align="center">
-  <strong>Focused Practice Management for Solo Practitioners & Small Clinics</strong><br>
-  <em>"The Pathology Lab Report" design system. Zero EMR overhead. Instant patient lookup to prescription in under 60 seconds.</em>
-</p>
+**Focused practice management for solo practitioners and small clinics.**
+*Patient lookup to prescription without EMR overhead, in a design system inspired by the pathology lab report.*
 
-<p align="center">
-  <a href="#3-architectural--multi-tenancy-invariants"><img src="https://img.shields.io/badge/Next.js-16.3%20(App%20Router)-black?style=flat-square&logo=next.js" alt="Next.js 16" /></a>
-  <a href="#3-architectural--multi-tenancy-invariants"><img src="https://img.shields.io/badge/React-19.2-black?style=flat-square&logo=react" alt="React 19" /></a>
-  <a href="#4-tech-stack"><img src="https://img.shields.io/badge/Supabase-Postgres%20%26%20Storage-3ECF8E?style=flat-square&logo=supabase&logoColor=white" alt="Supabase Postgres" /></a>
-  <a href="#4-tech-stack"><img src="https://img.shields.io/badge/Drizzle-ORM%200.45-C5F74F?style=flat-square&logo=drizzle" alt="Drizzle ORM" /></a>
-  <a href="#4-tech-stack"><img src="https://img.shields.io/badge/Better%20Auth-1.7-black?style=flat-square" alt="Better Auth" /></a>
-  <a href="#4-tech-stack"><img src="https://img.shields.io/badge/Tailwind%20CSS-v4%20%2B%20Shadcn-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white" alt="Tailwind CSS v4" /></a>
-  <a href="#5-getting-started--local-development"><img src="https://img.shields.io/badge/Vitest-239%20Tests%20Passing-6E9F18?style=flat-square&logo=vitest&logoColor=white" alt="Vitest Tests" /></a>
-</p>
+![Next.js](https://img.shields.io/badge/Next.js-16%20App%20Router-black?style=flat-square&logo=next.js)
+![React](https://img.shields.io/badge/React-19-black?style=flat-square&logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-Postgres-3ECF8E?style=flat-square&logo=supabase&logoColor=white)
+![Drizzle](https://img.shields.io/badge/Drizzle-ORM-C5F74F?style=flat-square&logo=drizzle)
+![Tailwind](https://img.shields.io/badge/Tailwind-v4%20%2B%20shadcn%2Fui-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)
 
----
+![CliniCare dashboard](public/demo/screenshots/01-dashboard.png)
 
-<p align="center">
-  <img src="public/demo/screenshots/01-dashboard.png" alt="CliniCare Clinical Dashboard Hero" width="100%" />
-</p>
+> **Demo project.** CliniCare is a portfolio application. It is not certified for HIPAA, GDPR or any other regulatory framework, and it must not be used with real patient data. All seed data is fictional.
 
 ---
 
-## 1. Overview & "The Pathology Lab Report" Philosophy
+## Table of contents
 
-**CliniCare** is a practice-management web application engineered for individual doctors and small multi-doctor clinics (1–5 practitioners). It captures the vital clinical loop — patient identification, appointment management, consultation charting, and prescription issuance — without the suffocating overhead of hospital EMRs, complex billing, or enterprise bureaucracy.
-
-Rather than assembling a generic SaaS dashboard with clinical data bolted on, CliniCare's interface is conceived as an extension of the clinician's diagnostic instrument, adhering to the design tenets in [`DESIGN.md`](DESIGN.md):
-
-- **The Pathology Lab Report Aesthetic**: High-contrast carbon ink (`#141618`) on warm, glare-free form paper (`#FAFAF7`). Flat tonal layering with crisp 1px structural rules. Zero decorative gradients, glassmorphism, or frivolous consumer animations.
-- **Persistent 30/70 Clinical Topology**: A sticky 30% left column locks critical patient identity, life-threatening allergies, and active problems into permanent view. The 70% right canvas hosts chronological encounter narratives and visit records.
-- **Diagnostic Color Parsimony**: 95% neutral ground. Saturated color is strictly rationed for clinical gravity: Critical Flag Red (`#B91C1C`) for anaphylaxis contraindications, Warning Amber (`#D97706`) for sensitivities, and Resolved Green (`#166534`) for cleared conditions.
-- **Tabular Precision**: Monospaced tabular numerals (`tnum`) across all clinical measurements, blood pressure readings, dosages, and European standard dates (`DD/MM/YYYY`) to eliminate reading errors under surgery pressure.
-
----
-
-## 2. Core Workflows & Media Showcase
-
-### Flow 1 — Practice Hub & Command Velocity
-> Morning huddle command center showing real-time appointment queues and clinical status, paired with a global `⌘K` command palette for instant patient search and zero-friction walk-in triage.
-
-<table width="100%">
-  <tr>
-    <td width="50%" valign="top">
-      <img src="public/demo/screenshots/01-dashboard.png" alt="Practice Command Center" width="100%" />
-      <p align="center"><sub><strong>Practice Hub:</strong> At-a-glance operational overview showing today's patient queue, active visit statuses, and immediate consultation triggers.</sub></p>
-    </td>
-    <td width="50%" valign="top">
-      <img src="public/demo/screenshots/02-command-palette.png" alt="Global Command Palette" width="100%" />
-      <p align="center"><sub><strong>Global Command Palette (<code>⌘K</code>):</strong> Instant lookup across names, DOBs, and NHS numbers, with one-stroke walk-in appointment creation.</sub></p>
-    </td>
-  </tr>
-</table>
+1. [Overview](#1-overview)
+2. [Core workflows](#2-core-workflows)
+3. [Architecture and multi-tenancy](#3-architecture-and-multi-tenancy)
+4. [Tech stack](#4-tech-stack)
+5. [Getting started](#5-getting-started)
+6. [Demo sandbox and scripts](#6-demo-sandbox-and-scripts)
+7. [Scope and known limitations](#7-scope-and-known-limitations)
+8. [Documentation](#8-documentation)
 
 ---
 
-### Flow 2 — Patient Directory & Longitudinal Clinical Chart
-> High-density searchable patient roster paired with the two-column clinical chart: permanent allergy flags and chronic condition ledger anchored on the left, chronological timeline on the right.
+## 1. Overview
 
-<table width="100%">
-  <tr>
-    <td width="50%" valign="top">
-      <img src="public/demo/screenshots/03-patients-list.png" alt="Patient Directory" width="100%" />
-      <p align="center"><sub><strong>Patient Directory:</strong> Tabular roster optimized for rapid scanning with real-time filtering, age calculation, and contact points.</sub></p>
-    </td>
-    <td width="50%" valign="top">
-      <img src="public/demo/screenshots/04-patient-profile.png" alt="Longitudinal Patient Profile" width="100%" />
-      <p align="center"><sub><strong>Clinical Chart:</strong> 30% persistent column with high-visibility allergy severity chips (`#B91C1C`), problem list, and past encounter history.</sub></p>
-    </td>
-  </tr>
-</table>
+CliniCare is a practice-management web app for individual doctors and small clinics (1-5 practitioners). It covers the core clinical loop: identifying a patient, managing appointments, charting a consultation, and issuing a prescription. It leaves out hospital EMR complexity, billing and enterprise workflows on purpose.
+
+The interface is designed as an extension of the clinician's working tools rather than a generic SaaS dashboard. The full rules live in [`DESIGN.md`](DESIGN.md):
+
+- **Lab report aesthetic.** Carbon ink (`#141618`) on warm, glare-free paper (`#FAFAF7`), flat tonal layers and crisp 1px rules. No decorative gradients, glassmorphism or playful animation.
+- **Persistent 30/70 layout.** A sticky left column keeps patient identity, allergies and active problems in view at all times. The right canvas holds the chronological encounter record.
+- **Restrained color.** About 95% of the UI is neutral. Saturated color is reserved for clinical meaning: Critical Red (`#B91C1C`) for severe allergies, Warning Amber (`#D97706`) for sensitivities, Resolved Green (`#166534`) for cleared conditions.
+- **Tabular precision.** Tabular numerals for measurements, blood pressure and dosages, and unambiguous `DD/MM/YYYY` dates, to reduce reading errors.
 
 ---
 
-### Flow 3 — 30-Second Encounter Note & Daily Appointment Schedule
-> Dedicated full-page encounter workspace — never a cramped modal — capturing chief complaints, structured diagnoses, and clinical narratives beside time-blocked daily scheduling.
+## 2. Core workflows
 
-<table width="100%">
-  <tr>
-    <td width="50%" valign="top">
-      <img src="public/demo/screenshots/05-consultation-new.png" alt="Consultation Encounter Recording" width="100%" />
-      <p align="center"><sub><strong>Encounter Documentation:</strong> Distraction-free full-page consultation flow with symptom breakdown, clinical notes, and prescription linking.</sub></p>
-    </td>
-    <td width="50%" valign="top">
-      <img src="public/demo/screenshots/06-appointments-day.png" alt="Daily Appointment Schedule" width="100%" />
-      <p align="center"><sub><strong>Daily Schedule:</strong> Real-time schedule grid tracking check-in lifecycle transitions (Scheduled → Arrived → In Consultation → Completed).</sub></p>
-    </td>
-  </tr>
-</table>
+### Flow 1: Command palette and walk-ins
 
----
+A global `Cmd/Ctrl+K` palette searches patients by name, date of birth or NHS number, and can create a same-day walk-in appointment in one step.
 
-### Flow 4 — Prescription Authoring & Printable Vector Rx
-> Multi-item prescription orders with itemized dosage instructions, quantity limits, and one-click printable vector PDF slip generation.
+![Global command palette](public/demo/screenshots/02-command-palette.png)
 
-<p align="center">
-  <img src="public/demo/screenshots/07-prescription.png" alt="Prescription Generation & Vector Print Slip" width="100%" />
-</p>
-<p align="center">
-  <sub><strong>Printable Rx Engine:</strong> Itemized medication orders authored directly during consultation, rendered into clean vector PDFs via <code>@react-pdf/renderer</code> with clinic letterhead, doctor credentials, and signature block.</sub>
-</p>
+### Flow 2: Patient directory and longitudinal chart
 
----
+A dense, searchable patient roster leads into a two-column chart. Allergies and the chronic problem list stay pinned on the left, and the encounter timeline runs on the right.
 
-## 3. Architectural & Multi-Tenancy Invariants
+| Patient directory | Clinical chart |
+| --- | --- |
+| ![Patient directory](public/demo/screenshots/03-patients-list.png) | ![Patient profile](public/demo/screenshots/04-patient-profile.png) |
+| Tabular roster with real-time filtering, calculated age and contact details. | Pinned allergy chips, problem list and past encounters. |
 
-CliniCare enforces strict boundaries documented in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md):
+### Flow 3: Encounter notes and daily schedule
 
-1. **Strict Multi-Tenancy Isolation**: Every query and mutation touching clinical records (`patients`, `appointments`, `consultations`, `prescriptions`, `allergies`, `problems`) explicitly receives and filters by `clinic_id`. Cross-clinic data leakage is impossible by design.
-2. **Two-Role Hard Separation**:
-   - **Doctor (`role: doctor`)**: Unrestricted clinical documentation — patient profiles, medical problems, allergies, consultation encounters, and itemized prescription authoring.
-   - **Receptionist (`role: receptionist`)**: Front-desk operations — patient registration and appointment scheduling. Receptionists are barred from clinical consultation and prescription routes at the server layer (`lib/auth/guards.ts`), not merely in the UI.
-3. **Thin Route Orchestration**: Next.js App Router routes (`app/`) act solely as thin orchestrators. Business logic and database access are strictly encapsulated in feature modules (`features/<domain>/{queries,mutations}.ts`).
-4. **Soft-Delete Clinical Safety**: Patient charts and medical records are soft-deleted via `deleted_at` timestamps. Medical history is never hard-deleted.
-5. **Full-Page Consultations**: Clinical encounters require deep physician focus and are presented as dedicated full-page routes — never trapped within modal windows.
+Consultations open as a dedicated full page, never a modal, so the physician can focus on chief complaint, diagnoses and narrative. The daily schedule tracks each visit through *Scheduled, Arrived, In Consultation, Completed*.
+
+| Consultation | Daily schedule |
+| --- | --- |
+| ![New consultation](public/demo/screenshots/05-consultation-new.png) | ![Daily appointments](public/demo/screenshots/06-appointments-day.png) |
+| Full-page encounter form with symptoms, notes and prescription linking. | Time-blocked grid with check-in status transitions. |
+
+### Flow 4: Prescriptions and printable Rx
+
+Multi-item prescriptions with dosage instructions and quantities are authored during the consultation, then rendered to a vector PDF with `@react-pdf/renderer`, including clinic letterhead, doctor details and a signature block.
+
+![Prescription slip](public/demo/screenshots/07-prescription.png)
 
 ---
 
-## 4. Tech Stack
+## 3. Architecture and multi-tenancy
 
-| Layer | Technology | Details |
-| :--- | :--- | :--- |
-| **Framework** | [Next.js 16.3](https://nextjs.org/) | App Router, Turbopack, Server Actions, React Server Components |
-| **UI Library** | [React 19.2](https://react.dev/) | Concurrent React, modern action hooks |
-| **Styling** | [Tailwind CSS v4](https://tailwindcss.com/) + [Shadcn UI](https://ui.shadcn.com/) | Lab report token system, Base UI primitives, Lucide icons |
-| **Database & ORM** | [Supabase Postgres](https://supabase.com/) & [Drizzle ORM](https://orm.drizzle.team/) | Drizzle Kit migrations, type-safe schema definitions, Drizzle Zod |
-| **Authentication** | [Better Auth 1.7](https://www.better-auth.com/) | Role-based sessions (Doctor/Receptionist), OAuth & sandbox switching |
-| **Validation** | [React Hook Form](https://react-hook-form.com/) & [Zod 4](https://zod.dev/) | Client and server-side clinical schema validation |
-| **Document Engine** | [`@react-pdf/renderer`](https://react-pdf.org/) | Vector PDF generation for prescription slips |
-| **Testing** | [Vitest](https://vitest.dev/) | Pure-logic unit and integration test suite (239 tests passing) |
+The boundaries below are documented in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md):
+
+1. **Tenant isolation.** Every query and mutation on clinical records (`patients`, `appointments`, `consultations`, `prescriptions`, `allergies`, `problems`) takes and filters by `clinic_id`, and this is covered by tests.
+2. **Two roles, enforced on the server.**
+   - **Doctor:** full clinical documentation, including problems, allergies, consultations and prescriptions.
+   - **Receptionist:** patient registration and appointment scheduling only. Consultation and prescription routes are blocked in `lib/auth/guards.ts`, not just hidden in the UI.
+3. **Thin routes.** App Router routes in `app/` only orchestrate. Business logic and data access live in feature modules (`features/<domain>/{queries,mutations}.ts`).
+4. **Soft deletes.** Patient charts and medical records use `deleted_at` timestamps, so clinical history is never hard-deleted.
+5. **Full-page consultations.** Clinical encounters are dedicated routes, not modal windows.
+6. **Hardened auth.** `clinicId` and `role` are not settable from client input in Better Auth, and new accounts default to the least-privileged role (receptionist).
 
 ---
 
-## 5. Getting Started & Local Development
+## 4. Tech stack
+
+| Layer | Technology | Notes |
+| --- | --- | --- |
+| Framework | [Next.js 16](https://nextjs.org/) | App Router, Turbopack, Server Actions, React Server Components |
+| UI | [React 19](https://react.dev/) | Modern action hooks |
+| Styling | [Tailwind CSS v4](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/) | Custom token system, Lucide icons |
+| Database | [Supabase Postgres](https://supabase.com/) + [Drizzle ORM](https://orm.drizzle.team/) | Drizzle Kit migrations, type-safe schema, drizzle-zod |
+| Auth | [Better Auth](https://www.better-auth.com/) | Role-based sessions (Doctor / Receptionist) |
+| Validation | [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) | Shared client and server schemas |
+| PDF | [`@react-pdf/renderer`](https://react-pdf.org/) | Vector prescription slips |
+| Testing | [Vitest](https://vitest.dev/) | Unit and integration tests for domain logic |
+
+---
+
+## 5. Getting started
 
 ### Prerequisites
 
 - Node.js 20+
-- pnpm 12+ (`corepack enable pnpm`)
-- Postgres database (Supabase or local instance)
+- pnpm (`corepack enable pnpm`)
+- A Postgres database (Supabase or local)
 
 ### Installation
 
-1. **Clone repository & install dependencies**:
+1. **Clone and install**
+
    ```bash
    git clone https://github.com/darkside1337/clinicare.git
    cd clinicare
    pnpm install
    ```
 
-2. **Configure environment variables in `.env.local`**:
-   ```env
+2. **Configure `.env.local`**
+
+   ```bash
    DATABASE_URL="postgres://postgres:[PASSWORD]@[HOST]:[PORT]/[DB]"
    BETTER_AUTH_SECRET="your-auth-secret-here"
    BETTER_AUTH_URL="http://localhost:3000"
    NEXT_PUBLIC_APP_URL="http://localhost:3000"
+   DEMO_MODE="true"   # enables the one-click demo login and the demo reset script
    ```
 
-3. **Run database migrations and seed baseline data**:
+3. **Apply migrations and seed demo data**
+
    ```bash
-   pnpm db:generate
    pnpm db:migrate
    pnpm db:seed
    ```
 
-4. **Launch development server**:
+   Migrations are already committed. Only run `pnpm db:generate` after you change the Drizzle schema.
+
+4. **Start the dev server**
+
    ```bash
    pnpm dev
    ```
-   Open [http://localhost:3000](http://localhost:3000) to access the landing page and sandbox staff switchers.
+
+   Open <http://localhost:3000> and pick a demo staff member from the landing page.
 
 ---
 
-## 6. Demo Sandbox & Development Scripts
+## 6. Demo sandbox and scripts
 
-The application includes safe sandbox personas (Dr. Sarah Chen, Receptionist James Wilson) for local evaluation and automated testing.
+With `DEMO_MODE=true`, the landing page offers one-click login as two fictional personas: **Dr. Sarah Chen** (doctor) and **James Wilson** (receptionist). Comparing the two is the quickest way to see the role separation in action.
 
 | Command | Description |
-| :--- | :--- |
-| `pnpm dev` | Starts Next.js development server with Turbopack |
-| `pnpm build` | Builds optimized production bundle |
-| `pnpm test` | Runs the Vitest test suite (`31 test files, 239 tests`) |
-| `pnpm test:watch` | Runs test runner in interactive watch mode |
-| `pnpm db:generate` | Generates SQL migrations from Drizzle schema |
-| `pnpm db:migrate` | Applies schema migrations to target database |
-| `pnpm db:seed` | Populates database with sample clinic, staff personas, and patients |
-| `pnpm db:reset-demo` | Truncates and resets demo database (guarded by `DEMO_MODE=true`) |
+| --- | --- |
+| `pnpm dev` | Start the Next.js dev server (Turbopack) |
+| `pnpm build` | Create a production build |
+| `pnpm test` | Run the Vitest suite |
+| `pnpm test:watch` | Run tests in watch mode |
+| `pnpm db:generate` | Generate SQL migrations from schema changes |
+| `pnpm db:migrate` | Apply migrations to the target database |
+| `pnpm db:seed` | Seed a sample clinic, staff personas and patients |
+| `pnpm db:reset-demo` | Truncate and reset the demo database (requires `DEMO_MODE=true`) |
 
 ---
 
-## 7. Architecture & Documentation
+## 7. Scope and known limitations
 
-- [`docs/ROADMAP.md`](docs/ROADMAP.md) — Phased task breakdown and milestone progress
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — Multi-tenancy boundaries, module structure, and Server Actions patterns
-- [`docs/PRD.md`](docs/PRD.md) — Clinical requirements, domain models, and feature specifications
-- [`DESIGN.md`](DESIGN.md) — "The Pathology Lab Report" visual design tokens, typography, and layout rules
-- [`PRODUCT.md`](PRODUCT.md) — Product positioning, operational principles, and personas
+CliniCare is intentionally an MVP. Deliberately out of scope:
+
+- AI-assisted diagnosis
+- Insurance, pharmacy and lab integrations
+- Billing and complex medical coding
+- Telemedicine and wearable data
+- Multi-hospital or enterprise features
+
+Known gaps:
+
+- Consultations are editable in place. An append-only amendment and audit trail is planned for after the MVP.
+- Any doctor in a clinic can view and treat any patient in that clinic. There is no per-doctor patient assignment.
+
+---
+
+## 8. Documentation
+
+- [`docs/ROADMAP.md`](docs/ROADMAP.md): phased task breakdown and milestone progress
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md): multi-tenancy boundaries, module structure and Server Action patterns
+- [`docs/PRD.md`](docs/PRD.md): clinical requirements, domain models and feature specs
+- [`DESIGN.md`](DESIGN.md): visual design tokens, typography and layout rules
+- [`PRODUCT.md`](PRODUCT.md): product positioning, principles and personas
