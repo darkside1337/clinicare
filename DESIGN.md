@@ -144,6 +144,14 @@ CliniCare uses flat tonal layering and precise 1px borders rather than soft blur
 - **Format:** Structured document card with header banner, complaint/diagnosis grid, and collapsible physical examination & vitals block.
 - **Expand/Collapse Interaction:** Immediate disclosure triangle with border-t divider; never opens an interruptive modal.
 
+## Logo
+
+- **Files:** `public/brand/clinicare-mark.svg` (full ruled cross with shadow) and `public/brand/clinicare-mark-small.svg` (simplified favicon cross, also copied to `app/icon.svg`).
+- **Components:** `components/brand/clinicare-mark.tsx` (mark alone, `size` default 24) and `components/brand/clinicare-logo.tsx` (mark + wordmark).
+- **Minimum sizes:** full mark 24px, small mark 16px. Never render below these.
+- **Red rule:** the flagged cell (`destructive`) is always the only red element in the lockup.
+- **Wordmark rule:** always live text in the mono font — uppercase, bold, wide letter spacing. Never render the wordmark as an image.
+
 ## Do's and Don'ts
 
 ### Do:
