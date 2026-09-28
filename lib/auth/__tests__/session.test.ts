@@ -190,6 +190,37 @@ describe("lib/auth/session.ts - getSession", () => {
       expect(mockRedirect).not.toHaveBeenCalled();
     });
 
+    it("returns null when clinicId is undefined without redirecting", async () => {
+      mockGetSession.mockResolvedValueOnce({
+        user: {
+          id: "u-2",
+          name: "No Clinic Key",
+          email: "nokey@test.com",
+          role: "doctor",
+        },
+      });
+
+      const session = await getOptionalSession();
+      expect(session).toBeNull();
+      expect(mockRedirect).not.toHaveBeenCalled();
+    });
+
+    it("returns null when role is an unknown value without redirecting", async () => {
+      mockGetSession.mockResolvedValueOnce({
+        user: {
+          id: "u-3",
+          name: "Super User",
+          email: "super@test.com",
+          clinicId: "clinic-1",
+          role: "superuser",
+        },
+      });
+
+      const session = await getOptionalSession();
+      expect(session).toBeNull();
+      expect(mockRedirect).not.toHaveBeenCalled();
+    });
+
     it("returns SessionContext when valid doctor session is present", async () => {
       mockGetSession.mockResolvedValueOnce({
         user: {
