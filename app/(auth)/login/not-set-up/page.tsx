@@ -1,6 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
-import LoginNotSetUpView from "@/components/login-not-set-up-view";
+import LoginNotSetUpView from "@/components/auth/login-not-set-up-view";
 
 export const metadata: Metadata = {
   title: "Account Pending Clinic Assignment | CliniCare",

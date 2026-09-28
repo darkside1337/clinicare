@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
 import type { Metadata } from "next";
-import LoginView from "@/components/login-view";
+import LoginView from "@/components/auth/login-view";
 
 export const metadata: Metadata = {
   title: "Sign In | CliniCare Practice Management",

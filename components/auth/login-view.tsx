@@ -29,7 +29,7 @@ export default function LoginView() {
     } catch (err: unknown) {
       console.error("Sign-in failed:", err);
       setLoadingProvider(null);
-      setErrorMessage("Authentication failed. Please verify provider connectivity and try again.");
+      setErrorMessage("Authentication failed. Please check your connection and try again.");
     }
   };
 
